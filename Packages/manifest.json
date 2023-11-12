@@ -4,7 +4,6 @@
     "com.unity.feature.development": "1.0.1",
     "com.unity.inputsystem": "1.6.3",
     "com.unity.nuget.mono-cecil": "1.10.2",
-    "com.unity.springbone": "https://github.com/unity3d-jp/UnityChanSpringBone.git",
     "com.unity.textmeshpro": "3.0.6",
     "com.unity.timeline": "1.7.4",
     "com.unity.ugui": "1.0.0",
