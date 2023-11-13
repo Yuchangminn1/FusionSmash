@@ -51,6 +51,12 @@ public class CharacterMovementHandler : NetworkBehaviour
     {
 
     }
+
+    private void FixedUpdate()
+    {
+        
+    }
+
     void OnMove(InputValue value)
     {
         Vector2 dir = value.Get<Vector2>();

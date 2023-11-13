@@ -14,6 +14,7 @@ public class MoveState : PlayerState
     public override void Enter()
     {
         base.Enter();
+        Debug.Log("Move Enter");
         player.jumpCount = 0;
         player.dodgeCount = 0f;
     }

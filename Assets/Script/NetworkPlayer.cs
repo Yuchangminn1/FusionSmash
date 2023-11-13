@@ -16,14 +16,22 @@ public class NetworkPlayer : NetworkBehaviour,IPlayerLeft
     [Networked(OnChanged = nameof(OnNickNameChanged))]
     public NetworkString<_16> nickName { get; set; }
 
-
+    ChatSystem chatSystem;
 
     //특정 부분 안보이게
     //public Transform playerModel;
 
     // Start is called before the first frame update
+
+    private void Awake()
+    {
+        chatSystem = GetComponent<ChatSystem>();
+    }
+
     void Start()
     {
+
+        
     }
 
     public override void Spawned()
@@ -84,7 +92,11 @@ public class NetworkPlayer : NetworkBehaviour,IPlayerLeft
     {
         Debug.Log($"Nickname chaged for player to {nickName} for player {gameObject.name}");
 
+
+
         playerNickNameTM.text = nickName.ToString();
+        chatSystem.myName = nickName.ToString();
+
     }
 
     [Rpc(RpcSources.InputAuthority,RpcTargets.StateAuthority)]

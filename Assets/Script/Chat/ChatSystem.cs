@@ -14,7 +14,6 @@ public class ChatSystem : NetworkBehaviour
     private InputAction sumit;
     
 
-
     [Networked(OnChanged = nameof(OnChangeChatLog))]
     public NetworkString<_16> myChat { get; set; }
 
@@ -55,7 +54,7 @@ public class ChatSystem : NetworkBehaviour
         playerControls = new PlayerInputAction();
         chatLog = GameObject.FindWithTag("ChatDisplay").GetComponentInChildren<TMP_Text>();
         scrollV = GameObject.FindWithTag("ScrollV").GetComponent<Scrollbar>();
-        myNameText = GameObject.FindWithTag("Nickname").GetComponentInChildren<TMP_Text>();
+        //myNameText = GameObject.FindWithTag("Nickname").GetComponentInChildren<TMP_Text>();
 
     }
     public void Start()
@@ -69,7 +68,6 @@ public class ChatSystem : NetworkBehaviour
         }
         Debug.Log("chatLog = " + chatLog);
 
-        myName = myNameText.text;
 
         //sendPlayer = PlayerPrefs.GetString("PlayerNickname");
     }
@@ -190,7 +188,7 @@ public class ChatSystem : NetworkBehaviour
             chatLog = GameObject.FindWithTag("ChatDisplay").GetComponent<TMP_Text>();
         }
 
-        chatLog.text += $"{sendName} : {myChat}";
+        chatLog.text += $"\n {sendName} : {myChat}";
         myChat = "";
         scrollV.value = 0;
 

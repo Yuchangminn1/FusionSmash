@@ -27,7 +27,8 @@ public class PlayerState : EntityState
     {
         base.Enter();
         startTime = Time.time;
-        player.SetInt("State", currentStateNum);
+        player.SetState(currentStateNum);
+        //player.SetInt("State", currentStateNum);
         if (currentStateNum != 0) { player.animationTrigger = true; }
     }
     public override void Update()
@@ -71,6 +72,7 @@ public class PlayerState : EntityState
     public override void FixedUpdate()
     {
         base.FixedUpdate();
+        Debug.Log($"currentStateNum = {currentStateNum}");
     }
 
     public override void Exit()

@@ -5,6 +5,15 @@ using UnityEngine;
 
 public class PlayerStateHandler : NetworkBehaviour
 {
+    [Networked(OnChanged = nameof(OnSetStateChanged))]
+    public int state { get; set; }
+
+    [Networked(OnChanged = nameof(OnSetState2Changed))]
+    public int state2 { get; set; }
+
+    public NetworkString<_16> nickName { get; set; }
+
+
     public float dodgeCount = 0f;
 
     public int jumpCount = 0;
@@ -79,7 +88,11 @@ public class PlayerStateHandler : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        stateMachine.Update();
+    }
+    void FixedUpdate()
+    {
+        stateMachine.FixedUpdate();
     }
     private void LateUpdate()
     {
@@ -100,10 +113,24 @@ public class PlayerStateHandler : NetworkBehaviour
     public void SetFloat(string _parameters, float value) => anima.SetFloat(_parameters, value);
     public void ZeroHorizontal() => anima.SetFloat("Horizontal", 0f);
     public void AnimaPlay(string _name) => anima.Play(_name);
+    public void SetState(int _num)
+    {
+        state = _num;
+        SetInt("State", state);
+    }
     public void SetState2(int _num)
     {
-        //stateNum2 = _num;
-        SetInt("State2", _num);
+        state2 = _num;
+        SetInt("State2", state2);
+    }
+
+    static void OnSetState2Changed(Changed<PlayerStateHandler> changed)
+    {
+        changed.Behaviour.SetState2(changed.Behaviour.state2);
+    }
+    static void OnSetStateChanged(Changed<PlayerStateHandler> changed)
+    {
+        changed.Behaviour.SetState(changed.Behaviour.state);
     }
     public void StateChange(EntityState _newState)
     {

@@ -49,6 +49,7 @@ public class LocalCameraHandler : MonoBehaviour
 
         cameraRotationY += viewInput.x * Time.deltaTime * networkCharacterControllerPrototypeCustom.rotationSpeed;
 
+
         localCamera.transform.rotation = Quaternion.Euler(cameraRotationX, cameraRotationY, 0);
     }
 

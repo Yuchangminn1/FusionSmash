@@ -11,7 +11,7 @@ public class NetworkCharacterControllerPrototypeCustom : NetworkTransform
 {
     //>> NetworkTransform  이란 게임오브젝트위 트랜스폼을 다른 모든 피어로 복제하여 ? 
     // 동기화하는 것  이 게임오브젝트의 부모에는 networkObject가 필요하다는데 ?
-
+    //야를 플레이어 컨트롤러 대용으로 써봅시다 
     [Header("Character Controller Settings")]
     public float gravity = -20.0f;
     public float jumpImpulse = 8.0f;
