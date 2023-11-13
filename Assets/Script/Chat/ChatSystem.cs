@@ -21,7 +21,7 @@ public class ChatSystem : NetworkBehaviour
     [Networked(OnChanged = nameof(OnChangeChatLog))]
     public string sendName { get; set; }
 
-    public TMP_Text sendPlayer;
+    public TMP_Text myNameText;
 
     public string myName;
 
@@ -53,6 +53,9 @@ public class ChatSystem : NetworkBehaviour
     {
         //이걸 어웨이크에서 안하면 null이라 오류남 
         playerControls = new PlayerInputAction();
+        chatLog = GameObject.FindWithTag("ChatDisplay").GetComponentInChildren<TMP_Text>();
+        scrollV = GameObject.FindWithTag("ScrollV").GetComponent<Scrollbar>();
+        myNameText = GameObject.FindWithTag("Nickname").GetComponentInChildren<TMP_Text>();
 
     }
     public void Start()
@@ -64,12 +67,9 @@ public class ChatSystem : NetworkBehaviour
         {
             mainInputField.enabled = true;
         }
-        chatLog = GameObject.FindWithTag("ChatDisplay").GetComponentInChildren<TMP_Text>();
         Debug.Log("chatLog = " + chatLog);
-        scrollV = GameObject.FindWithTag("ScrollV").GetComponent<Scrollbar>();
 
-        myName = sendPlayer.text;
-        sendName = myName;
+        myName = myNameText.text;
 
         //sendPlayer = PlayerPrefs.GetString("PlayerNickname");
     }
@@ -127,8 +127,7 @@ public class ChatSystem : NetworkBehaviour
                 Debug.Log(mainInputField.text.Length);
                 myChat = mainInputField.text;
                 chatLog.text += $"\n {myName} : {myChat}";
-
-                RPC_SetChat(myChat.ToString(), sendName);
+                RPC_SetChat(myChat.ToString(), myName);
                 Debug.Log($"Send MyChat = {myChat}");
                 mainInputField.text = "";
 
@@ -200,6 +199,7 @@ public class ChatSystem : NetworkBehaviour
     [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
     public void RPC_SetChat(string mychat, string _sendName, RpcInfo info = default)
     {
+
         sendName = _sendName;
         Debug.Log($"[RPC] SetNickname : {mychat}");
         this.myChat = mychat;
