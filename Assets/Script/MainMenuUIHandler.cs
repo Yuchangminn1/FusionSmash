@@ -19,12 +19,18 @@ public class MainMenuUIHandler : NetworkBehaviour
     }
 
 
-    public void OnJoinGameCliked()
+    public void OnJoinGameClikedWorld1()
     {
         PlayerPrefs.SetString("PlayerNickname", inputField.text);
         PlayerPrefs.Save();
 
         SceneManager.LoadScene("World1");
     }
+    public void OnJoinGameClikedISO()
+    {
+        PlayerPrefs.SetString("PlayerNickname", inputField.text);
+        PlayerPrefs.Save();
 
+        SceneManager.LoadScene("MyS");
+    }
 }

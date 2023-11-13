@@ -52,7 +52,7 @@ public class CharacterInputhandler : MonoBehaviour
             return;
         lookVec = Vector2.Lerp(lookVec, look.ReadValue<Vector2>(), 0.2f);
 
-        Debug.Log($"lookVec  = " + lookVec);
+       // Debug.Log($"lookVec  = " + lookVec);
         //View input camera 
         //viewInputVector.x = Input.GetAxis("Mouse X");
         //viewInputVector.y = Input.GetAxis("Mouse Y") * -1; //Invert the mouse look

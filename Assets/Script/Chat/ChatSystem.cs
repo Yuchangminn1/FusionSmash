@@ -64,11 +64,12 @@ public class ChatSystem : NetworkBehaviour
         {
             mainInputField.enabled = true;
         }
-        chatLog = GameObject.FindWithTag("ChatDisplay").GetComponent<TMP_Text>();
+        chatLog = GameObject.FindWithTag("ChatDisplay").GetComponentInChildren<TMP_Text>();
         Debug.Log("chatLog = " + chatLog);
         scrollV = GameObject.FindWithTag("ScrollV").GetComponent<Scrollbar>();
 
-
+        myName = sendPlayer.text;
+        sendName = myName;
 
         //sendPlayer = PlayerPrefs.GetString("PlayerNickname");
     }
@@ -104,8 +105,7 @@ public class ChatSystem : NetworkBehaviour
     }
     private void FixedUpdate()
     {
-        myName = sendPlayer.text;
-        sendName = myName;
+        
         if (chatDown)
         {
             Debug.Log("chatDown");
@@ -114,6 +114,8 @@ public class ChatSystem : NetworkBehaviour
             Debug.Log("Enter로  Summit 실행");
             chatDown = false;
         }
+        scrollV.value = 0;
+
     }
     public void Summit()
     {
@@ -122,12 +124,14 @@ public class ChatSystem : NetworkBehaviour
         {
             if (mainInputField.text != "" && mainInputField.text != " ")
             {
+                Debug.Log(mainInputField.text.Length);
                 myChat = mainInputField.text;
-                chatLog.text += $"\n {myName} : " + myChat;
+                chatLog.text += $"\n {myName} : {myChat}";
 
                 RPC_SetChat(myChat.ToString(), sendName);
                 Debug.Log($"Send MyChat = {myChat}");
                 mainInputField.text = "";
+
             }
             mainInputField.interactable = false;
 
@@ -170,6 +174,14 @@ public class ChatSystem : NetworkBehaviour
 
     public void PushMessage()
     {
+        string nullcheck = null;
+        foreach (var chatSystem in myChat)
+        {
+            nullcheck += chatSystem;
+
+            Debug.Log($"이거{chatSystem}이거");
+        }
+        //Debug.Log($"PushMessage myChat = {myChat[0]+ myChat[0]+ myChat[0]+ myChat[4]}");
         if (Object.HasInputAuthority)
         {
             return;
@@ -179,9 +191,10 @@ public class ChatSystem : NetworkBehaviour
             chatLog = GameObject.FindWithTag("ChatDisplay").GetComponent<TMP_Text>();
         }
 
-        chatLog.text += $"\n {sendName} : {myChat}";
-
+        chatLog.text += $"{sendName} : {myChat}";
         myChat = "";
+        scrollV.value = 0;
+
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
