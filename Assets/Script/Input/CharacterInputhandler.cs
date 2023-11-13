@@ -144,6 +144,7 @@ public class CharacterInputhandler : MonoBehaviour
 
         jump.performed += Jump;
         fire.performed += Fire;
+
     }
     private void OnDisable()
     {

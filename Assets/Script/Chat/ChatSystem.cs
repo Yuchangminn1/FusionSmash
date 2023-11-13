@@ -11,8 +11,8 @@ public class ChatSystem : NetworkBehaviour
 {
     //New Input System;
     public PlayerInputAction playerControls;
-    private InputAction chat;
-
+    private InputAction sumit;
+    
 
 
     [Networked(OnChanged = nameof(OnChangeChatLog))]
@@ -100,16 +100,7 @@ public class ChatSystem : NetworkBehaviour
     }
     private void Update()
     {
-        //if (Object.HasInputAuthority)
-        //{
-        //if (Input.GetButtonDown("Submit"))
-        //{
-        //    chatDown = true;
-        //}
 
-
-
-        //}
     }
     private void FixedUpdate()
     {
@@ -204,16 +195,16 @@ public class ChatSystem : NetworkBehaviour
     private void OnEnable()
     {
         Debug.Log("chatDown change true ");
-        chat = playerControls.Player.Chat;
-        chat.Enable();
+        sumit = playerControls.Player.Sumit;
+        sumit.Enable();
 
-        chat.performed += Chat;
+        sumit.performed += Sumit;
     }
     private void OnDisable()
     {
-        chat.Disable();
+        sumit.Disable();
     }
-    private void Chat(InputAction.CallbackContext context)
+    private void Sumit(InputAction.CallbackContext context)
     {
         Debug.Log("chatDown change true ");
         chatDown = true;

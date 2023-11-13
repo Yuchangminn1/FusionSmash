@@ -28,6 +28,7 @@ public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
         if (runner.IsServer) //연결되어있으면
         {
             runner.Spawn(playerPrefab, Utils.GetRandomSpawnPoint(), Quaternion.identity, player);
+
             //생성해
         }
         

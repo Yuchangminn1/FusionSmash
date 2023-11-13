@@ -42,7 +42,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Chat",
+                    "name": "Sumit",
                     "type": "Button",
                     "id": "3aee00e1-4821-4347-b45d-015514891d97",
                     "expectedControlType": "Button",
@@ -301,7 +301,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
-                    "action": "Chat",
+                    "action": "Sumit",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -9,7 +9,7 @@ public class NewInputTest : MonoBehaviour
     private InputAction move;
     private InputAction jump;
     private InputAction fire;
-    private InputAction chat;
+   // private InputAction chat;
     private InputAction look;
 
 
@@ -36,14 +36,14 @@ public class NewInputTest : MonoBehaviour
         fire = playerControls.Player.Fire;
         fire.Enable();
 
-        chat = playerControls.Player.Chat;
-        chat.Enable();
+        //chat = playerControls.Player.Chat;
+        //chat.Enable();
 
 
         
         jump.performed += Jump;
         fire.performed += Fire;
-        chat.performed += Chat;
+     //   chat.performed += Chat;
     }
     private void OnDisable()
     {
