@@ -93,10 +93,10 @@ public class NetworkPlayer : NetworkBehaviour,IPlayerLeft
         Debug.Log($"[RPC] SetNickname : {nickName}");
         this.nickName = nickName;
     }
-    //[Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority)]
-    //public void RPC_SetNickNameTOIn(string nickName, RpcInfo info = default)
-    //{
-    //    Debug.Log($"[RPC] SetNickname : {nickName}");
-    //    this.nickName = nickName;
-    //}
+    [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority)]
+    public void RPC_SetNickNameTOIn(string nickName, RpcInfo info = default)
+    {
+        Debug.Log($"[RPC] SetNickname : {nickName}");
+        this.nickName = nickName;
+    }
 }
