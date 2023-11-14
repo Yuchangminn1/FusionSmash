@@ -15,8 +15,11 @@ public class MoveState : PlayerState
     {
         base.Enter();
         Debug.Log("Move Enter");
-        player.jumpCount = 0;
-        player.dodgeCount = 0f;
+        if (player.IsGround())
+        {
+            player.jumpCount = 0;
+            player.dodgeCount = 0f;
+        }
     }
 
     public override void Update()
