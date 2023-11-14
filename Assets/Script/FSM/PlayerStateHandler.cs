@@ -78,32 +78,21 @@ public class PlayerStateHandler : NetworkBehaviour
         deathState = new DeathState(this, 7);
         healState = new HealState(this, 8);
         #endregion
-        if (Object.HasInputAuthority)
-        {
-            stateMachine.ChangeState(moveState);
-        }
+        stateMachine.ChangeState(moveState);
     }
     public void ChangeState(PlayerState state)
     {
-        if (Object.HasInputAuthority)
-        {
-            stateMachine.ChangeState(state);
-        }
+        stateMachine.ChangeState(state);
+
     }
     // Update is called once per frame
     void Update()
     {
-        if (Object.HasInputAuthority)
-        {
-            stateMachine.Update();
-        }
+        stateMachine.Update();
     }
     void FixedUpdate()
     {
-        if (Object.HasInputAuthority)
-        {
-            stateMachine.FixedUpdate();
-        }
+        stateMachine.FixedUpdate();
     }
     private void LateUpdate()
     {
@@ -128,14 +117,11 @@ public class PlayerStateHandler : NetworkBehaviour
     {
         state = _num;
         SetInt("State", state);
-        RPC_SetState(state);
     }
     public void SetState2(int _num)
     {
         state2 = _num;
         SetInt("State2", state2);
-        RPC_SetState2(state2);
-
     }
 
     static void OnSetState2Changed(Changed<PlayerStateHandler> changed)
@@ -151,16 +137,4 @@ public class PlayerStateHandler : NetworkBehaviour
         stateMachine.ChangeState(_newState);
     }
     #endregion
-
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    public void RPC_SetState(int _state, RpcInfo info = default)
-    {
-        this.state = _state;
-    }
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    public void RPC_SetState2(int _state2, RpcInfo info = default)
-    {
-
-        this.state2 = _state2;
-    }
 }
