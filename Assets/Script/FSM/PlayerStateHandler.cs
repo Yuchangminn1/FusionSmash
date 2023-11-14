@@ -80,21 +80,32 @@ public class PlayerStateHandler : NetworkBehaviour
         deathState = new DeathState(this, 7);
         healState = new HealState(this, 8);
         #endregion
-        stateMachine.ChangeState(moveState);
+        if (Object.HasInputAuthority)
+        {
+            stateMachine.ChangeState(moveState);
+        }
     }
     public void ChangeState(PlayerState state)
     {
-        stateMachine.ChangeState(state);
-
+        if (Object.HasInputAuthority)
+        {
+            stateMachine.ChangeState(state);
+        }
     }
     // Update is called once per frame
     void Update()
     {
-        stateMachine.Update();
+        if (Object.HasInputAuthority)
+        {
+            stateMachine.Update();
+        }
     }
     void FixedUpdate()
     {
-        stateMachine.FixedUpdate();
+        if (Object.HasInputAuthority)
+        {
+            stateMachine.FixedUpdate();
+        }
     }
     private void LateUpdate()
     {
