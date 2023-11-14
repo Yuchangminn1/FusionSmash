@@ -30,7 +30,6 @@ public class NetworkCharacterControllerPrototypeCustom : NetworkTransform
     public Vector3 Velocity { get; set; }
 
 
-    PlayerStateHandler stateHandler;
 
     /// <summary>
     /// Sets the default teleport interpolation velocity to be the CC's current velocity.
@@ -65,7 +64,6 @@ public class NetworkCharacterControllerPrototypeCustom : NetworkTransform
             Controller = GetComponent<CharacterController>();
 
             Assert.Check(Controller != null, $"An object with {nameof(NetworkCharacterControllerPrototype)} must also have a {nameof(CharacterController)} component.");
-            stateHandler = GetComponent<PlayerStateHandler>();
         }
     }
 
@@ -88,16 +86,12 @@ public class NetworkCharacterControllerPrototypeCustom : NetworkTransform
     /// </summary>
     public virtual void Jump(bool ignoreGrounded = false, float? overrideImpulse = null)
     {
-        if (stateHandler.jumpCount<2 && !stateHandler.isJumping)
+        if (IsGrounded || ignoreGrounded)
         {
-            stateHandler.ChangeState(stateHandler.jumpState);
             var newVel = Velocity;
-            newVel.y = 0f;
             newVel.y += overrideImpulse ?? jumpImpulse;
             Velocity = newVel;
-
         }
-
     }
 
     /// <summary>

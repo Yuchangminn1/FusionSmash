@@ -17,10 +17,10 @@ public class JumpState : PlayerState
     public override void Enter()
     {
         base.Enter();
-        player.isJumping = true;
-        if (player.jumpCount <2) 
+        if(player.jumpCount < 2) 
         {
             player.SetState2(player.jumpCount);
+            ++player.jumpCount;
             return;
         }
         if (!player.IsGround() )
@@ -43,6 +43,7 @@ public class JumpState : PlayerState
         if (Input.GetKeyDown(KeyCode.Space) && (player.jumpCount < 2))
         {
             player.SetState2(player.jumpCount);
+            ++player.jumpCount;
             Debug.Log("DoubleJump");
             return;
         }
@@ -67,11 +68,7 @@ public class JumpState : PlayerState
     public override void Exit()
     {
         base.Exit();
-        ++player.jumpCount;
-        player.isJumping = false;
-
-
     }
 
-
+    
 }

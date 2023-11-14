@@ -28,8 +28,6 @@ public class PlayerState : EntityState
         base.Enter();
         startTime = Time.time;
         player.SetState(currentStateNum);
-        player.SetState2(0);
-
         //player.SetInt("State", currentStateNum);
         if (currentStateNum != 0) { player.animationTrigger = true; }
     }

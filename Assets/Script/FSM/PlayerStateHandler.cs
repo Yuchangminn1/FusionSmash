@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class PlayerStateHandler : NetworkBehaviour
 {
-    public NetworkCharacterControllerPrototypeCustom networkCC;
     [Networked(OnChanged = nameof(OnSetStateChanged))]
     public int state { get; set; }
 
@@ -22,7 +21,6 @@ public class PlayerStateHandler : NetworkBehaviour
     public bool isdead = false;
 
     public bool isStop = false;
-    public bool isJumping = false;
 
     //체력회복 
     public bool isHeal = false;
