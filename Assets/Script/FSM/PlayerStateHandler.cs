@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class PlayerStateHandler : NetworkBehaviour
 {
-    public NetworkCharacterControllerPrototypeCustom networkCC;
+ //   public NetworkCharacterControllerPrototypeCustom networkCC;
     [Networked(OnChanged = nameof(OnSetStateChanged))]
     public int state { get; set; }
 

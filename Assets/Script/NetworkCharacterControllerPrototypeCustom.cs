@@ -90,7 +90,6 @@ public class NetworkCharacterControllerPrototypeCustom : NetworkTransform
     {
         if (stateHandler.jumpCount<2 && !stateHandler.isJumping)
         {
-            stateHandler.ChangeState(stateHandler.jumpState);
             var newVel = Velocity;
             newVel.y = 0f;
             newVel.y += overrideImpulse ?? jumpImpulse;

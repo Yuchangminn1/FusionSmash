@@ -1,8 +1,10 @@
+using Fusion;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerAnimationTrigger : MonoBehaviour
+public class PlayerAnimationTrigger : NetworkBehaviour
 {
     PlayerStateHandler player;
     Animator animator;
@@ -21,7 +23,10 @@ public class PlayerAnimationTrigger : MonoBehaviour
 
     void AnimationTrigger()
     {
-        player.animationTrigger = false;
+        if (Object.HasInputAuthority)
+        {
+            player.animationTrigger = false;
+        }
     }
 
 }

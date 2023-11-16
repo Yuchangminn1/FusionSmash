@@ -930,6 +930,7 @@ MonoBehaviour:
   - {fileID: 4151183343878407558}
   - {fileID: 6938089165380881423}
   - {fileID: -5338822107721316203}
+  - {fileID: -4192808931933286514}
   SimulationBehaviours: []
 --- !u!114 &6537298461557146503
 MonoBehaviour:
@@ -1161,6 +1162,7 @@ MonoBehaviour:
   jumpCount: 0
   isdead: 0
   isStop: 0
+  isJumping: 0
   isHeal: 0
   fHpHeal: 40
   healNum: 0
@@ -1183,6 +1185,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1867ea4fadc9a3e41a6a35efcd2ac9a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
 --- !u!1 &1443194376284472811
 GameObject:
   m_ObjectHideFlags: 0
