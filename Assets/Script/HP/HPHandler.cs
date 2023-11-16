@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class HPHandler : NetworkBehaviour
 {
-
+    
     int MaxHp { get; set; }
 
     [Networked(OnChanged = nameof(OnHPChanged))]
