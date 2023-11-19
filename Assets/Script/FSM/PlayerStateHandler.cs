@@ -1,11 +1,11 @@
 using Fusion;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerStateHandler : NetworkBehaviour
 {
- //   public NetworkCharacterControllerPrototypeCustom networkCC;
     [Networked(OnChanged = nameof(OnSetStateChanged))]
     public int state { get; set; }
 
@@ -54,6 +54,11 @@ public class PlayerStateHandler : NetworkBehaviour
     public DeathState deathState { get; private set; }
     public HealState healState { get; private set; }
 
+    NetworkCharacterControllerPrototypeCustom networkCC;
+
+    public bool isJumpButtonPressed = false;
+
+    Vector3 inputVec3;
 
     #endregion
     void Awake()
@@ -67,7 +72,7 @@ public class PlayerStateHandler : NetworkBehaviour
     {
         anima = transform.GetComponent<Animator>();
         cc = transform.GetComponent<CharacterController>();
-
+        networkCC = GetComponent<NetworkCharacterControllerPrototypeCustom>();
 
         #region FSM_Initialize
         moveState = new MoveState(this, 0);
@@ -105,16 +110,25 @@ public class PlayerStateHandler : NetworkBehaviour
         if (Object.HasInputAuthority)
         {
             stateMachine.FixedUpdate();
+            isJumpButtonPressed = false;
         }
     }
+
+
     private void LateUpdate()
     {
-        Vector3 tmp = cc.velocity;
-        tmp = tmp.normalized;
-        SetFloat("InputX", tmp.x);
-        SetFloat("InputZ", tmp.z);
+        
+        SetFloat("InputX", inputVec3.x);
+        SetFloat("InputZ", inputVec3.y);
 
     }
+    public Vector3 SetInputVec(Vector3 vector3)
+    {
+        inputVec3 = vector3;
+        return inputVec3;
+    }
+    
+
 
     public bool IsGround()
     {
@@ -128,18 +142,27 @@ public class PlayerStateHandler : NetworkBehaviour
     public void AnimaPlay(string _name) => anima.Play(_name);
     public void SetState(int _num)
     {
-        state = _num;
-        SetInt("State", state);
+        SetInt("State", _num);
+        //RPC_SetState(_num);
+        if (Object.HasInputAuthority)
+        {
+            RPC_SetState(_num);
+        }
     }
     public void SetState2(int _num)
     {
-        state2 = _num;
-        SetInt("State2", state2);
+        SetInt("State2", _num);
+        //RPC_SetState2(_num);
+        if (Object.HasInputAuthority)
+        {
+            RPC_SetState2(_num);
+        }
     }
 
     static void OnSetState2Changed(Changed<PlayerStateHandler> changed)
     {
         changed.Behaviour.SetState2(changed.Behaviour.state2);
+
     }
     static void OnSetStateChanged(Changed<PlayerStateHandler> changed)
     {
@@ -150,4 +173,18 @@ public class PlayerStateHandler : NetworkBehaviour
         stateMachine.ChangeState(_newState);
     }
     #endregion
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RPC_SetState(int _state, RpcInfo info = default)
+    {
+        Debug.Log($"[RPC] State{state}");
+        state = _state;
+    }
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RPC_SetState2(int _state2, RpcInfo info = default)
+    {
+        Debug.Log($"[RPC] State2 {state2} ");
+        state2 = _state2;
+    }
+
+    
 }

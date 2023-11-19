@@ -13,42 +13,41 @@ public class MoveState : PlayerState
 
     public override void Enter()
     {
-        base.Enter();
-        Debug.Log("Move Enter");
         if (player.IsGround())
         {
             player.jumpCount = 0;
             player.dodgeCount = 0f;
         }
+        base.Enter();
     }
 
-    public override void Update()
+    public override bool Update()
     {
         base.Update();
-        if(Input.GetKeyDown(KeyCode.E)) 
-        {
-            //player.healNum += UIScript.instance.ResetHPHealNumIcon(1);
-            return;
-        }
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            //player.healNum += UIScript.instance.ResetHPHealNumIcon(player.healNumMax);
+        //if(Input.GetKeyDown(KeyCode.E)) 
+        //{
+        //    //player.healNum += UIScript.instance.ResetHPHealNumIcon(1);
+        //    return;
+        //}
+        //if (Input.GetKeyDown(KeyCode.R))
+        //{
+        //    //player.healNum += UIScript.instance.ResetHPHealNumIcon(player.healNumMax);
 
-            return;
-        }
-        if (Input.GetKeyDown(KeyCode.Space))
+        //    return;
+        //}
+        if (player.isJumpButtonPressed)
         {
             player.StateChange(player.jumpState);
-            return;
+            return true;
         }
-        
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            //회복
-            player.StateChange(player.healState);
-            return;
-        }
-        
+
+        //if (Input.GetKeyDown(KeyCode.Q))
+        //{
+        //    //회복
+        //    player.StateChange(player.healState);
+        //    return;
+        //}
+        return false;
     }
 
     public override void Exit()

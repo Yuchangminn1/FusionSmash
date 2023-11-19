@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 
 public class CharacterInputhandler : MonoBehaviour
 {
+    
     //New Input System
     public PlayerInputAction playerControls;
 

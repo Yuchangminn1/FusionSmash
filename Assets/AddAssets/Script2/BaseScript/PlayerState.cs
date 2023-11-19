@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
@@ -33,7 +34,7 @@ public class PlayerState : EntityState
         //player.SetInt("State", currentStateNum);
         if (currentStateNum != 0) { player.animationTrigger = true; }
     }
-    public override void Update()
+    public override bool Update()
     {
         base.Update();
         stateTimer = Time.time;
@@ -42,7 +43,7 @@ public class PlayerState : EntityState
         if(Input.GetKeyDown(KeyCode.X) && isAbleAttack) 
         {
             player.StateChange(player.attackState);
-            return;
+            return true;
         }
         if (!isAbleFly)
         {
@@ -56,7 +57,7 @@ public class PlayerState : EntityState
                 if(Time.time - airTime > 0.25f)
                 {
                     player.StateChange(player.fallState);
-                    return;
+                    return true;
                 }
             }
             else
@@ -67,9 +68,9 @@ public class PlayerState : EntityState
         if (Input.GetKeyDown(KeyCode.C) && isAbleDodge)
         {
             player.StateChange(player.attackState);
-            return;
+            return true;
         }
-        BaseState();
+        return BaseState();
     }
     public override void FixedUpdate()
     {
@@ -84,7 +85,7 @@ public class PlayerState : EntityState
     
 
     
-    protected void BaseState()
+    protected bool BaseState()
     {
         
         if (!player.animationTrigger && endMotionChange)
@@ -92,12 +93,17 @@ public class PlayerState : EntityState
             if (player.IsGround()) 
             {
                 player.StateChange(player.moveState);
+                return true;
             }
             else
             {
                 player.StateChange(player.fallState);
+                return true;
+
             }
         }
+        return false;
+
     }
 
 

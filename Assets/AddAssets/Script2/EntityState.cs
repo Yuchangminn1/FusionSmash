@@ -17,9 +17,11 @@ public class EntityState
     {
         startTime = Time.time;
     }
-    public virtual void Update()
+    public virtual bool Update()
     {
         stateTimer = Time.time;
+        return false;
+
     }
     public virtual void FixedUpdate()
     {

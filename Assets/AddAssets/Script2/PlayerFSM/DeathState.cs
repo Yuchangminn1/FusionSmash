@@ -17,7 +17,7 @@ public class DeathState : PlayerState
     {
         base.Enter();
     }
-    public override void Update()
+    public override bool Update()
     {
        // base.Update();
         if (!player.animationTrigger)
@@ -27,6 +27,7 @@ public class DeathState : PlayerState
             //Á×À½ UI
             //ÀÌÆåÆ®  ¹¹ µîµî 
         }
+        return false;
     }
     
 

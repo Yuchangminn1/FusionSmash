@@ -22,18 +22,20 @@ public class HitState : PlayerState
     }
 
 
-    public override void Update()
+    public override bool Update()
     {
-        base.Update();
+        if (base.Update())
+            return true;
         if(!player.animationTrigger)
         {
             if (player.isdead)
             {
                 player.StateChange(player.deathState);
-                return;
+                return true;
             }
             player.StateChange(player.moveState);
         }
+        return false;
     }
     public override void FixedUpdate()
     {

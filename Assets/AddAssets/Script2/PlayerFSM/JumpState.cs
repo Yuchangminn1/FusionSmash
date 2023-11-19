@@ -16,11 +16,15 @@ public class JumpState : PlayerState
 
     public override void Enter()
     {
+
+        player.isJumpButtonPressed = false;
+
         base.Enter();
-        player.isJumping = true;
         if (player.jumpCount <2) 
         {
+            player.isJumping = true;
             player.SetState2(player.jumpCount);
+            
             return;
         }
         if (!player.IsGround() )
@@ -30,33 +34,40 @@ public class JumpState : PlayerState
         }
         
     }
-    public override void Update()
+    public override bool Update()
     {
-        base.Update();
+        if (base.Update())
+            return true;
 
         if (Input.GetKeyDown(KeyCode.C) && player.dodgeCount == 0f)
         {
             player.animationTrigger = false;
             player.StateChange(player.dodgeState);
-            return;
+            return true;
         }
         if (Input.GetKeyDown(KeyCode.Space) && (player.jumpCount < 2))
         {
             player.SetState2(player.jumpCount);
             Debug.Log("DoubleJump");
-            return;
+            return true;
+
         }
         if (!player.animationTrigger)
         {
             if (player.IsGround())
             {
                 player.StateChange(player.moveState);
+                return true;
+
             }
             else
             {
                 player.StateChange(player.fallState);
+                return true;
+
             }
         }
+        return false;
 
 
     }

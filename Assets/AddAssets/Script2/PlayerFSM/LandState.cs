@@ -22,15 +22,16 @@ public class LandState : PlayerState
         //player.ZeroVelocityX();
 
     }
-    public override void Update()
+    public override bool Update()
     {
-        base.Update();
+        if (base.Update())
+            return true;
         if (!player.animationTrigger)
         {
             player.StateChange(player.moveState);
-            return;
+            return true;
         }
-        
+        return false;
         
     }
     public override void Exit()

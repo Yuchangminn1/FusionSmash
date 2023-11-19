@@ -7,7 +7,7 @@ public class AttackState : PlayerState
 {
     int counter;
     Queue<bool> Combo;
-    
+
     public AttackState(PlayerStateHandler _player, int _currentStateNum) : base(_player, _currentStateNum)
     {
         player = _player;
@@ -26,16 +26,19 @@ public class AttackState : PlayerState
         player.SetInt("Counter", counter);
         //player.Spawn(counter);
     }
-    
 
-    public override void Update()
+
+    public override bool Update()
     {
         if (Input.GetKeyDown(KeyCode.X))
         {
             Combo.Enqueue(true);
             Debug.Log("ÄÞº¸ Ãß°¡");
         }
-        base.Update();
+        if (base.Update())
+        {
+            return true;
+        }
         //player.ZeroVelocity();
         if (!player.animationTrigger)
         {
@@ -46,6 +49,7 @@ public class AttackState : PlayerState
                 player.SetInt("Counter", counter);
                 //player.Spawn(counter);
                 Debug.Log("counter = " + counter);
+                return true;
 
             }
             else
@@ -55,9 +59,14 @@ public class AttackState : PlayerState
                     player.StateChange(player.moveState);
                 else
                     player.StateChange(player.fallState);
+
+                return true;
+
             }
-            
+
         }
+        return false;
+
     }
 
     public override void FixedUpdate()

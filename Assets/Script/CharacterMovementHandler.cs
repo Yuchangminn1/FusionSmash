@@ -11,6 +11,10 @@ using UnityEngine.EventSystems;
 
 public class CharacterMovementHandler : NetworkBehaviour
 {
+
+    //인풋 전달
+    PlayerStateHandler playerStateHandler;
+
     PlayerInput input;
     Vector3 moveDirection;
     //InputAction moveAction;
@@ -39,6 +43,7 @@ public class CharacterMovementHandler : NetworkBehaviour
         hpHandler = GetComponent<HPHandler>();
         networkCharacterControllerPrototypeCustom = GetComponent<NetworkCharacterControllerPrototypeCustom>();
         localCamera = GetComponentInChildren<Camera>();
+        playerStateHandler = GetComponent<PlayerStateHandler>();
     }
     // Start is called before the first frame update
     void Start()
@@ -60,12 +65,14 @@ public class CharacterMovementHandler : NetworkBehaviour
     void OnMove(InputValue value)
     {
         Vector2 dir = value.Get<Vector2>();
-        if(input != null)
+        if (input != null)
         {
             moveDirection = new Vector3(dir.x, 0f, dir.y);
+
             Debug.Log("New INput System Value = " + moveDirection);
 
         }
+        
     }
 
     //그냥 update 는 로컬로만 움직임 
@@ -88,9 +95,8 @@ public class CharacterMovementHandler : NetworkBehaviour
         
 
 
-
         //Don't update the clients position when they ard dead
-        
+
 
         //플레이어 이동 
         //get the input form the network
@@ -124,14 +130,18 @@ public class CharacterMovementHandler : NetworkBehaviour
 
             Vector3 moveDirection = transform.forward * networkInputData.movementInput.y + transform.right * networkInputData.movementInput.x;
             moveDirection.Normalize();
-
+            playerStateHandler.SetInputVec(networkInputData.movementInput);
+            Debug.Log($"networkInputData.movementInput = {networkInputData.movementInput}");
             networkCharacterControllerPrototypeCustom.Move(moveDirection);
 
             //Debug.Log("moveDirection = " + moveDirection);
             //Jump 
             if (networkInputData.isJumpButtonPressed)
             {
-                networkCharacterControllerPrototypeCustom.Jump();
+                //여기다가 든 networkcharactercontroller뭐시기 든 
+                //점프 카운트 같은 조건 추가하고 isground일때 조건 초기화 해 주는 식으로 해보지뭐 
+                if(playerStateHandler.jumpCount<=2)
+                    networkCharacterControllerPrototypeCustom.Jump();
             }
             //if (networkInputData.isFireButtonPressed)
             //{

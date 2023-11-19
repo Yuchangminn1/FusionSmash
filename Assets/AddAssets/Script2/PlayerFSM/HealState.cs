@@ -26,15 +26,19 @@ public class HealState : PlayerState
         player.isStop = true;
         //player.ZeroVelocity();
     }
-    public override void Update()
+    public override bool Update()
     {
-        base.Update();
+        if (base.Update())
+        {
+            return true;
+        }
         if (!player.animationTrigger)
         {
             ReCoverHP();
             player.StateChange(player.moveState);
-            return;
+            return true;
         }
+        return false;
     }
     
     public override void FixedUpdate()

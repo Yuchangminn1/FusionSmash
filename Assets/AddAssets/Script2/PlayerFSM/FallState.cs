@@ -18,26 +18,29 @@ public class FallState : PlayerState
     public override void Enter()
     {
         base.Enter();
+
         startTime = Time.time;
         //Debug.Log("endMotionChange " + endMotionChange);
        // player.gravity = gravityOrigin;
     }
-    public override void Update()
+    public override bool Update()
     {
-        base.Update();
+        if (base.Update())
+            return true;
         if (player.IsGround())
         {
            // Debug.Log("Time = " + (Time.time - startTime));
             if (Time.time - startTime > 1f)
             {
                 player.StateChange(player.landState);
-                return;
+                return true;
             }
             else
             {
                 //Debug.Log("Fall to MoveState IS Ground On");
                 player.StateChange(player.moveState);
-                return;
+                return true;
+
 
             }
         }
@@ -45,14 +48,18 @@ public class FallState : PlayerState
         {
             player.animationTrigger = false;
             player.StateChange(player.dodgeState);
-            return;
+            return true;
+
         }
 
         if (Input.GetKeyDown(KeyCode.Space) && (player.jumpCount < 2))
         {
             player.StateChange(player.jumpState);
-            return;
+            return true;
+
         }
+        return false;
+
     }
 
     public override void FixedUpdate()

@@ -88,14 +88,14 @@ public class NetworkCharacterControllerPrototypeCustom : NetworkTransform
     /// </summary>
     public virtual void Jump(bool ignoreGrounded = false, float? overrideImpulse = null)
     {
-        if (stateHandler.jumpCount<2 && !stateHandler.isJumping)
-        {
-            var newVel = Velocity;
-            newVel.y = 0f;
-            newVel.y += overrideImpulse ?? jumpImpulse;
-            Velocity = newVel;
 
-        }
+        var newVel = Velocity;
+        newVel.y = 0f;
+        newVel.y += jumpImpulse;
+
+        //newVel.y += overrideImpulse ?? jumpImpulse;
+        Velocity = newVel;
+
 
     }
 
@@ -143,7 +143,7 @@ public class NetworkCharacterControllerPrototypeCustom : NetworkTransform
 
 
     }
-    
+
 
     public void Rotate(float rotationY)
     {

@@ -17,17 +17,20 @@ public class DodgeState : PlayerState
     public override void Enter()
     {
         base.Enter();
-        
+
         ++player.dodgeCount;
-        
+
         //if (dodgeDir == null || dodgeDir == Vector3.zero)
         //{
         //    player.StateChange(player.moveState);
         //}
     }
-    public override void Update()
+    public override bool Update()
     {
-        base.Update();
+        if (base.Update())
+            return true;
+
+        return false;
     }
     public override void FixedUpdate()
     {
