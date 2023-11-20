@@ -56,9 +56,13 @@ public class AttackState : PlayerState
             {
                 //player.EndSpawn();
                 if (player.IsGround())
-                    player.StateChange(player.moveState);
+                    player.nextState = player.moveState;
+
+                //player.StateChange(player.moveState);
                 else
-                    player.StateChange(player.fallState);
+                    player.nextState = player.fallState;
+
+                //player.StateChange(player.fallState);
 
                 return true;
 
@@ -73,7 +77,10 @@ public class AttackState : PlayerState
     {
         base.FixedUpdate();
     }
-
+    public override void LateUpdate()
+    {
+        base.LateUpdate();
+    }
     //void Spawn()
     //{
     //    player.Spawn(counter);

@@ -30,10 +30,15 @@ public class HitState : PlayerState
         {
             if (player.isdead)
             {
-                player.StateChange(player.deathState);
+
+                player.nextState = player.deathState;
+
+                //player.StateChange(player.deathState);
                 return true;
             }
-            player.StateChange(player.moveState);
+            player.nextState = player.moveState;
+
+            //player.StateChange(player.moveState);
         }
         return false;
     }
@@ -41,7 +46,10 @@ public class HitState : PlayerState
     {
         base.FixedUpdate();
     }
-
+    public override void LateUpdate()
+    {
+        base.LateUpdate();
+    }
     public override void Exit()
     {
         base.Exit();

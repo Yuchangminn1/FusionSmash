@@ -32,13 +32,17 @@ public class FallState : PlayerState
            // Debug.Log("Time = " + (Time.time - startTime));
             if (Time.time - startTime > 1f)
             {
-                player.StateChange(player.landState);
+                player.nextState = player.landState;
+
+                //player.StateChange(player.landState);
                 return true;
             }
             else
             {
                 //Debug.Log("Fall to MoveState IS Ground On");
-                player.StateChange(player.moveState);
+                player.nextState = player.moveState;
+
+                //player.StateChange(player.moveState);
                 return true;
 
 
@@ -47,14 +51,18 @@ public class FallState : PlayerState
         if ((Input.GetKeyDown(KeyCode.C))  && player.dodgeCount == 0f)
         {
             player.animationTrigger = false;
-            player.StateChange(player.dodgeState);
+            player.nextState = player.dodgeState;
+
+            //player.StateChange(player.dodgeState);
             return true;
 
         }
 
         if (Input.GetKeyDown(KeyCode.Space) && (player.jumpCount < 2))
         {
-            player.StateChange(player.jumpState);
+            player.nextState = player.jumpState;
+
+            //player.StateChange(player.jumpState);
             return true;
 
         }
@@ -70,6 +78,10 @@ public class FallState : PlayerState
         //    player.CCGravity(player.gravity);
         //    player.gravity += 0.1f;
         //}
+    }
+    public override void LateUpdate()
+    {
+        base.LateUpdate();
     }
     public override void Exit()
     {

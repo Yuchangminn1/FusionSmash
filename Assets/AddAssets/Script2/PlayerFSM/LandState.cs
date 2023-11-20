@@ -28,11 +28,18 @@ public class LandState : PlayerState
             return true;
         if (!player.animationTrigger)
         {
-            player.StateChange(player.moveState);
+            player.nextState = player.moveState;
+
+
+            //player.StateChange(player.moveState);
             return true;
         }
         return false;
         
+    }
+    public override void LateUpdate()
+    {
+        base.LateUpdate();
     }
     public override void Exit()
     {

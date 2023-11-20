@@ -23,13 +23,16 @@ public class JumpState : PlayerState
         if (player.jumpCount <2) 
         {
             player.isJumping = true;
+            ++player.jumpCount;
             player.SetState2(player.jumpCount);
-            
+            //++player.characterMovementHandler.jumpcount;
             return;
         }
         if (!player.IsGround() )
         {
-            player.StateChange(player.fallState);
+            player.nextState = player.fallState;
+
+            //player.StateChange(player.fallState);
             return;
         }
         
@@ -41,31 +44,31 @@ public class JumpState : PlayerState
 
         if (Input.GetKeyDown(KeyCode.C) && player.dodgeCount == 0f)
         {
-            player.animationTrigger = false;
-            player.StateChange(player.dodgeState);
+
+            player.nextState = player.dodgeState;
+
+            //player.StateChange(player.dodgeState);
             return true;
         }
-        if (Input.GetKeyDown(KeyCode.Space) && (player.jumpCount < 2))
-        {
-            player.SetState2(player.jumpCount);
-            Debug.Log("DoubleJump");
-            return true;
+        //if (Input.GetKeyDown(KeyCode.Space) && (player.jumpCount < 2))
+        //{
+        //    player.SetState2(player.jumpCount);
+        //    Debug.Log("DoubleJump");
+        //    return true;
 
+        //}
+        if (player.IsGround())
+        {
+            player.nextState = player.moveState;
+
+            //player.StateChange(player.moveState);
+            return true;
         }
         if (!player.animationTrigger)
         {
-            if (player.IsGround())
-            {
-                player.StateChange(player.moveState);
+                player.nextState = player.fallState;
+                //player.StateChange(player.fallState);
                 return true;
-
-            }
-            else
-            {
-                player.StateChange(player.fallState);
-                return true;
-
-            }
         }
         return false;
 
@@ -75,12 +78,14 @@ public class JumpState : PlayerState
     {
         
     }
+    public override void LateUpdate()
+    {
+        base.LateUpdate();
+    }
     public override void Exit()
     {
         base.Exit();
-        ++player.jumpCount;
         player.isJumping = false;
-
 
     }
 

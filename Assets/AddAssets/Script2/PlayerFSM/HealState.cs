@@ -35,7 +35,9 @@ public class HealState : PlayerState
         if (!player.animationTrigger)
         {
             ReCoverHP();
-            player.StateChange(player.moveState);
+            player.nextState = player.moveState;
+
+            //player.StateChange(player.moveState);
             return true;
         }
         return false;
@@ -45,7 +47,10 @@ public class HealState : PlayerState
     {
         base.FixedUpdate();
     }
-
+    public override void LateUpdate()
+    {
+        base.LateUpdate();
+    }
     public override void Exit()
     {
         base.Exit();

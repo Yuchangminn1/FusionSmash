@@ -33,4 +33,11 @@ public class StateMachine
             currentState.FixedUpdate();
         }
     }
+    public void LateUpdate()
+    {
+        if (currentState != null)
+        {
+            currentState.LateUpdate();
+        }
+    }
 }

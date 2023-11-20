@@ -8,6 +8,7 @@ using JetBrains.Annotations;
 using UnityEngine.InputSystem;
 using ExitGames.Client.Photon.StructWrapping;
 using UnityEngine.EventSystems;
+using System;
 
 public class CharacterMovementHandler : NetworkBehaviour
 {
@@ -38,6 +39,10 @@ public class CharacterMovementHandler : NetworkBehaviour
 
     NetworkCharacterControllerPrototypeCustom networkCharacterControllerPrototypeCustom;
     HPHandler hpHandler;
+
+    //[Networked(OnChanged = nameof(jumpcountSet))]
+    //public int jumpcount { get; set; }
+
     void Awake()
     {
         hpHandler = GetComponent<HPHandler>();
@@ -56,10 +61,42 @@ public class CharacterMovementHandler : NetworkBehaviour
     {
 
     }
+    //점프 카운트 왜 0이 되는지 이해가 안감 
+    //static void jumpcountSet(Changed<CharacterMovementHandler> changed)
+    //{
+    //    changed.Behaviour.setJumpcount();
+
+    //    Debug.Log($"chaged jumpcount = {changed.Behaviour.jumpcount}");
+    //}
+    //[Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    //public void RPC_SetJumpCount(int _jumpcount, RpcInfo info = default)
+    //{
+    //    Debug.Log($"jumpcount {_jumpcount} ");
+    //    if (!Object.HasInputAuthority)
+    //    {
+    //       // jumpcount = _jumpcount;
+    //    }
+    //}
+    //public void setJumpcount()
+    //{
+    //    if (Object.HasInputAuthority)
+    //    {
+    //        Debug.Log($"{transform.name}jumpcount = {jumpcount}");
+    //        // RPC_SetJumpCount(jumpcount);
+    //    }
+    //    //if (Object.HasInputAuthority)
+    //    //{
+    //    //    jumpcount = _jumpcount;
+    //    //}
+    //    //if (Object.HasInputAuthority)
+    //    //{
+    //    //    RPC_SetJumpCount(_jumpcount);
+    //    //}
+    //}
 
     private void FixedUpdate()
     {
-        
+
     }
 
     void OnMove(InputValue value)
@@ -72,7 +109,7 @@ public class CharacterMovementHandler : NetworkBehaviour
             Debug.Log("New INput System Value = " + moveDirection);
 
         }
-        
+
     }
 
     //그냥 update 는 로컬로만 움직임 
@@ -92,7 +129,7 @@ public class CharacterMovementHandler : NetworkBehaviour
             if (hpHandler.isDead)
                 return;
         }
-        
+
 
 
         //Don't update the clients position when they ard dead
@@ -131,7 +168,7 @@ public class CharacterMovementHandler : NetworkBehaviour
             Vector3 moveDirection = transform.forward * networkInputData.movementInput.y + transform.right * networkInputData.movementInput.x;
             moveDirection.Normalize();
             playerStateHandler.SetInputVec(networkInputData.movementInput);
-            Debug.Log($"networkInputData.movementInput = {networkInputData.movementInput}");
+            //Debug.Log($"networkInputData.movementInput = {networkInputData.movementInput}");
             networkCharacterControllerPrototypeCustom.Move(moveDirection);
 
             //Debug.Log("moveDirection = " + moveDirection);
@@ -140,8 +177,16 @@ public class CharacterMovementHandler : NetworkBehaviour
             {
                 //여기다가 든 networkcharactercontroller뭐시기 든 
                 //점프 카운트 같은 조건 추가하고 isground일때 조건 초기화 해 주는 식으로 해보지뭐 
-                if(playerStateHandler.jumpCount<=2)
+                if (true)
+                {
+                    if (Object.HasInputAuthority)
+                    {
+                        //++jumpcount;
+                        Debug.Log("점프 카운트 올라감 ");
+                    }
                     networkCharacterControllerPrototypeCustom.Jump();
+                    networkInputData.isJumpButtonPressed = false;
+                }
             }
             //if (networkInputData.isFireButtonPressed)
             //{

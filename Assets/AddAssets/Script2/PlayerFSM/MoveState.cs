@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class MoveState : PlayerState
@@ -13,11 +14,7 @@ public class MoveState : PlayerState
 
     public override void Enter()
     {
-        if (player.IsGround())
-        {
-            player.jumpCount = 0;
-            player.dodgeCount = 0f;
-        }
+        
         base.Enter();
     }
 
@@ -37,7 +34,9 @@ public class MoveState : PlayerState
         //}
         if (player.isJumpButtonPressed)
         {
-            player.StateChange(player.jumpState);
+            player.nextState = player.jumpState;
+
+            //player.StateChange(player.jumpState);
             return true;
         }
 
@@ -49,7 +48,25 @@ public class MoveState : PlayerState
         //}
         return false;
     }
+    public override void FixedUpdate()
+    {
+        if (player.IsGround())
+        {
+            //if(player.characterMovementHandler.jumpcount != 0)
+            //{
+            //    //player.characterMovementHandler.jumpcount = 0;
+            //    Debug.Log("점프 카운트 초기화");
+            //}
 
+            //player.jumpCount = 0;
+            player.dodgeCount = 0f;
+        }
+    }
+    
+    public override void LateUpdate()
+    {
+        base.LateUpdate();
+    }
     public override void Exit()
     {
         base.Exit();

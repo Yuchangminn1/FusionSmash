@@ -27,6 +27,11 @@ public class EntityState
     {
 
     }
+    public virtual void LateUpdate()
+    {
+
+    }
+
     public virtual void Exit()
     {
 

@@ -43,7 +43,7 @@ public class PlayerStateHandler : NetworkBehaviour
 
     #region FSM
     protected StateMachine stateMachine;
-
+    public PlayerState nextState;
     public MoveState moveState { get; private set; }
     public JumpState jumpState { get; private set; }
     public FallState fallState { get; private set; }
@@ -54,9 +54,12 @@ public class PlayerStateHandler : NetworkBehaviour
     public DeathState deathState { get; private set; }
     public HealState healState { get; private set; }
 
-    NetworkCharacterControllerPrototypeCustom networkCC;
+    //public NetworkCharacterControllerPrototypeCustom networkCC;
+    public CharacterMovementHandler characterMovementHandler;
 
     public bool isJumpButtonPressed = false;
+
+
 
     Vector3 inputVec3;
 
@@ -72,8 +75,8 @@ public class PlayerStateHandler : NetworkBehaviour
     {
         anima = transform.GetComponent<Animator>();
         cc = transform.GetComponent<CharacterController>();
-        networkCC = GetComponent<NetworkCharacterControllerPrototypeCustom>();
-
+        //networkCC = GetComponent<NetworkCharacterControllerPrototypeCustom>();
+        characterMovementHandler = transform.GetComponent<CharacterMovementHandler>();
         #region FSM_Initialize
         moveState = new MoveState(this, 0);
         jumpState = new JumpState(this, 1);
@@ -90,13 +93,7 @@ public class PlayerStateHandler : NetworkBehaviour
             stateMachine.ChangeState(moveState);
         }
     }
-    public void ChangeState(PlayerState state)
-    {
-        if (Object.HasInputAuthority)
-        {
-            stateMachine.ChangeState(state);
-        }
-    }
+    
     // Update is called once per frame
     void Update()
     {
@@ -120,7 +117,10 @@ public class PlayerStateHandler : NetworkBehaviour
         
         SetFloat("InputX", inputVec3.x);
         SetFloat("InputZ", inputVec3.y);
-
+        if (Object.HasInputAuthority)
+        {
+            stateMachine.LateUpdate();
+        }
     }
     public Vector3 SetInputVec(Vector3 vector3)
     {
@@ -168,9 +168,17 @@ public class PlayerStateHandler : NetworkBehaviour
     {
         changed.Behaviour.SetState(changed.Behaviour.state);
     }
-    public void StateChange(EntityState _newState)
+    //public void StateChange(EntityState _newState)
+    //{
+    //    stateMachine.ChangeState(_newState);
+    //}
+
+    public void ChangeState()
     {
-        stateMachine.ChangeState(_newState);
+        if (Object.HasInputAuthority)
+        {
+            stateMachine.ChangeState(nextState);
+        }
     }
     #endregion
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]

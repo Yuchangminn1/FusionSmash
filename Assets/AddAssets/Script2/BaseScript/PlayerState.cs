@@ -4,6 +4,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using static Fusion.Simulation.Statistics;
 
 public class PlayerState : EntityState
 {
@@ -42,7 +43,9 @@ public class PlayerState : EntityState
         //공격
         if(Input.GetKeyDown(KeyCode.X) && isAbleAttack) 
         {
-            player.StateChange(player.attackState);
+            player.nextState = player.attackState;
+
+            //player.StateChange(player.attackState);
             return true;
         }
         if (!isAbleFly)
@@ -56,7 +59,9 @@ public class PlayerState : EntityState
                 }
                 if(Time.time - airTime > 0.25f)
                 {
-                    player.StateChange(player.fallState);
+                    player.nextState = player.fallState;
+
+                    //player.StateChange(player.fallState);
                     return true;
                 }
             }
@@ -67,7 +72,8 @@ public class PlayerState : EntityState
         }
         if (Input.GetKeyDown(KeyCode.C) && isAbleDodge)
         {
-            player.StateChange(player.attackState);
+            player.nextState = player.attackState;
+            //player.StateChange(player.attackState);
             return true;
         }
         return BaseState();
@@ -77,7 +83,14 @@ public class PlayerState : EntityState
         base.FixedUpdate();
         Debug.Log($"currentStateNum = {currentStateNum}");
     }
-
+    public override void LateUpdate()
+    {
+        if(player.nextState != this)
+        {
+            player.ChangeState();
+        }
+        //Debug.Log($"체인지 스태이트 player.nextState = {player.nextState}  this = {this}");
+    }
     public override void Exit()
     {
         base.Exit();
@@ -92,12 +105,16 @@ public class PlayerState : EntityState
         {
             if (player.IsGround()) 
             {
-                player.StateChange(player.moveState);
+                player.nextState = player.moveState;
+
+                //player.StateChange(player.moveState);
                 return true;
             }
             else
             {
-                player.StateChange(player.fallState);
+                player.nextState = player.fallState;
+
+                //player.StateChange(player.fallState);
                 return true;
 
             }

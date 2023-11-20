@@ -35,6 +35,10 @@ public class DeathState : PlayerState
     {
 
     }
+    public override void LateUpdate()
+    {
+        base.LateUpdate();
+    }
     public override void Exit()
     {
 

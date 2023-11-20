@@ -88,7 +88,6 @@ public class NetworkCharacterControllerPrototypeCustom : NetworkTransform
     /// </summary>
     public virtual void Jump(bool ignoreGrounded = false, float? overrideImpulse = null)
     {
-
         var newVel = Velocity;
         newVel.y = 0f;
         newVel.y += jumpImpulse;

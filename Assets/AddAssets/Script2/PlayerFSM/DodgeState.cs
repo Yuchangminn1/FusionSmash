@@ -37,6 +37,10 @@ public class DodgeState : PlayerState
         base.FixedUpdate();
         //player.CCDodge(dodgeDir);
     }
+    public override void LateUpdate()
+    {
+        base.LateUpdate();
+    }
     public override void Exit()
     {
         base.Exit();
