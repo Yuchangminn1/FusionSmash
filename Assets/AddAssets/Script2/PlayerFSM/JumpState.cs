@@ -20,28 +20,32 @@ public class JumpState : PlayerState
         player.isJumpButtonPressed = false;
 
         base.Enter();
-        if (player.jumpCount <2) 
+        if (player.jumpCount < 2)
         {
+            //점프 스테이트 체인지할떄 여기서 캐릭터 무브먼트 핸들러로 점프 명령을 보내야함  
+            //bool값으로 fixednetwork 에다가 
+            //저거 틱이 이상해서 답이 없음 
+            //아니면 JUMP함수 있는곳에다가 조건을 거는게 맞을 수 있음 
+
             player.isJumping = true;
-            ++player.jumpCount;
-            player.SetState2(player.characterMovementHandler.jumpcountHas -1);
+            //++player.jumpCount;
+            //player.SetState2(player.characterMovementHandler.jumpcountHas -1);
 
             //player.SetState2(player.jumpCount);
             return;
         }
-        if (!player.IsGround() )
+        if (!player.IsGround())
         {
             player.nextState = player.fallState;
 
             //player.StateChange(player.fallState);
             return;
         }
-        
+
     }
     public override bool Update()
     {
-        if (base.Update())
-            return true;
+        
 
         if (Input.GetKeyDown(KeyCode.C) && player.dodgeCount == 0f)
         {
@@ -67,9 +71,12 @@ public class JumpState : PlayerState
         }
         if (!player.animationTrigger)
         {
-                player.nextState = player.fallState;
-                //player.StateChange(player.fallState);
+            if (base.Update())
                 return true;
+
+            player.nextState = player.fallState;
+            //player.StateChange(player.fallState);
+            return true;
         }
         return false;
 
@@ -77,11 +84,13 @@ public class JumpState : PlayerState
     }
     public override void FixedUpdate()
     {
-        
+        base.FixedUpdate();
     }
     public override void LateUpdate()
     {
-        player.SetState2(player.characterMovementHandler.jumpcountHas);
+        //Debug.Log($"이건 점프 스테이트 레이트  {player.jumpCount}");
+
+        player.SetState2(player.jumpCount-1);
 
         base.LateUpdate();
     }

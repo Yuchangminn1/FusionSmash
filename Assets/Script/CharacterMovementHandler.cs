@@ -12,7 +12,7 @@ using System;
 
 public class CharacterMovementHandler : NetworkBehaviour
 {
-    CharacterInputhandler characterInputhandler;
+    public CharacterInputhandler characterInputhandler;
     //인풋 전달
     PlayerStateHandler playerStateHandler;
 
@@ -43,10 +43,9 @@ public class CharacterMovementHandler : NetworkBehaviour
     //[Networked(OnChanged = nameof(jumpcountSet))]
     public int jumpcountHas { get; set; }
     //public int jumpcount2 = 0;
-
     void Awake()
     {
-        characterInputhandler = transform.GetComponent<CharacterInputhandler>();
+        characterInputhandler = GetComponent<CharacterInputhandler>();
         hpHandler = GetComponent<HPHandler>();
         networkCharacterControllerPrototypeCustom = GetComponent<NetworkCharacterControllerPrototypeCustom>();
         localCamera = GetComponentInChildren<Camera>();
@@ -188,13 +187,18 @@ public class CharacterMovementHandler : NetworkBehaviour
             //Jump 
             if (networkInputData.isJumpButtonPressed)
             {
+                //Debug.Log("JumpButton Press");
                 //여기다가 든 networkcharactercontroller뭐시기 든 
                 //점프 카운트 같은 조건 추가하고 isground일때 조건 초기화 해 주는 식으로 해보지뭐 
-                if (jumpcountHas < 2)
+                if (jumpcountHas < 2 )
                 {
+                    //Debug.Log("jumpcountHas < 2");
+                    Debug.Log("JumpF");
                     networkCharacterControllerPrototypeCustom.Jump();
-                    if (Object.HasInputAuthority && characterInputhandler.isJumpButtonPressed)
+                    if (Object.HasInputAuthority)
                     {
+                        playerStateHandler.isJumpButtonPressed = true;
+                        ++playerStateHandler.jumpCount;
 
                         jumpcountHas += 1;
                         RPC_SetJumpCount(jumpcountHas);
@@ -207,6 +211,10 @@ public class CharacterMovementHandler : NetworkBehaviour
                 
                 //networkInputData.isJumpButtonPressed = false;
             }
+            //if (Object.HasInputAuthority)
+            //    characterInputhandler.isJumpButtonPressed = false;
+
+
             //if (networkInputData.isFireButtonPressed)
             //{
             //    ++fireNum;
@@ -215,12 +223,18 @@ public class CharacterMovementHandler : NetworkBehaviour
             CheckFallRespawn();
 
             //이상하게 떨어지면 정상적으로 리스폰
-            characterInputhandler.isJumpButtonPressed = false;
+
+
+            
 
         }
 
     }
-
+    public void RPCJumpCount(int num)
+    {
+        jumpcountHas = num;
+        RPC_SetJumpCount(jumpcountHas);
+    }
     /// <summary>
     /// 이상하게 떨어지면 정상적으로 리스폰
     /// </summary>

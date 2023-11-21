@@ -122,7 +122,7 @@ public class CharacterInputhandler : MonoBehaviour
 
         networkInputData.fireNum = fireNum;
 
-        //isJumpButtonPressed = false;
+        isJumpButtonPressed = false;
         isFireButtonPressed = false;
         isRightEnterPressed = false;
         return networkInputData;

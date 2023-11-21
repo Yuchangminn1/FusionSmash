@@ -20,7 +20,8 @@ public class MoveState : PlayerState
 
     public override bool Update()
     {
-        base.Update();
+        if (base.Update())
+            return true;
         //if(Input.GetKeyDown(KeyCode.E)) 
         //{
         //    //player.healNum += UIScript.instance.ResetHPHealNumIcon(1);
@@ -39,7 +40,7 @@ public class MoveState : PlayerState
             //player.StateChange(player.jumpState);
             return true;
         }
-
+        
         //if (Input.GetKeyDown(KeyCode.Q))
         //{
         //    //회복
@@ -50,22 +51,26 @@ public class MoveState : PlayerState
     }
     public override void FixedUpdate()
     {
-        if (player.IsGround())
-        {
-            if (player.characterMovementHandler.jumpcountHas != 0)
-            {
-                player.characterMovementHandler.jumpcountHas = 0;
-                Debug.Log("점프 카운트 초기화");
-            }
+        base.FixedUpdate();
 
-            player.jumpCount = 0;
-            player.dodgeCount = 0f;
-        }
+        
     }
     
     public override void LateUpdate()
     {
         base.LateUpdate();
+        if (player.IsGround())
+        {
+            if (player.characterMovementHandler.jumpcountHas != 0)
+            {
+                player.characterMovementHandler.RPCJumpCount(0);
+                Debug.Log("점프 카운트 초기화");
+
+            }
+
+            player.jumpCount = 0;
+            player.dodgeCount = 0f;
+        }
     }
     public override void Exit()
     {

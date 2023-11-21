@@ -72,6 +72,7 @@ public class FallState : PlayerState
 
     public override void FixedUpdate()
     {
+        base.FixedUpdate();
         //player.CCMove();
         //if (!player.IsGround())
         //{

@@ -81,11 +81,13 @@ public class PlayerState : EntityState
     public override void FixedUpdate()
     {
         base.FixedUpdate();
-        Debug.Log($"currentStateNum = {currentStateNum}");
+
     }
     public override void LateUpdate()
     {
-        if(player.nextState != this)
+        //Debug.Log($"currentStateNum = {currentStateNum} this = {this}");
+
+        if (player.nextState != this)
         {
             player.ChangeState();
         }

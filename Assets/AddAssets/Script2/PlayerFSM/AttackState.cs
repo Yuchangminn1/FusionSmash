@@ -35,10 +35,7 @@ public class AttackState : PlayerState
             Combo.Enqueue(true);
             Debug.Log("ÄÞº¸ Ãß°¡");
         }
-        if (base.Update())
-        {
-            return true;
-        }
+        
         //player.ZeroVelocity();
         if (!player.animationTrigger)
         {
@@ -54,6 +51,11 @@ public class AttackState : PlayerState
             }
             else
             {
+                if (base.Update())
+                {
+                    return true;
+                }
+
                 //player.EndSpawn();
                 if (player.IsGround())
                     player.nextState = player.moveState;
