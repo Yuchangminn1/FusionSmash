@@ -22,7 +22,7 @@ public class CharacterInputhandler : MonoBehaviour
 
     Vector2 moveInputVector = Vector2.zero;
     Vector2 viewInputVector = Vector2.zero;
-    bool isJumpButtonPressed = false;
+    public bool isJumpButtonPressed = false;
     bool isFireButtonPressed = false;
     bool isRightEnterPressed = false;
     int fireNum;
@@ -122,7 +122,7 @@ public class CharacterInputhandler : MonoBehaviour
 
         networkInputData.fireNum = fireNum;
 
-        isJumpButtonPressed = false;
+        //isJumpButtonPressed = false;
         isFireButtonPressed = false;
         isRightEnterPressed = false;
         return networkInputData;
@@ -164,7 +164,7 @@ public class CharacterInputhandler : MonoBehaviour
     }
     private void Jump(InputAction.CallbackContext context)
     {
-        Debug.Log("Jump!!!");
+        //Debug.Log("Jump!!!");
 
         isJumpButtonPressed = true;
     }

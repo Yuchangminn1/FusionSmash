@@ -24,8 +24,9 @@ public class JumpState : PlayerState
         {
             player.isJumping = true;
             ++player.jumpCount;
-            player.SetState2(player.jumpCount);
-            //++player.characterMovementHandler.jumpcount;
+            player.SetState2(player.characterMovementHandler.jumpcountHas -1);
+
+            //player.SetState2(player.jumpCount);
             return;
         }
         if (!player.IsGround() )
@@ -80,6 +81,8 @@ public class JumpState : PlayerState
     }
     public override void LateUpdate()
     {
+        player.SetState2(player.characterMovementHandler.jumpcountHas);
+
         base.LateUpdate();
     }
     public override void Exit()

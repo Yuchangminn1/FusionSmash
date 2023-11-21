@@ -56,7 +56,7 @@ public class WeaponHandler : NetworkBehaviour
             return;
         }
 
-        StartCoroutine(FireEffectCO());
+        //StartCoroutine(FireEffectCO());
 
         Runner.LagCompensation.Raycast(aimPoint.position, aimForwardVector, 100, Object.InputAuthority, out var hitnfo, collisionLayer, HitOptions.IncludePhysX);
 

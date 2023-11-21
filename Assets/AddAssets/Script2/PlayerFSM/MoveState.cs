@@ -52,13 +52,13 @@ public class MoveState : PlayerState
     {
         if (player.IsGround())
         {
-            //if(player.characterMovementHandler.jumpcount != 0)
-            //{
-            //    //player.characterMovementHandler.jumpcount = 0;
-            //    Debug.Log("점프 카운트 초기화");
-            //}
+            if (player.characterMovementHandler.jumpcountHas != 0)
+            {
+                player.characterMovementHandler.jumpcountHas = 0;
+                Debug.Log("점프 카운트 초기화");
+            }
 
-            //player.jumpCount = 0;
+            player.jumpCount = 0;
             player.dodgeCount = 0f;
         }
     }
