@@ -174,8 +174,10 @@ public class PlayerStateHandler : NetworkBehaviour
     {
         state = num;
         //SetInt("State", state);
-        if(Object.HasInputAuthority)
+        if (Object.HasInputAuthority)
+        {
             RPC_SetState(state);
+        }
     }
     public void SetState2(int num)
     {
@@ -201,8 +203,11 @@ public class PlayerStateHandler : NetworkBehaviour
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     public void RPC_SetState(int _state, RpcInfo info = default)
     {
-       // Debug.Log($"[RPC] State{state}");
+        // Debug.Log($"[RPC] State{state}");
+
         state = _state;
+        characterMovementHandler.playerstate = _state;
+
         //SetInt("State", state);
 
     }

@@ -193,6 +193,8 @@ public class CharacterMovementHandler : NetworkBehaviour
                 if (playerstate == 4)
                 {
                     Debug.Log("공격중이라 점프 불가 ");
+                    playerStateHandler.StateChageUpdate();
+
                     jumpcountHas = 3;
                     RPC_SetJumpCount(jumpcountHas);
                 }
@@ -202,30 +204,30 @@ public class CharacterMovementHandler : NetworkBehaviour
                 //점프 카운트 같은 조건 추가하고 isground일때 조건 초기화 해 주는 식으로 해보지뭐
                 if (jumpcountHas < 2)
                 {
-                    if (Object.HasInputAuthority && jumpTime + jumpCooldown < Time.time)
+                    if(jumpTime + jumpCooldown < Time.time)
                     {
-                        jumpTime = Time.time;
-                        //Debug.Log($"jumpTime = {jumpTime} jumpCooldown = {jumpCooldown} Time.time = {Time.time}");
+                        playerStateHandler.nextState = playerStateHandler.jumpState;
+                        playerStateHandler.StateChageUpdate();
 
-                        //Debug.Log($"전 HasIn JumpCount = {jumpcountHas}");
-                        jumpcountHas += 1;
-                        RPC_SetJumpCount(jumpcountHas);
-
-                        Debug.Log($"HasIn JumpCount = {jumpcountHas}");
-
-
+                        networkCharacterControllerPrototypeCustom.Jump();
 
                         if (Object.HasInputAuthority)
-                            playerStateHandler.isJumpButtonPressed = true;
-                    }
-                    playerStateHandler.nextState = playerStateHandler.jumpState;
-                    playerStateHandler.StateChageUpdate();
+                        {
+                            jumpTime = Time.time;
+                            //Debug.Log($"jumpTime = {jumpTime} jumpCooldown = {jumpCooldown} Time.time = {Time.time}");
+                            //Debug.Log($"전 HasIn JumpCount = {jumpcountHas}");
+                            jumpcountHas += 1;
+                            RPC_SetJumpCount(jumpcountHas);
 
-                    networkCharacterControllerPrototypeCustom.Jump();
+                            Debug.Log($"HasIn JumpCount = {jumpcountHas}");
+
+                            if (Object.HasInputAuthority)
+                                playerStateHandler.isJumpButtonPressed = true;
+                        }
+                    }
                 }
-                //networkInputData.isJumpButtonPressed = false;
             }
-            if (playerstate == 0)
+            else if (playerstate == 0)
             {
                 
                 if (playerStateHandler.IsGround()&&jumpcountHas != 0)

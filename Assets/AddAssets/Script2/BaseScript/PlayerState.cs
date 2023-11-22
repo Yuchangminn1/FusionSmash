@@ -29,7 +29,7 @@ public class PlayerState : EntityState
     {
         base.Enter();
         startTime = Time.time;
-        player.characterMovementHandler.playerstate = currentStateNum;
+        
 
         if (currentStateNum != 0) { player.animationTrigger = true; }
     }
@@ -78,10 +78,10 @@ public class PlayerState : EntityState
         base.FixedUpdate();
         if (player.state != currentStateNum)
         {
-            Debug.Log($"player.state = {player.state} currentStateNum{currentStateNum}");
+            //Debug.Log($"player.state = {player.state} currentStateNum{currentStateNum}");
             player.SetState(currentStateNum);
         }
-        Debug.Log($"currentNum = {currentStateNum}");
+        //Debug.Log($"currentNum = {currentStateNum}");
 
     }
     public override void LateUpdate()
