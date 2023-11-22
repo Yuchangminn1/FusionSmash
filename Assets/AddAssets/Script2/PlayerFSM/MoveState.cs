@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class MoveState : PlayerState
 {
-    
+
     public MoveState(PlayerStateHandler _player, int _currentStateNum) : base(_player, _currentStateNum)
     {
         player = _player;
@@ -14,12 +14,18 @@ public class MoveState : PlayerState
 
     public override void Enter()
     {
-        
         base.Enter();
+
+
+        
     }
 
     public override bool Update()
     {
+        if (player.nextState != this)
+        {
+            return true;
+        }
         if (base.Update())
             return true;
         //if(Input.GetKeyDown(KeyCode.E)) 
@@ -40,7 +46,7 @@ public class MoveState : PlayerState
             //player.StateChange(player.jumpState);
             return true;
         }
-        
+
         //if (Input.GetKeyDown(KeyCode.Q))
         //{
         //    //회복
@@ -53,24 +59,18 @@ public class MoveState : PlayerState
     {
         base.FixedUpdate();
 
-        
-    }
-    
-    public override void LateUpdate()
-    {
-        base.LateUpdate();
         if (player.IsGround())
         {
-            if (player.characterMovementHandler.jumpcountHas != 0)
-            {
-                player.characterMovementHandler.RPCJumpCount(0);
-                Debug.Log("점프 카운트 초기화");
-
-            }
-
+            //Debug.Log("MoveState JumpCount초기화 ");
             player.jumpCount = 0;
             player.dodgeCount = 0f;
         }
+    }
+
+    public override void LateUpdate()
+    {
+        base.LateUpdate();
+        
     }
     public override void Exit()
     {

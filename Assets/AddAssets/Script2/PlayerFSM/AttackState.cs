@@ -30,15 +30,20 @@ public class AttackState : PlayerState
 
     public override bool Update()
     {
+        if (player.nextState != this)
+        {
+            return true;
+        }
         if (Input.GetKeyDown(KeyCode.X))
         {
             Combo.Enqueue(true);
             Debug.Log("ÄÞº¸ Ãß°¡");
         }
-        
+
         //player.ZeroVelocity();
         if (!player.animationTrigger)
         {
+            
             if (Combo.TryDequeue(out bool Q) && counter < 2f)
             {
                 ++counter;
@@ -90,5 +95,7 @@ public class AttackState : PlayerState
     public override void Exit()
     {
         base.Exit();
+        player.animationTrigger = false;
+
     }
 }

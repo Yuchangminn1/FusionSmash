@@ -40,8 +40,14 @@ public class CharacterMovementHandler : NetworkBehaviour
     NetworkCharacterControllerPrototypeCustom networkCharacterControllerPrototypeCustom;
     HPHandler hpHandler;
 
-    //[Networked(OnChanged = nameof(jumpcountSet))]
     public int jumpcountHas { get; set; }
+
+    float jumpTime = 0f;
+
+    float jumpCooldown = 0.15f;
+
+    public int playerstate { get; set; }
+
     //public int jumpcount2 = 0;
     void Awake()
     {
@@ -68,42 +74,23 @@ public class CharacterMovementHandler : NetworkBehaviour
     //    int newC = changed.Behaviour.jumpcountHas;
     //    changed.LoadOld();
     //    int oldC = changed.Behaviour.jumpcountHas;
-    //    changed.LoadNew();
     //    if (newC != oldC)
     //    {
-    //        Debug.Log($"newC {newC},  oldC{oldC}");
-    //        changed.Behaviour.setJumpcount(changed.Behaviour.jumpcountHas);
+    //        //Debug.Log($"newC {newC},  oldC{oldC}");
+    //        changed.Behaviour.setJumpcount(newC);
     //    }
-
-
-    //    Debug.Log($"chaged jumpcount = {changed.Behaviour.jumpcount}");
     //}
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     public void RPC_SetJumpCount(int _jumpcount, RpcInfo info = default)
     {
+
         Debug.Log($"jumpcount {_jumpcount} ");
         jumpcountHas = _jumpcount;
+
     }
     //public void setJumpcount(int num)
     //{
     //    jumpcountHas = num;
-
-    //    if (Object.HasInputAuthority)
-    //    {
-    //        Debug.Log($"전 jumpcount2 = {jumpcount2}    jumpcountHas = {jumpcountHas} num = {num}");
-    //        jumpcount2 = jumpcountHas;
-    //        Debug.Log($"후 jumpcount2 = {jumpcount2}    jumpcountHas = {jumpcountHas} num = {num}");
-
-    //        // RPC_SetJumpCount(jumpcount);
-    //    }
-    //    //if (Object.HasInputAuthority)
-    //    //{
-    //    //    jumpcount = _jumpcount;
-    //    //}
-    //    //if (Object.HasInputAuthority)
-    //    //{
-    //    //    RPC_SetJumpCount(_jumpcount);
-    //    //}
     //}
 
     private void FixedUpdate()
@@ -128,8 +115,14 @@ public class CharacterMovementHandler : NetworkBehaviour
     //서버에서 움직일려면 fixedUpdateNetwork
     public override void FixedUpdateNetwork()
     {
+        //if (Object.HasInputAuthority)
+        //{
+        //    playerStateHandler.StateChageUpdate();
+        //}
+
         if (HasStateAuthority)
         {
+
             //상호작용 권한이 있으면
             if (isRespawnRequsted)
             {
@@ -157,8 +150,14 @@ public class CharacterMovementHandler : NetworkBehaviour
         //반환된 입력 구조체는 Fusion.NetworkObject.InputAuthority에서 시작하며,
         // 유효한 경우 현재 시뮬레이션 틱에 대해 해당 Fusion.PlayerRef가 제공한 입력을 포함합니다
         //GetInput >> NetworkBehavior 에 있는 함수
+        if (Object.HasInputAuthority)
+        {
+            playerStateHandler.StateChageUpdate();
+        }
+
         if (GetInput(out NetworkInputData networkInputData))
         {
+            
 
             //Debug.Log($" has 뭐시기{transform.name} = " + networkCharacterControllerPrototypeCustom.Object.HasInputAuthority);w
 
@@ -185,31 +184,57 @@ public class CharacterMovementHandler : NetworkBehaviour
 
             //Debug.Log("moveDirection = " + moveDirection);
             //Jump 
+            
+
             if (networkInputData.isJumpButtonPressed)
             {
-                //Debug.Log("JumpButton Press");
-                //여기다가 든 networkcharactercontroller뭐시기 든 
-                //점프 카운트 같은 조건 추가하고 isground일때 조건 초기화 해 주는 식으로 해보지뭐 
-                if (jumpcountHas < 2 )
+                //Debug.Log($"PlayerState =  {playerstate}");
+
+                if (playerstate == 4)
                 {
-                    //Debug.Log("jumpcountHas < 2");
-                    Debug.Log("JumpF");
-                    networkCharacterControllerPrototypeCustom.Jump();
-                    if (Object.HasInputAuthority)
-                    {
-                        playerStateHandler.isJumpButtonPressed = true;
-                        ++playerStateHandler.jumpCount;
-
-                        jumpcountHas += 1;
-                        RPC_SetJumpCount(jumpcountHas);
-                        Debug.Log($"HasIn JumpCount = {jumpcountHas}");
-
-                    }
+                    Debug.Log("공격중이라 점프 불가 ");
+                    jumpcountHas = 3;
+                    RPC_SetJumpCount(jumpcountHas);
                 }
 
-                
-                
+                //Debug.Log("JumpButton Press");
+                //여기다가 든 networkcharactercontroller뭐시기 든 
+                //점프 카운트 같은 조건 추가하고 isground일때 조건 초기화 해 주는 식으로 해보지뭐
+                if (jumpcountHas < 2)
+                {
+                    if (Object.HasInputAuthority && jumpTime + jumpCooldown < Time.time)
+                    {
+                        jumpTime = Time.time;
+                        //Debug.Log($"jumpTime = {jumpTime} jumpCooldown = {jumpCooldown} Time.time = {Time.time}");
+
+                        //Debug.Log($"전 HasIn JumpCount = {jumpcountHas}");
+                        jumpcountHas += 1;
+                        RPC_SetJumpCount(jumpcountHas);
+
+                        Debug.Log($"HasIn JumpCount = {jumpcountHas}");
+
+
+
+                        if (Object.HasInputAuthority)
+                            playerStateHandler.isJumpButtonPressed = true;
+                    }
+                    playerStateHandler.nextState = playerStateHandler.jumpState;
+                    playerStateHandler.StateChageUpdate();
+
+                    networkCharacterControllerPrototypeCustom.Jump();
+                }
                 //networkInputData.isJumpButtonPressed = false;
+            }
+            if (playerstate == 0)
+            {
+                
+                if (playerStateHandler.IsGround()&&jumpcountHas != 0)
+                {
+                    Debug.Log("JUmpCountHas 초기화 ");
+                    jumpcountHas = 0;
+                    RPC_SetJumpCount(jumpcountHas);
+                }
+
             }
             //if (Object.HasInputAuthority)
             //    characterInputhandler.isJumpButtonPressed = false;
@@ -225,16 +250,16 @@ public class CharacterMovementHandler : NetworkBehaviour
             //이상하게 떨어지면 정상적으로 리스폰
 
 
-            
+
 
         }
 
     }
-    public void RPCJumpCount(int num)
-    {
-        jumpcountHas = num;
-        RPC_SetJumpCount(jumpcountHas);
-    }
+    //public void RPCJumpCount(int num)
+    //{
+    //    jumpcountHas = num;
+    //    RPC_SetJumpCount(jumpcountHas);
+    //}
     /// <summary>
     /// 이상하게 떨어지면 정상적으로 리스폰
     /// </summary>

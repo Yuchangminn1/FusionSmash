@@ -4024,8 +4024,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  characterInputhandler: {fileID: 0}
   isRespawnRequsted: 0
-  _jumpcount: 0
 --- !u!114 &3429284897864010673
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4038,6 +4038,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fa4f3d31f40bc54f97585ce791316af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isJumpButtonPressed: 0
 --- !u!114 &8063667466583055301
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4210,7 +4211,7 @@ MonoBehaviour:
   fHpHeal: 40
   healNum: 0
   healNumMax: 3
-  GroundCheckDis: 0.2
+  GroundCheckDis: 0.12
   groundLayer:
     serializedVersion: 2
     m_Bits: 64

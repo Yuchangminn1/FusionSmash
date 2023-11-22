@@ -44,7 +44,6 @@ public class DodgeState : PlayerState
     public override void Exit()
     {
         base.Exit();
-        //player.isDodge = false;
 
     }
 }

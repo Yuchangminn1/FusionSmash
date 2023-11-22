@@ -11,6 +11,8 @@ public class LandState : PlayerState
         player = _player;
         currentStateNum = _currentStateNum;
         isAbleFly = true;
+        endMotionChange = false;
+
         isAbleAttack = false;
         isAbleDodge = false;
     }
@@ -18,16 +20,37 @@ public class LandState : PlayerState
     public override void Enter()
     {
         base.Enter();
+        Debug.Log("랜드 진입");
         player.isStop = true;
+        if(player.state2 >= 2)
+        {
+            player.state2 = 1;
+            player.SetState2(player.state2);
+        }
         //player.ZeroVelocityX();
 
     }
     public override bool Update()
     {
-        if (base.Update())
-            return true;
+        //Debug.Log("0");
+        //if (player.nextState != this)
+        //{
+        //    Debug.Log("1");
+        //    return true;
+        //}
+        player.nextState = player.moveState;
+        return true;
         if (!player.animationTrigger)
         {
+           // Debug.Log("2");
+
+            if (base.Update())
+                return true;
+
+
+
+
+
             player.nextState = player.moveState;
 
 
@@ -44,8 +67,9 @@ public class LandState : PlayerState
     public override void Exit()
     {
         base.Exit();
-        player.SetState2(0);
+        player.state2 = 0;
         player.isStop = false;
+        player.animationTrigger = false;
 
     }
 

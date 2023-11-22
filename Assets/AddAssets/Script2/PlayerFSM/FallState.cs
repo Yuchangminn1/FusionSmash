@@ -25,6 +25,10 @@ public class FallState : PlayerState
     }
     public override bool Update()
     {
+        if (player.nextState != this)
+        {
+            return true;
+        }
         if (base.Update())
             return true;
         if (player.IsGround())
@@ -73,6 +77,7 @@ public class FallState : PlayerState
     public override void FixedUpdate()
     {
         base.FixedUpdate();
+        //Debug.Log($"playerIsGround {player.IsGround()}");
         //player.CCMove();
         //if (!player.IsGround())
         //{

@@ -101,11 +101,11 @@ public class Entity : MonoBehaviour
         stateNum2 = _num;
         SetInt("State2", _num);
     }
-    public void StateChange(EntityState _newState)
-    {
-        stateMachine.ChangeState(_newState);
-        //Debug.Log("_newState = " + _newState);
-    }
+    //public void StateChange(EntityState _newState)
+    //{
+    //    stateMachine.ChangeState(_newState);
+    //    //Debug.Log("_newState = " + _newState);
+    //}
     #endregion
     //public void ZeroVelocity() => rb.velocity = Vector2.zero;
     

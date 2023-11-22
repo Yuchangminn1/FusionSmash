@@ -6,10 +6,9 @@ using UnityEngine;
 
 public class PlayerStateHandler : NetworkBehaviour
 {
-    [Networked(OnChanged = nameof(OnSetStateChanged))]
+    [Networked(OnChanged = nameof(ChangeState))]
     public int state { get; set; }
-
-    [Networked(OnChanged = nameof(OnSetState2Changed))]
+    [Networked(OnChanged = nameof(ChangeState2))]
     public int state2 { get; set; }
 
     public NetworkString<_16> nickName { get; set; }
@@ -17,7 +16,7 @@ public class PlayerStateHandler : NetworkBehaviour
 
     public float dodgeCount = 0f;
 
-    public int jumpCount = 0;
+    public int jumpCount { get; set; }
 
     public bool isdead = false;
 
@@ -30,7 +29,7 @@ public class PlayerStateHandler : NetworkBehaviour
     public int healNum;
     public int healNumMax = 3;
 
-    
+
 
     [SerializeField] protected float GroundCheckDis = 0.65f;
     public LayerMask groundLayer; // 땅인지 확인하기 위한 레이어 마스크
@@ -58,6 +57,7 @@ public class PlayerStateHandler : NetworkBehaviour
     public CharacterMovementHandler characterMovementHandler;
 
     public bool isJumpButtonPressed = false;
+
 
 
 
@@ -90,10 +90,12 @@ public class PlayerStateHandler : NetworkBehaviour
         #endregion
         if (Object.HasInputAuthority)
         {
-            stateMachine.ChangeState(moveState);
+            nextState = moveState;
+            this.ChangeState();
+            //stateMachine.ChangeState(moveState);
         }
     }
-    
+
     // Update is called once per frame
     void Update()
     {
@@ -114,9 +116,18 @@ public class PlayerStateHandler : NetworkBehaviour
 
     private void LateUpdate()
     {
-        
+
         SetFloat("InputX", inputVec3.x);
         SetFloat("InputZ", inputVec3.y);
+        //if (Object.HasInputAuthority)
+        //{
+        //    stateMachine.LateUpdate();
+        //}
+
+    }
+
+    public void StateChageUpdate()
+    {
         if (Object.HasInputAuthority)
         {
             stateMachine.LateUpdate();
@@ -127,9 +138,28 @@ public class PlayerStateHandler : NetworkBehaviour
         inputVec3 = vector3;
         return inputVec3;
     }
-    
 
+    static void ChangeState(Changed<PlayerStateHandler> changed)
+    {
+        int newS = changed.Behaviour.state;
+        changed.LoadOld();
+        int oldS = changed.Behaviour.state;
+        if (newS != oldS)
+        {
+            changed.Behaviour.SetInt("State", newS);
 
+        }
+    }
+    static void ChangeState2(Changed<PlayerStateHandler> changed)
+    {
+        int newS = changed.Behaviour.state2;
+        changed.LoadOld();
+        int oldS = changed.Behaviour.state2;
+        if (newS != oldS)
+        {
+            changed.Behaviour.SetInt("State2", newS);
+        }
+    }
     public bool IsGround()
     {
         //발밑체크
@@ -140,34 +170,21 @@ public class PlayerStateHandler : NetworkBehaviour
     public void SetFloat(string _parameters, float value) => anima.SetFloat(_parameters, value);
     public void ZeroHorizontal() => anima.SetFloat("Horizontal", 0f);
     public void AnimaPlay(string _name) => anima.Play(_name);
-    public void SetState(int _num)
+    public void SetState(int num)
     {
-        SetInt("State", _num);
-        //RPC_SetState(_num);
-        if (Object.HasInputAuthority)
-        {
-            RPC_SetState(_num);
-        }
+        state = num;
+        //SetInt("State", state);
+        if(Object.HasInputAuthority)
+            RPC_SetState(state);
     }
-    public void SetState2(int _num)
+    public void SetState2(int num)
     {
-        SetInt("State2", _num);
-        //RPC_SetState2(_num);
+        state2 = num;
+        //SetInt("State2", state2);
         if (Object.HasInputAuthority)
-        {
-            RPC_SetState2(_num);
-        }
+            RPC_SetState2(state2);
     }
 
-    static void OnSetState2Changed(Changed<PlayerStateHandler> changed)
-    {
-        changed.Behaviour.SetState2(changed.Behaviour.state2);
-
-    }
-    static void OnSetStateChanged(Changed<PlayerStateHandler> changed)
-    {
-        changed.Behaviour.SetState(changed.Behaviour.state);
-    }
     //public void StateChange(EntityState _newState)
     //{
     //    stateMachine.ChangeState(_newState);
@@ -184,15 +201,19 @@ public class PlayerStateHandler : NetworkBehaviour
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     public void RPC_SetState(int _state, RpcInfo info = default)
     {
-        Debug.Log($"[RPC] State{state}");
+       // Debug.Log($"[RPC] State{state}");
         state = _state;
+        //SetInt("State", state);
+
     }
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     public void RPC_SetState2(int _state2, RpcInfo info = default)
     {
-        Debug.Log($"[RPC] State2 {state2} ");
+        //Debug.Log($"[RPC] State2 {state2} ");
         state2 = _state2;
+        //SetInt("State2", state2);
+
     }
 
-    
+
 }

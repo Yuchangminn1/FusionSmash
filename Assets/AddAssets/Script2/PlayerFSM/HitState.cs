@@ -24,6 +24,10 @@ public class HitState : PlayerState
 
     public override bool Update()
     {
+        if (player.nextState != this)
+        {
+            return true;
+        }
         if (base.Update())
             return true;
         if(!player.animationTrigger)

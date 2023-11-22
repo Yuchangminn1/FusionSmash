@@ -29,8 +29,14 @@ public class PlayerState : EntityState
     {
         base.Enter();
         startTime = Time.time;
-        player.SetState(currentStateNum);
-        player.SetState2(0);
+        player.characterMovementHandler.playerstate = currentStateNum;
+        //Debug.Log($"Statechange currentStateNum = {currentStateNum}");
+
+        //player.state = currentStateNum;
+        //player.SetState(player.state);
+
+        //player.SetState(currentStateNum);
+        //player.SetState2(0);
 
         //player.SetInt("State", currentStateNum);
         if (currentStateNum != 0) { player.animationTrigger = true; }
@@ -39,9 +45,13 @@ public class PlayerState : EntityState
     {
         base.Update();
         stateTimer = Time.time;
-
+        //Debug.Log($"NextState = {player.nextState}");
+        //if (player.nextState != this)
+        //{
+        //    return true;
+        //}
         //공격
-        if(Input.GetKeyDown(KeyCode.X) && isAbleAttack) 
+        if (Input.GetKeyDown(KeyCode.X) && isAbleAttack) 
         {
             player.nextState = player.attackState;
 
@@ -57,7 +67,7 @@ public class PlayerState : EntityState
                 {
                     airTime = Time.time;
                 }
-                if(Time.time - airTime > 0.25f)
+                if(Time.time - airTime > 0.4f)
                 {
                     player.nextState = player.fallState;
 
@@ -81,17 +91,27 @@ public class PlayerState : EntityState
     public override void FixedUpdate()
     {
         base.FixedUpdate();
+        if (player.state != currentStateNum)
+        {
+            Debug.Log($"player.state = {player.state} currentStateNum{currentStateNum}");
+            player.SetState(currentStateNum);
+        }
+        Debug.Log($"currentNum = {currentStateNum}");
 
     }
     public override void LateUpdate()
     {
-        //Debug.Log($"currentStateNum = {currentStateNum} this = {this}");
+
 
         if (player.nextState != this)
         {
+            //Debug.Log($"player.nextState = {player.nextState} this = {this}");
+
+            //Debug.Log($"currentStateNum = {currentStateNum} this = {this}");
             player.ChangeState();
+            //Debug.Log($"체인지 스태이트 player.nextState = {player.nextState}  this = {this}");
+
         }
-        //Debug.Log($"체인지 스태이트 player.nextState = {player.nextState}  this = {this}");
     }
     public override void Exit()
     {
