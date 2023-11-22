@@ -27,34 +27,18 @@ public class LandState : PlayerState
             player.state2 = 1;
             player.SetState2(player.state2);
         }
-        //player.ZeroVelocityX();
-
     }
     public override bool Update()
     {
-        //Debug.Log("0");
-        //if (player.nextState != this)
-        //{
-        //    Debug.Log("1");
-        //    return true;
-        //}
+
         player.nextState = player.moveState;
         return true;
         if (!player.animationTrigger)
         {
-           // Debug.Log("2");
-
             if (base.Update())
                 return true;
 
-
-
-
-
             player.nextState = player.moveState;
-
-
-            //player.StateChange(player.moveState);
             return true;
         }
         return false;

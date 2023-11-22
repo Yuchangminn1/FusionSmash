@@ -17,7 +17,6 @@ public class HitState : PlayerState
     public override void Enter()
     {
         base.Enter();
-       // player.transform.localScale = new Vector3(player.entityDir * -1f, 1f,1f);
 
     }
 
@@ -37,12 +36,10 @@ public class HitState : PlayerState
 
                 player.nextState = player.deathState;
 
-                //player.StateChange(player.deathState);
                 return true;
             }
             player.nextState = player.moveState;
 
-            //player.StateChange(player.moveState);
         }
         return false;
     }
@@ -57,7 +54,6 @@ public class HitState : PlayerState
     public override void Exit()
     {
         base.Exit();
-       // player.transform.localScale = new Vector3(player.entityDir, 1f,1f);
 
     }
 }

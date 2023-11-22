@@ -28,31 +28,12 @@ public class MoveState : PlayerState
         }
         if (base.Update())
             return true;
-        //if(Input.GetKeyDown(KeyCode.E)) 
-        //{
-        //    //player.healNum += UIScript.instance.ResetHPHealNumIcon(1);
-        //    return;
-        //}
-        //if (Input.GetKeyDown(KeyCode.R))
-        //{
-        //    //player.healNum += UIScript.instance.ResetHPHealNumIcon(player.healNumMax);
 
-        //    return;
-        //}
         if (player.isJumpButtonPressed)
         {
             player.nextState = player.jumpState;
-
-            //player.StateChange(player.jumpState);
             return true;
         }
-
-        //if (Input.GetKeyDown(KeyCode.Q))
-        //{
-        //    //회복
-        //    player.StateChange(player.healState);
-        //    return;
-        //}
         return false;
     }
     public override void FixedUpdate()
@@ -61,7 +42,6 @@ public class MoveState : PlayerState
 
         if (player.IsGround())
         {
-            //Debug.Log("MoveState JumpCount초기화 ");
             player.jumpCount = 0;
             player.dodgeCount = 0f;
         }

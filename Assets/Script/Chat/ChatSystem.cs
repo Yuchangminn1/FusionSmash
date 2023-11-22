@@ -9,7 +9,6 @@ using System;
 
 public class ChatSystem : NetworkBehaviour
 {
-    //New Input System;
     public PlayerInputAction playerControls;
     private InputAction sumit;
     
@@ -24,19 +23,10 @@ public class ChatSystem : NetworkBehaviour
 
     public string myName;
 
-
-    //public bool logChange = false;
-
     [SerializeField] InputField mainInputField;
 
     bool isEnter = false;
     bool chatOnOff = false;
-
-
-    //bool repit = false;
-
-    //Debug.Log($"Push {nowString}");
-    //TMPText.text += nowString;
 
     public TMP_Text chatLog;
     public Scrollbar scrollV;
@@ -54,7 +44,6 @@ public class ChatSystem : NetworkBehaviour
         playerControls = new PlayerInputAction();
         chatLog = GameObject.FindWithTag("ChatDisplay").GetComponentInChildren<TMP_Text>();
         scrollV = GameObject.FindWithTag("ScrollV").GetComponent<Scrollbar>();
-        //myNameText = GameObject.FindWithTag("Nickname").GetComponentInChildren<TMP_Text>();
 
     }
     public void Start()
@@ -69,33 +58,12 @@ public class ChatSystem : NetworkBehaviour
         Debug.Log("chatLog = " + chatLog);
 
 
-        //sendPlayer = PlayerPrefs.GetString("PlayerNickname");
+
     }
 
-    //public override void FixedUpdateNetwork()
-    //{
-    //    if (Object.HasInputAuthority)
-    //    {
-    //        if (GetInput(out NetworkInputData networkInputData))
-    //        {
-    //            if (networkInputData.isRightEnterPressed)
-    //            {
-
-    //                chatDown = true;
-    //            }
-
-    //        }
-    //    }
-
-    //}
     public override void FixedUpdateNetwork()
     {
-        //if (chatDown)
-        //{
-        //    Summit();
-        //    Debug.Log("Enter로  Summit 실행");
-        //    chatDown = false;
-        //}
+
     }
     private void Update()
     {
@@ -142,19 +110,6 @@ public class ChatSystem : NetworkBehaviour
 
     }
 
-    //private void FixedUpdate()
-    //{
-
-    //    if (chatDown)
-    //    {
-
-    //        //scrollV.value = 0; 에를 네트워크로 해서 변경될 떄 함수 호출해보자 ㅇㅇ
-    //        Debug.Log("chatDown");
-    //        scrollV.value = 0;
-    //        chatDown = false;
-    //    }
-    //}
-
     static void OnChangeChatLog(Changed<ChatSystem> changed)
     {
         Debug.Log("mychat = " + changed.Behaviour.myChat);
@@ -162,10 +117,10 @@ public class ChatSystem : NetworkBehaviour
         {
             return;
         }
-        //changed.Behaviour.PushMessageName();
+
 
         changed.Behaviour.PushMessage();
-        //Debug.Log("이름은 " +changed.Behaviour.transform.name);
+
     }
 
 
@@ -178,7 +133,6 @@ public class ChatSystem : NetworkBehaviour
 
             Debug.Log($"이거{chatSystem}이거");
         }
-        //Debug.Log($"PushMessage myChat = {myChat[0]+ myChat[0]+ myChat[0]+ myChat[4]}");
         if (Object.HasInputAuthority)
         {
             return;

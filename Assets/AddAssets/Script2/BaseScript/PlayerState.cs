@@ -30,32 +30,19 @@ public class PlayerState : EntityState
         base.Enter();
         startTime = Time.time;
         player.characterMovementHandler.playerstate = currentStateNum;
-        //Debug.Log($"Statechange currentStateNum = {currentStateNum}");
 
-        //player.state = currentStateNum;
-        //player.SetState(player.state);
-
-        //player.SetState(currentStateNum);
-        //player.SetState2(0);
-
-        //player.SetInt("State", currentStateNum);
         if (currentStateNum != 0) { player.animationTrigger = true; }
     }
     public override bool Update()
     {
         base.Update();
         stateTimer = Time.time;
-        //Debug.Log($"NextState = {player.nextState}");
-        //if (player.nextState != this)
-        //{
-        //    return true;
-        //}
+
         //공격
         if (Input.GetKeyDown(KeyCode.X) && isAbleAttack) 
         {
             player.nextState = player.attackState;
 
-            //player.StateChange(player.attackState);
             return true;
         }
         if (!isAbleFly)
@@ -71,7 +58,6 @@ public class PlayerState : EntityState
                 {
                     player.nextState = player.fallState;
 
-                    //player.StateChange(player.fallState);
                     return true;
                 }
             }
@@ -83,7 +69,6 @@ public class PlayerState : EntityState
         if (Input.GetKeyDown(KeyCode.C) && isAbleDodge)
         {
             player.nextState = player.attackState;
-            //player.StateChange(player.attackState);
             return true;
         }
         return BaseState();
@@ -105,12 +90,7 @@ public class PlayerState : EntityState
 
         if (player.nextState != this)
         {
-            //Debug.Log($"player.nextState = {player.nextState} this = {this}");
-
-            //Debug.Log($"currentStateNum = {currentStateNum} this = {this}");
             player.ChangeState();
-            //Debug.Log($"체인지 스태이트 player.nextState = {player.nextState}  this = {this}");
-
         }
     }
     public override void Exit()
@@ -122,28 +102,19 @@ public class PlayerState : EntityState
     
     protected bool BaseState()
     {
-        
         if (!player.animationTrigger && endMotionChange)
         {
             if (player.IsGround()) 
             {
                 player.nextState = player.moveState;
-
-                //player.StateChange(player.moveState);
                 return true;
             }
             else
             {
                 player.nextState = player.fallState;
-
-                //player.StateChange(player.fallState);
                 return true;
-
             }
         }
         return false;
-
     }
-
-
 }

@@ -19,13 +19,12 @@ public class DeathState : PlayerState
     }
     public override bool Update()
     {
-       // base.Update();
+
         if (!player.animationTrigger)
         {
-            //player.ZeroVelocity();
+
             ;
-            //Á×À½ UI
-            //ÀÌÆåÆ®  ¹¹ µîµî 
+
         }
         return false;
     }
