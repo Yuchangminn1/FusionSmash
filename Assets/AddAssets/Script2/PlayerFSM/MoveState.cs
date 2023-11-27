@@ -15,13 +15,17 @@ public class MoveState : PlayerState
     public override void Enter()
     {
         base.Enter();
-
-
+        
         
     }
 
     public override bool Update()
     {
+        if (player.isJumpButtonPressed)
+        {
+            player.nextState = player.jumpState;
+            return true;
+        }
         if (player.nextState != this)
         {
             return true;
@@ -39,12 +43,12 @@ public class MoveState : PlayerState
     public override void FixedUpdate()
     {
         base.FixedUpdate();
-
-        if (player.IsGround())
+        if(player.state2 != 0 && player.IsGround())
         {
-            player.jumpCount = 0;
-            player.dodgeCount = 0f;
+            player.state2 = 0;
+            player.SetState2(player.state2);
         }
+
     }
 
     public override void LateUpdate()

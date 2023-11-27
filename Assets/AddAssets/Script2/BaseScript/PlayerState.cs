@@ -28,6 +28,8 @@ public class PlayerState : EntityState
     public override void Enter()
     {
         base.Enter();
+        player.state = currentStateNum;
+        player.SetState(player.state);
         startTime = Time.time;
         
 
@@ -37,9 +39,9 @@ public class PlayerState : EntityState
     {
         base.Update();
         stateTimer = Time.time;
-
+        
         //공격
-        if (Input.GetKeyDown(KeyCode.X) && isAbleAttack) 
+        if (player.isFireButtonPressed && isAbleAttack) 
         {
             player.nextState = player.attackState;
 
@@ -71,11 +73,15 @@ public class PlayerState : EntityState
             player.nextState = player.attackState;
             return true;
         }
+
+
         return BaseState();
     }
     public override void FixedUpdate()
     {
         base.FixedUpdate();
+        
+        //틀어진 애니메이션 맞춰주기 ? 
         if (player.state != currentStateNum)
         {
             //Debug.Log($"player.state = {player.state} currentStateNum{currentStateNum}");
@@ -86,7 +92,12 @@ public class PlayerState : EntityState
     }
     public override void LateUpdate()
     {
-
+        if (player.IsGround() && player.state != 1)
+        {
+            //Debug.Log("MoveState 점프 카운트 초기화");
+            //이것도 나중에 지워야함
+            player.dodgeCount = 0f;
+        }
 
         if (player.nextState != this)
         {
@@ -96,6 +107,10 @@ public class PlayerState : EntityState
     public override void Exit()
     {
         base.Exit();
+        if (currentStateNum != 0)
+        {
+            player.animationTrigger = false;
+        }
     }
     
 

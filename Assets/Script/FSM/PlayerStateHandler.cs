@@ -38,7 +38,7 @@ public class PlayerStateHandler : NetworkBehaviour
     public bool animationTrigger = false;
     [SerializeField] Animator anima;
 
-    CharacterController cc;
+    public CharacterController cc;
 
     #region FSM
     protected StateMachine stateMachine;
@@ -58,6 +58,7 @@ public class PlayerStateHandler : NetworkBehaviour
 
     public bool isJumpButtonPressed = false;
 
+    public bool isFireButtonPressed = false;
 
 
 
@@ -109,7 +110,8 @@ public class PlayerStateHandler : NetworkBehaviour
         if (Object.HasInputAuthority)
         {
             stateMachine.FixedUpdate();
-            isJumpButtonPressed = false;
+            //isJumpButtonPressed = false;
+            //isFireButtonPressed = false;
         }
     }
 
@@ -130,6 +132,7 @@ public class PlayerStateHandler : NetworkBehaviour
     {
         if (Object.HasInputAuthority)
         {
+            stateMachine.Update();
             stateMachine.LateUpdate();
         }
     }
@@ -147,6 +150,7 @@ public class PlayerStateHandler : NetworkBehaviour
         if (newS != oldS)
         {
             changed.Behaviour.SetInt("State", newS);
+            //changed.Behaviour.SetState(newS);
 
         }
     }
@@ -157,7 +161,9 @@ public class PlayerStateHandler : NetworkBehaviour
         int oldS = changed.Behaviour.state2;
         if (newS != oldS)
         {
+            //changed.Behaviour.SetState2(newS);
             changed.Behaviour.SetInt("State2", newS);
+
         }
     }
     public bool IsGround()
@@ -173,24 +179,30 @@ public class PlayerStateHandler : NetworkBehaviour
     public void SetState(int num)
     {
         state = num;
-        //SetInt("State", state);
+        //Debug.Log($"스테이트  = {state}");
+        SetInt("State", num);
         if (Object.HasInputAuthority)
         {
+            //state = num;
             RPC_SetState(state);
         }
     }
     public void SetState2(int num)
     {
         state2 = num;
-        //SetInt("State2", state2);
+        //Debug.Log($"State2 = {state2}");
+        SetInt("State2", num);
         if (Object.HasInputAuthority)
+        {
             RPC_SetState2(state2);
-    }
 
-    //public void StateChange(EntityState _newState)
-    //{
-    //    stateMachine.ChangeState(_newState);
-    //}
+        }
+    }
+    //스테이트 변경 더블 점프에서 사용함
+    public void StateChange(EntityState _newState)
+    {
+        stateMachine.ChangeState(_newState);
+    }
 
     public void ChangeState()
     {
@@ -206,7 +218,7 @@ public class PlayerStateHandler : NetworkBehaviour
         // Debug.Log($"[RPC] State{state}");
 
         state = _state;
-        characterMovementHandler.playerstate = _state;
+        //characterMovementHandler.playerstate = _state;
 
         //SetInt("State", state);
 
@@ -216,6 +228,13 @@ public class PlayerStateHandler : NetworkBehaviour
     {
         //Debug.Log($"[RPC] State2 {state2} ");
         state2 = _state2;
+        //if (state == 1 || state == 2)
+        //{
+        //    Debug.Log($"_state2 = {state2}");
+
+        //    characterMovementHandler.playerjumpcount = state2;
+        //}
+
         //SetInt("State2", state2);
 
     }

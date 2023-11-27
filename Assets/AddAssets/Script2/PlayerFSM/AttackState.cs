@@ -23,7 +23,11 @@ public class AttackState : PlayerState
         base.Enter();
         Combo = new Queue<bool>();
         counter = 0;
+        player.SetState2(counter);
+
         player.SetInt("Counter", counter);
+        player.isFireButtonPressed = false;
+
         //player.Spawn(counter);
     }
 
@@ -34,19 +38,23 @@ public class AttackState : PlayerState
         {
             return true;
         }
-        if (Input.GetKeyDown(KeyCode.X))
+        if (player.isJumpButtonPressed)
         {
             Combo.Enqueue(true);
             Debug.Log("ÄÞº¸ Ãß°¡");
+            player.isFireButtonPressed = false;
+
         }
 
         //player.ZeroVelocity();
         if (!player.animationTrigger)
         {
             
-            if (Combo.TryDequeue(out bool Q) && counter < 2f)
+            if (Combo.TryDequeue(out bool Q) && counter < 2)
             {
+            
                 ++counter;
+                player.SetState2(counter);
                 player.animationTrigger = true;
                 player.SetInt("Counter", counter);
                 //player.Spawn(counter);

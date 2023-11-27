@@ -18,6 +18,13 @@ public class CharacterMovementHandler : NetworkBehaviour
 
     PlayerInput input;
     Vector3 moveDirection;
+
+    public GameObject playerWeaponHandle;
+    public GameObject playerEquipWeapon;
+    public GameObject[] playerWeaponPrefab;
+    [Networked(OnChanged = nameof(ChangeWeaponNum))]
+    int weaponNum { get; set; }
+
     //InputAction moveAction;
 
     //[Networked(OnChanged = nameof(OnFireNumChanged))]
@@ -46,24 +53,74 @@ public class CharacterMovementHandler : NetworkBehaviour
 
     float jumpCooldown = 0.15f;
 
-    public int playerstate { get; set; }
+
+
+    //public int playerstate { get; set; }
+
+    public int playerjumpcount { get; set; }
 
     //public int jumpcount2 = 0;
     void Awake()
     {
+
         characterInputhandler = GetComponent<CharacterInputhandler>();
         hpHandler = GetComponent<HPHandler>();
         networkCharacterControllerPrototypeCustom = GetComponent<NetworkCharacterControllerPrototypeCustom>();
         localCamera = GetComponentInChildren<Camera>();
         playerStateHandler = GetComponent<PlayerStateHandler>();
+
     }
     // Start is called before the first frame update
     void Start()
     {
+
+        ChangeWeapon(0);
         //textMeshPro = GetComponentInChildren<TextMeshPro>();
 
     }
+    static void ChangeWeaponNum(Changed<CharacterMovementHandler> changed)
+    {
+        int newWeaponNum = changed.Behaviour.weaponNum;
+        changed.LoadOld();
+        int oldWeaponNum = changed.Behaviour.weaponNum;
+        if (newWeaponNum != oldWeaponNum)
+        {
+            changed.Behaviour.ChangeWeapon(changed.Behaviour.weaponNum);
 
+        }
+    }
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RPC_WeaponNum(int _weaponNum, RpcInfo info = default)
+    {
+        if (playerEquipWeapon == null)
+            return;
+        if (playerEquipWeapon.transform.localPosition != Vector3.zero)
+        {
+            playerEquipWeapon.transform.localPosition = Vector3.zero;
+        }
+        weaponNum = _weaponNum;
+    }
+    void ChangeWeapon(int num)
+    {
+        if (playerEquipWeapon != null)
+            Destroy(playerEquipWeapon);
+        weaponNum = num;
+
+        if (Object.HasInputAuthority)
+        {
+            RPC_WeaponNum(weaponNum);
+        }
+
+        if (playerWeaponPrefab.Length > num && playerWeaponPrefab[num] != null)
+        {
+            playerEquipWeapon = Instantiate(playerWeaponPrefab[num], Vector3.zero, Quaternion.identity);
+
+            playerEquipWeapon.transform.parent = playerWeaponHandle.transform;
+            playerEquipWeapon.transform.localPosition = Vector3.zero;
+
+        }
+
+    }
     private void Update()
     {
 
@@ -83,11 +140,16 @@ public class CharacterMovementHandler : NetworkBehaviour
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     public void RPC_SetJumpCount(int _jumpcount, RpcInfo info = default)
     {
-
         Debug.Log($"jumpcount {_jumpcount} ");
         jumpcountHas = _jumpcount;
-
     }
+
+    //[Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    //public void RPC_SetState(int _State, RpcInfo info = default)
+    //{
+    //    //Debug.Log($"_State {_State} ");
+    //    playerstate = _State;
+    //}
     //public void setJumpcount(int num)
     //{
     //    jumpcountHas = num;
@@ -157,8 +219,8 @@ public class CharacterMovementHandler : NetworkBehaviour
 
         if (GetInput(out NetworkInputData networkInputData))
         {
-            
-
+            //playerstate = playerStateHandler.state;
+            //RPC_SetState(playerstate);
             //Debug.Log($" has 뭐시기{transform.name} = " + networkCharacterControllerPrototypeCustom.Object.HasInputAuthority);w
 
             //Rotate the transform according to the client aim vector
@@ -180,64 +242,78 @@ public class CharacterMovementHandler : NetworkBehaviour
             moveDirection.Normalize();
             playerStateHandler.SetInputVec(networkInputData.movementInput);
             //Debug.Log($"networkInputData.movementInput = {networkInputData.movementInput}");
-            networkCharacterControllerPrototypeCustom.Move(moveDirection);
+            if (playerjumpcount != 0)
+                Debug.Log($"JumpCount = {playerjumpcount}");
 
             //Debug.Log("moveDirection = " + moveDirection);
             //Jump 
-            
 
+            //if (networkInputData.isFireButtonPressed || playerstate == 4)
+            //{
+            //    if (Object.HasInputAuthority)
+            //    {
+            //        playerStateHandler.isFireButtonPressed = true;
+            //    }
+
+            //    if(playerstate < 3 && playerstate >=0)
+            //    {
+            //        playerStateHandler.nextState = playerStateHandler.attackState;
+            //        playerStateHandler.StateChageUpdate();
+            //    }
+            //    moveDirection.x = 0f;
+            //    moveDirection.z = 0f;
+
+            //    networkCharacterControllerPrototypeCustom.Move(moveDirection);
+            //    return;
+
+            //}
+
+            networkCharacterControllerPrototypeCustom.Move(moveDirection);
             if (networkInputData.isJumpButtonPressed)
             {
-                //Debug.Log($"PlayerState =  {playerstate}");
+                bool jumpcount = false;
 
-                if (playerstate == 4)
+                if (Object.HasInputAuthority)
                 {
-                    Debug.Log("공격중이라 점프 불가 ");
-                    playerStateHandler.StateChageUpdate();
-
-                    jumpcountHas = 3;
-                    RPC_SetJumpCount(jumpcountHas);
-                }
-
-                //Debug.Log("JumpButton Press");
-                //여기다가 든 networkcharactercontroller뭐시기 든 
-                //점프 카운트 같은 조건 추가하고 isground일때 조건 초기화 해 주는 식으로 해보지뭐
-                if (jumpcountHas < 2)
-                {
-                    if(jumpTime + jumpCooldown < Time.time)
+                    if (jumpTime + jumpCooldown < Time.time)
                     {
-                        playerStateHandler.nextState = playerStateHandler.jumpState;
-                        playerStateHandler.StateChageUpdate();
-
-                        networkCharacterControllerPrototypeCustom.Jump();
-
-                        if (Object.HasInputAuthority)
+                        if (playerStateHandler.state2 < 2)
                         {
                             jumpTime = Time.time;
-                            //Debug.Log($"jumpTime = {jumpTime} jumpCooldown = {jumpCooldown} Time.time = {Time.time}");
-                            //Debug.Log($"전 HasIn JumpCount = {jumpcountHas}");
-                            jumpcountHas += 1;
-                            RPC_SetJumpCount(jumpcountHas);
 
-                            Debug.Log($"HasIn JumpCount = {jumpcountHas}");
+                            playerStateHandler.isJumpButtonPressed = true;
+                            playerStateHandler.StateChageUpdate();
 
-                            if (Object.HasInputAuthority)
-                                playerStateHandler.isJumpButtonPressed = true;
+
                         }
+                        if (playerStateHandler.state == 1)
+                        {
+                            playerStateHandler.state2 += 1;
+                            playerStateHandler.SetState2(playerStateHandler.state2);
+                        }
+
                     }
                 }
-            }
-            else if (playerstate == 0)
-            {
-                
-                if (playerStateHandler.IsGround()&&jumpcountHas != 0)
+
+                if (playerStateHandler.state == 1 && playerStateHandler.state2 <= 2)
                 {
-                    Debug.Log("JUmpCountHas 초기화 ");
-                    jumpcountHas = 0;
-                    RPC_SetJumpCount(jumpcountHas);
+                    networkCharacterControllerPrototypeCustom.Jump();
+                    Debug.Log($"JUMP실행 ");
                 }
 
+
             }
+            //else if (playerStateHandler.state == 0)
+            //{
+
+            //    if (playerStateHandler.IsGround())
+            //    {
+            //        //Debug.Log("JUmpCountHas 초기화 ");
+            //        jumpcountHas = 0;
+            //        RPC_SetJumpCount(jumpcountHas);
+            //    }
+
+            //}
             //if (Object.HasInputAuthority)
             //    characterInputhandler.isJumpButtonPressed = false;
 
