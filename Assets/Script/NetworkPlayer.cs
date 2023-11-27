@@ -68,7 +68,8 @@ public class NetworkPlayer : NetworkBehaviour,IPlayerLeft
         }
         //이름 Clone말고 번호로 하는법
         //string Q = $"{Object.Id}";
-        //transform.name = PlayerPrefs.GetString("PlayerNickname");
+        transform.name = transform.GetComponent<NetworkPlayer>().nickName.Value;
+            //PlayerPrefs.GetString("PlayerNickname");
         //Q =$"{Q[4]}";
         //mySNum = int.Parse(Q);
         //Debug.Log(mySNum);

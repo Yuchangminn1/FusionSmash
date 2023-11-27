@@ -10,7 +10,7 @@ public class HPHandler : NetworkBehaviour
     int MaxHp { get; set; }
 
     [Networked(OnChanged = nameof(OnHPChanged))]
-    int HP { get; set; }
+    public int HP { get; set; }
 
     [Networked(OnChanged = nameof(OnStateChanged))]
     public bool isDead { get; set; }

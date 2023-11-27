@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 8023995704114535095}
   - component: {fileID: 5587747701852437701}
   - component: {fileID: 9014223809844669387}
+  - component: {fileID: -3062080186606233040}
+  - component: {fileID: -5207179343095522770}
   m_Layer: 0
   m_Name: GreatSword
   m_TagString: Weapon
@@ -83,3 +85,37 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &-3062080186606233040
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7310598976432854536}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c0bc29e77afa8d46afeb3a2a6e2676e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!64 &-5207179343095522770
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7310598976432854536}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 3225604472675471355, guid: 00ee1ce116088f34f8e78f315f67212e, type: 3}

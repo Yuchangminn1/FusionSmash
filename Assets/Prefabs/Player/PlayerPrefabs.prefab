@@ -3791,7 +3791,7 @@ GameObject:
   - component: {fileID: 1055394155822837591}
   m_Layer: 0
   m_Name: PlayerPrefabs
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3926,6 +3926,7 @@ MonoBehaviour:
   _interpolationDataSource: 0
   characterInputhandler: {fileID: 0}
   playerWeaponHandle: {fileID: 2529847878629328461}
+  playerEquipWeapon: {fileID: 0}
   playerWeaponPrefab:
   - {fileID: 7310598976432854536, guid: 7c842d2001f1c1c498836f367aa6ad0b, type: 3}
   isRespawnRequsted: 0

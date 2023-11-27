@@ -406,5 +406,8 @@ public class CharacterMovementHandler : NetworkBehaviour
     //    if (textMeshPro != null)
     //        textMeshPro.text = $"{num}";
     //}
-
+    //private void OnTriggerEnter(Collider other)
+    //{
+    //    Debug.Log($"{other}");
+    //}
 }
