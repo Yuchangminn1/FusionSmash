@@ -52,7 +52,7 @@ public class FallState : PlayerState
 
             }
         }
-        if ((Input.GetKeyDown(KeyCode.C))  && player.dodgeCount == 0f)
+        if (player.isDodgeButtonPressed)
         {
             player.nextState = player.dodgeState;
 
@@ -61,7 +61,7 @@ public class FallState : PlayerState
 
         }
 
-        if (player.isJumpButtonPressed && (player.jumpCount < 2))
+        if (player.isJumpButtonPressed)
         {
             player.nextState = player.jumpState;
 

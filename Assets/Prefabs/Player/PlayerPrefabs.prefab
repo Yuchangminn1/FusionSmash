@@ -3929,6 +3929,8 @@ MonoBehaviour:
   playerEquipWeapon: {fileID: 0}
   playerWeaponPrefab:
   - {fileID: 7310598976432854536, guid: 7c842d2001f1c1c498836f367aa6ad0b, type: 3}
+  - {fileID: 7310598976432854536, guid: 7c842d2001f1c1c498836f367aa6ad0b, type: 3}
+  - {fileID: 7310598976432854536, guid: 7c842d2001f1c1c498836f367aa6ad0b, type: 3}
   isRespawnRequsted: 0
 --- !u!114 &3429284897864010673
 MonoBehaviour:
@@ -3993,6 +3995,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  _HP: 0
   _isDead: 0
   uiOnHitColor: {r: 0.9716981, g: 0.3254272, b: 0.3254272, a: 0.84313726}
   uiONHitImage: {fileID: 8793620033368583382}

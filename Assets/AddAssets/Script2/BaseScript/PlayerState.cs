@@ -33,18 +33,15 @@ public class PlayerState : EntityState
         startTime = Time.time;
         
 
-        if (currentStateNum != 0) { player.animationTrigger = true; }
+        if (endMotionChange) { player.animationTrigger = true; }
     }
     public override bool Update()
     {
         base.Update();
         stateTimer = Time.time;
-        
-        //공격
-        if (player.isFireButtonPressed && isAbleAttack) 
-        {
-            player.nextState = player.attackState;
 
+        if (player.nextState != this)
+        {
             return true;
         }
         if (!isAbleFly)
@@ -68,9 +65,20 @@ public class PlayerState : EntityState
                 airTime = 0f;
             }
         }
-        if (Input.GetKeyDown(KeyCode.C) && isAbleDodge)
+        if (player.isJumpButtonPressed && isAbleJump)
+        {
+            player.nextState = player.jumpState;
+            return true;
+        }
+        if (player.isFireButtonPressed && isAbleAttack)
         {
             player.nextState = player.attackState;
+
+            return true;
+        }
+        if (player.isDodgeButtonPressed && isAbleDodge)
+        {
+            player.nextState = player.dodgeState;
             return true;
         }
 
@@ -92,12 +100,6 @@ public class PlayerState : EntityState
     }
     public override void LateUpdate()
     {
-        if (player.IsGround() && player.state != 1)
-        {
-            //Debug.Log("MoveState 점프 카운트 초기화");
-            //이것도 나중에 지워야함
-            player.dodgeCount = 0f;
-        }
 
         if (player.nextState != this)
         {
@@ -107,10 +109,12 @@ public class PlayerState : EntityState
     public override void Exit()
     {
         base.Exit();
-        if (currentStateNum != 0)
-        {
-            player.animationTrigger = false;
-        }
+        if (endMotionChange) { player.animationTrigger = false; }
+
+        //if (currentStateNum != 0)
+        //{
+        //    player.animationTrigger = false;
+        //}
     }
     
 

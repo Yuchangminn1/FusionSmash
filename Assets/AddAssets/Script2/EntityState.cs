@@ -7,10 +7,11 @@ public class EntityState
     protected int currentStateNum;
     protected float stateTimer;
     protected float startTime;
-    protected bool endMotionChange = true;
-    protected bool isAbleFly = false;
+    protected bool endMotionChange = false;    //애니메이션 트리거 있는지
+    protected bool isAbleFly = false;         
     protected bool isAbleAttack = true;
     protected bool isAbleDodge = true;
+    protected bool isAbleJump = true;
 
 
     public virtual void Enter()

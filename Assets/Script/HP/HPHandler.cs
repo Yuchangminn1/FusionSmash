@@ -89,6 +89,9 @@ public class HPHandler : NetworkBehaviour
     {
         
     }
+
+
+
     public void OnTakeDamage(int _attackDamage = 1)
     {
         if (isDead)
@@ -174,7 +177,11 @@ public class HPHandler : NetworkBehaviour
     }
     void OnDeath()
     {
-
+        if(playerModel == null)
+        {
+            Debug.Log("playerModel is Null");
+            return;
+        }
         playerModel.gameObject.SetActive(false);
         hitboxRoot.HitboxRootActive = false;
         characterMovementHandler.SetCharacterControllerEnabled(false);
@@ -185,7 +192,11 @@ public class HPHandler : NetworkBehaviour
     }
     void OnReive()
     {
-
+        if (playerModel == null)
+        {
+            Debug.Log("playerModel is Null");
+            return;
+        }
         if (Object.HasInputAuthority)
             uiONHitImage.color = new Color(0,0,0,0);
 

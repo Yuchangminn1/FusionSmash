@@ -13,6 +13,8 @@ public class CharacterInputhandler : MonoBehaviour
     private InputAction move;
     private InputAction jump;
     private InputAction fire;
+    private InputAction dodge;
+
     private InputAction look;
 
     Vector2 moveDirection = Vector2.zero;
@@ -25,6 +27,7 @@ public class CharacterInputhandler : MonoBehaviour
     public bool isJumpButtonPressed = false;
     bool isFireButtonPressed = false;
     bool isRightEnterPressed = false;
+    bool isDodgeButtonPressed = false;
     int fireNum;
 
     CharacterMovementHandler characterMovementHandler;
@@ -53,35 +56,9 @@ public class CharacterInputhandler : MonoBehaviour
             return;
         lookVec = Vector2.Lerp(lookVec, look.ReadValue<Vector2>(), 0.2f);
 
-       // Debug.Log($"lookVec  = " + lookVec);
-        //View input camera 
-        //viewInputVector.x = Input.GetAxis("Mouse X");
-        //viewInputVector.y = Input.GetAxis("Mouse Y") * -1; //Invert the mouse look
         viewInputVector.x = lookVec.x;
         viewInputVector.y = lookVec.y * -1; //Invert the mouse look
-        ////ÀÎÇ²À» ¼öÁý  move input
-        //moveInputVector.x = Input.GetAxis("Horizontal");
-        //moveInputVector.y = Input.GetAxis("Vertical");
 
-
-        //if (Input.GetButtonDown("Jump"))
-        //{
-        //    Debug.Log("Jump!!!");
-
-        //    isJumpButtonPressed = true;
-        //}
-        //if (Input.GetButtonDown("Fire1"))
-        //{
-
-        //    isFireButtonPressed = true;
-        //    ++fireNum;
-        //}
-        //if (Input.GetButtonDown("Submit"))
-        //{
-        //    Debug.Log("Right Enter!!!");
-
-        //    isRightEnterPressed = true;
-        //}
         localCameraHandler.SetViewInputVector(viewInputVector);
 
 
@@ -125,6 +102,7 @@ public class CharacterInputhandler : MonoBehaviour
         isJumpButtonPressed = false;
         isFireButtonPressed = false;
         isRightEnterPressed = false;
+        isDodgeButtonPressed = false;
         return networkInputData;
 
     }
@@ -143,8 +121,12 @@ public class CharacterInputhandler : MonoBehaviour
         fire = playerControls.Player.Fire;
         fire.Enable();
 
+        dodge = playerControls.Player.Dodge;
+        dodge.Enable();
+
         jump.performed += Jump;
         fire.performed += Fire;
+        dodge.performed += Dodge;
 
     }
     private void OnDisable()
@@ -152,6 +134,8 @@ public class CharacterInputhandler : MonoBehaviour
         move.Disable();
         fire.Disable();
         jump.Disable();
+        dodge.Disable();
+
         look.Disable();
 
 
@@ -167,6 +151,14 @@ public class CharacterInputhandler : MonoBehaviour
         //Debug.Log("Jump!!!");
 
         isJumpButtonPressed = true;
+    }
+
+    private void Dodge(InputAction.CallbackContext context)
+    {
+        //Debug.Log("Dodge!!!");
+
+        isDodgeButtonPressed = true;
+        
     }
 
     private float MYCut(float _float)

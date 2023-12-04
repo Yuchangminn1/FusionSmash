@@ -21,7 +21,10 @@ public class CharacterMovementHandler : NetworkBehaviour
 
     public GameObject playerWeaponHandle;
     public GameObject playerEquipWeapon;
-    public GameObject[] playerWeaponPrefab;
+    public List<GameObject> playerWeaponPrefab;
+    TestWeapon testWeapon;
+
+
     [Networked(OnChanged = nameof(ChangeWeaponNum))]
     int weaponNum { get; set; }
 
@@ -47,17 +50,24 @@ public class CharacterMovementHandler : NetworkBehaviour
     NetworkCharacterControllerPrototypeCustom networkCharacterControllerPrototypeCustom;
     HPHandler hpHandler;
 
-    public int jumpcountHas { get; set; }
 
     float jumpTime = 0f;
 
     float jumpCooldown = 0.15f;
 
+    float attackTime = 0f;
+
+    float attackComboTime = 0.2f;
 
 
     //public int playerstate { get; set; }
 
-    public int playerjumpcount { get; set; }
+    public int playerJumpCount { get; set; }
+
+    public int playerDodgeCount { get; set; }
+
+    public int playerAttackCount { get; set; }
+
 
     //public int jumpcount2 = 0;
     void Awake()
@@ -73,6 +83,7 @@ public class CharacterMovementHandler : NetworkBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        testWeapon = GetComponentInChildren<TestWeapon>();
 
         ChangeWeapon(0);
         //textMeshPro = GetComponentInChildren<TextMeshPro>();
@@ -111,7 +122,7 @@ public class CharacterMovementHandler : NetworkBehaviour
             RPC_WeaponNum(weaponNum);
         }
 
-        if (playerWeaponPrefab.Length > num && playerWeaponPrefab[num] != null)
+        if (playerWeaponPrefab.Count > num && playerWeaponPrefab[num] != null)
         {
             playerEquipWeapon = Instantiate(playerWeaponPrefab[num], Vector3.zero, Quaternion.identity);
 
@@ -125,35 +136,7 @@ public class CharacterMovementHandler : NetworkBehaviour
     {
 
     }
-    //점프 카운트 왜 0이 되는지 이해가 안감 
-    //static void jumpcountSet(Changed<CharacterMovementHandler> changed)
-    //{
-    //    int newC = changed.Behaviour.jumpcountHas;
-    //    changed.LoadOld();
-    //    int oldC = changed.Behaviour.jumpcountHas;
-    //    if (newC != oldC)
-    //    {
-    //        //Debug.Log($"newC {newC},  oldC{oldC}");
-    //        changed.Behaviour.setJumpcount(newC);
-    //    }
-    //}
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    public void RPC_SetJumpCount(int _jumpcount, RpcInfo info = default)
-    {
-        Debug.Log($"jumpcount {_jumpcount} ");
-        jumpcountHas = _jumpcount;
-    }
 
-    //[Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    //public void RPC_SetState(int _State, RpcInfo info = default)
-    //{
-    //    //Debug.Log($"_State {_State} ");
-    //    playerstate = _State;
-    //}
-    //public void setJumpcount(int num)
-    //{
-    //    jumpcountHas = num;
-    //}
 
     private void FixedUpdate()
     {
@@ -195,6 +178,7 @@ public class CharacterMovementHandler : NetworkBehaviour
             //죽은 상태면 정보 보내지 말고 리턴 
             if (hpHandler.isDead)
                 return;
+
         }
 
 
@@ -212,8 +196,22 @@ public class CharacterMovementHandler : NetworkBehaviour
         //반환된 입력 구조체는 Fusion.NetworkObject.InputAuthority에서 시작하며,
         // 유효한 경우 현재 시뮬레이션 틱에 대해 해당 Fusion.PlayerRef가 제공한 입력을 포함합니다
         //GetInput >> NetworkBehavior 에 있는 함수
+
+
         if (Object.HasInputAuthority)
         {
+            if (testWeapon != null)
+            {
+                if (testWeapon.IsHit())
+                {
+                    testWeapon.AttackPlayer();
+                }
+            }
+            else
+            {
+                testWeapon = GetComponentInChildren<TestWeapon>();
+                Debug.Log("testWeapon is Null");
+            }
             playerStateHandler.StateChageUpdate();
         }
 
@@ -242,8 +240,8 @@ public class CharacterMovementHandler : NetworkBehaviour
             moveDirection.Normalize();
             playerStateHandler.SetInputVec(networkInputData.movementInput);
             //Debug.Log($"networkInputData.movementInput = {networkInputData.movementInput}");
-            if (playerjumpcount != 0)
-                Debug.Log($"JumpCount = {playerjumpcount}");
+            //if (playerjumpcount != 0)
+            //    Debug.Log($"점프카운트  = {playerjumpcount}");
 
             //Debug.Log("moveDirection = " + moveDirection);
             //Jump 
@@ -269,6 +267,7 @@ public class CharacterMovementHandler : NetworkBehaviour
             //}
 
             networkCharacterControllerPrototypeCustom.Move(moveDirection);
+            //점프 
             if (networkInputData.isJumpButtonPressed)
             {
                 bool jumpcount = false;
@@ -277,32 +276,83 @@ public class CharacterMovementHandler : NetworkBehaviour
                 {
                     if (jumpTime + jumpCooldown < Time.time)
                     {
-                        if (playerStateHandler.state2 < 2)
+                        ++playerJumpCount;
+
+                        // if (playerStateHandler.state2 < 2)
+                        if (playerJumpCount <= 2)
                         {
                             jumpTime = Time.time;
-
                             playerStateHandler.isJumpButtonPressed = true;
                             playerStateHandler.StateChageUpdate();
-
+                            playerStateHandler.SetState2(playerJumpCount);
 
                         }
                         if (playerStateHandler.state == 1)
                         {
-                            playerStateHandler.state2 += 1;
-                            playerStateHandler.SetState2(playerStateHandler.state2);
+                            //playerStateHandler.state2 += 1;
+                            
                         }
 
                     }
                 }
-
-                if (playerStateHandler.state == 1 && playerStateHandler.state2 <= 2)
+                if (playerStateHandler.state == 1 && playerJumpCount <= 2)
                 {
                     networkCharacterControllerPrototypeCustom.Jump();
-                    Debug.Log($"JUMP실행 ");
+                    Debug.Log($"JUMP실행 카운트 = {playerJumpCount}");
                 }
+            }
+            else 
+            {
+                playerStateHandler.isJumpButtonPressed = false;
+            }
 
+            //공격 
+            if (networkInputData.isFireButtonPressed)
+            {
+                if (Object.HasInputAuthority)
+                {
+                    if(attackTime+attackComboTime > Time.time)
+                    {
+                        //  com
+                        ;
+                        //콤보시간 추가할거임;
+                    }
+                    //인풋키 스테이트에 전달하는거 하고있었음 
+                    playerStateHandler.isFireButtonPressed = true;
+                    playerStateHandler.StateChageUpdate();
+                    playerStateHandler.SetState2(playerAttackCount);
+                    ++playerAttackCount;
+                }
+            }
+            else
+            {
+                playerStateHandler.isFireButtonPressed = false;
 
             }
+
+            //회피 
+            if (networkInputData.isDodgeButtonPressed)
+            {
+                if (Object.HasInputAuthority)
+                {
+                    playerStateHandler.isDodgeButtonPressed = true;
+                    playerStateHandler.StateChageUpdate();
+                    ++playerDodgeCount;
+                }
+            }
+            else
+            {
+                playerStateHandler.isDodgeButtonPressed = false;
+
+            }
+            if (playerStateHandler.IsGround() && playerStateHandler.state == 0)
+            {
+                //Debug.Log("점프카운트 초기화");
+                playerJumpCount = 0;
+                playerDodgeCount = 0;
+                playerAttackCount = 0;
+            }
+
             //else if (playerStateHandler.state == 0)
             //{
 

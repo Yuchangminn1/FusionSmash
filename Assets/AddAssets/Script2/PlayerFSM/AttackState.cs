@@ -12,10 +12,11 @@ public class AttackState : PlayerState
     {
         player = _player;
         currentStateNum = _currentStateNum;
-        endMotionChange = false;
+        endMotionChange = true;
         isAbleFly = true;
         isAbleAttack = false;
         isAbleDodge = false;
+        isAbleJump = false;
     }
 
     public override void Enter()
@@ -38,8 +39,9 @@ public class AttackState : PlayerState
         {
             return true;
         }
-        if (player.isJumpButtonPressed)
+        if (player.isFireButtonPressed && counter < 2)
         {
+            ++counter;
             Combo.Enqueue(true);
             Debug.Log("콤보 추가");
             player.isFireButtonPressed = false;
@@ -49,21 +51,20 @@ public class AttackState : PlayerState
         //player.ZeroVelocity();
         if (!player.animationTrigger)
         {
-            
-            if (Combo.TryDequeue(out bool Q) && counter < 2)
+            Debug.Log("애니메이션 트리거 끝남");
+
+            if (Combo.TryDequeue(out bool Q))
             {
-            
-                ++counter;
-                player.SetState2(counter);
+                Debug.Log($"카운터 = {counter}");
+
                 player.animationTrigger = true;
-                player.SetInt("Counter", counter);
-                //player.Spawn(counter);
-                Debug.Log("counter = " + counter);
+
                 return true;
 
             }
             else
             {
+                Debug.Log("카운터 없음");
                 if (base.Update())
                 {
                     return true;
@@ -91,6 +92,7 @@ public class AttackState : PlayerState
     public override void FixedUpdate()
     {
         base.FixedUpdate();
+       // Debug.Log("AttackState");
     }
     public override void LateUpdate()
     {
@@ -103,7 +105,7 @@ public class AttackState : PlayerState
     public override void Exit()
     {
         base.Exit();
-        player.animationTrigger = false;
+        Debug.Log("Attack Exit");
 
     }
 }

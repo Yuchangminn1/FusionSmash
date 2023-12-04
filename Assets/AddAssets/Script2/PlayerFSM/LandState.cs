@@ -10,11 +10,11 @@ public class LandState : PlayerState
     {
         player = _player;
         currentStateNum = _currentStateNum;
-        isAbleFly = true;
-        endMotionChange = false;
-
+        isAbleFly = false;
+        endMotionChange = true;
         isAbleAttack = false;
         isAbleDodge = false;
+        isAbleJump = false;
     }
 
     public override void Enter()
@@ -22,11 +22,7 @@ public class LandState : PlayerState
         base.Enter();
         Debug.Log("랜드 진입");
         player.isStop = true;
-        //if(player.state2 >= 2)
-        //{
-        //    player.state2 = 1;
-        //    player.SetState2(player.state2);
-        //}
+
     }
     public override bool Update()
     {

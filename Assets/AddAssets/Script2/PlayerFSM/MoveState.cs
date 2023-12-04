@@ -5,11 +5,12 @@ using UnityEngine;
 
 public class MoveState : PlayerState
 {
-
+    
     public MoveState(PlayerStateHandler _player, int _currentStateNum) : base(_player, _currentStateNum)
     {
         player = _player;
         currentStateNum = _currentStateNum;
+
     }
 
     public override void Enter()
@@ -21,23 +22,14 @@ public class MoveState : PlayerState
 
     public override bool Update()
     {
-        if (player.isJumpButtonPressed)
-        {
-            player.nextState = player.jumpState;
-            return true;
-        }
+        
         if (player.nextState != this)
         {
             return true;
         }
         if (base.Update())
             return true;
-
-        if (player.isJumpButtonPressed)
-        {
-            player.nextState = player.jumpState;
-            return true;
-        }
+        
         return false;
     }
     public override void FixedUpdate()

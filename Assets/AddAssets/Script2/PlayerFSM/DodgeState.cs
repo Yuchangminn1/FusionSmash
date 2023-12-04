@@ -9,23 +9,27 @@ public class DodgeState : PlayerState
     {
         player = _player;
         currentStateNum = _currentStateNum;
+        endMotionChange = true;
         isAbleAttack = false;
-        isAbleFly = true;
+        isAbleFly = false;
         isAbleDodge = false;
 
     }
     public override void Enter()
     {
         base.Enter();
-
-        ++player.dodgeCount;
+        Debug.Log("Dodge Enter");
+        //++player.dodgeCount;
+        player.isDodgeButtonPressed = false;
 
     }
     public override bool Update()
     {
-        if (base.Update())
-            return true;
-
+        if (!player.animationTrigger)
+        {
+            if (base.Update())
+                return true;
+        }
         return false;
     }
     public override void FixedUpdate()

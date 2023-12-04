@@ -14,9 +14,9 @@ public class PlayerStateHandler : NetworkBehaviour
     public NetworkString<_16> nickName { get; set; }
 
 
-    public float dodgeCount = 0f;
+    //public float dodgeCount = 0f;
 
-    public int jumpCount { get; set; }
+    //public int jumpCount { get; set; }
 
     public bool isdead = false;
 
@@ -60,6 +60,8 @@ public class PlayerStateHandler : NetworkBehaviour
 
     public bool isFireButtonPressed = false;
 
+    public bool isDodgeButtonPressed = false;
+
 
 
     Vector3 inputVec3;
@@ -67,18 +69,21 @@ public class PlayerStateHandler : NetworkBehaviour
     #endregion
     void Awake()
     {
-        stateMachine = new StateMachine();
+        anima = GetComponent<Animator>();
+        cc = GetComponent<CharacterController>();
+        //networkCC = GetComponent<NetworkCharacterControllerPrototypeCustom>();
+        characterMovementHandler = GetComponent<CharacterMovementHandler>();
+
 
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        anima = transform.GetComponent<Animator>();
-        cc = transform.GetComponent<CharacterController>();
-        //networkCC = GetComponent<NetworkCharacterControllerPrototypeCustom>();
-        characterMovementHandler = transform.GetComponent<CharacterMovementHandler>();
+
         #region FSM_Initialize
+        stateMachine = new StateMachine();
+
         moveState = new MoveState(this, 0);
         jumpState = new JumpState(this, 1);
         fallState = new FallState(this, 2);
@@ -130,6 +135,12 @@ public class PlayerStateHandler : NetworkBehaviour
 
     public void StateChageUpdate()
     {
+        if(stateMachine == null)
+        {
+            Debug.Log("stateMachine is Null");
+            return;
+        }
+
         if (Object.HasInputAuthority)
         {
             stateMachine.Update();
