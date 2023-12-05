@@ -22,11 +22,11 @@ public class AttackState : PlayerState
     public override void Enter()
     {
         base.Enter();
-        Combo = new Queue<bool>();
-        counter = 0;
-        player.SetState2(counter);
+        //Combo = new Queue<bool>();
+        //counter = 0;
+        //player.SetState2(counter);
 
-        player.SetInt("Counter", counter);
+        //player.SetInt("Counter", counter);
         player.isFireButtonPressed = false;
 
         //player.Spawn(counter);
@@ -39,50 +39,51 @@ public class AttackState : PlayerState
         {
             return true;
         }
-        if (player.isFireButtonPressed && counter < 2)
-        {
-            ++counter;
-            Combo.Enqueue(true);
-            Debug.Log("콤보 추가");
-            player.isFireButtonPressed = false;
+        //if (player.isFireButtonPressed && counter < 2)
+        //{
+        //    //++counter;
+        //    //Combo.Enqueue(true);
+        //    Debug.Log("콤보 추가");
+        //    player.isFireButtonPressed = false;
 
-        }
+        //}
 
         //player.ZeroVelocity();
         if (!player.animationTrigger)
         {
             Debug.Log("애니메이션 트리거 끝남");
 
-            if (Combo.TryDequeue(out bool Q))
+            //if (Combo.TryDequeue(out bool Q))
+            //{
+            //    Debug.Log($"카운터 = {counter}");
+
+            //    player.nextState = player.attackState;
+
+
+            //    return true;
+
+            //}
+            //else
+            //{
+            Debug.Log("카운터 없음");
+            if (base.Update())
             {
-                Debug.Log($"카운터 = {counter}");
-
-                player.animationTrigger = true;
-
                 return true;
-
             }
+
+            //player.EndSpawn();
+            if (player.IsGround())
+                player.nextState = player.moveState;
+
+            //player.StateChange(player.moveState);
             else
-            {
-                Debug.Log("카운터 없음");
-                if (base.Update())
-                {
-                    return true;
-                }
+                player.nextState = player.fallState;
 
-                //player.EndSpawn();
-                if (player.IsGround())
-                    player.nextState = player.moveState;
+            //player.StateChange(player.fallState);
 
-                //player.StateChange(player.moveState);
-                else
-                    player.nextState = player.fallState;
+            return true;
 
-                //player.StateChange(player.fallState);
-
-                return true;
-
-            }
+            //}
 
         }
         return false;
@@ -92,7 +93,7 @@ public class AttackState : PlayerState
     public override void FixedUpdate()
     {
         base.FixedUpdate();
-       // Debug.Log("AttackState");
+        // Debug.Log("AttackState");
     }
     public override void LateUpdate()
     {

@@ -53,7 +53,7 @@ public class CharacterMovementHandler : NetworkBehaviour
 
     float jumpTime = 0f;
 
-    float jumpCooldown = 0.15f;
+    float jumpCooldown = 0.30f;
 
     float attackTime = 0f;
 
@@ -320,6 +320,11 @@ public class CharacterMovementHandler : NetworkBehaviour
                     //인풋키 스테이트에 전달하는거 하고있었음 
                     playerStateHandler.isFireButtonPressed = true;
                     playerStateHandler.StateChageUpdate();
+
+                    if(playerStateHandler.state != 4)
+                    {
+                        playerStateHandler.isFireButtonPressed = false;
+                    }
                     playerStateHandler.SetState2(playerAttackCount);
                     ++playerAttackCount;
                 }

@@ -34,6 +34,11 @@ public class JumpState : PlayerState
             player.nextState = player.dodgeState;
             return true;
         }
+        if (player.isJumpButtonPressed)
+        {
+            player.nextState = player.jumpState;
+            return true;
+        }
         //if (player.isJumpButtonPressed)
         //{
         //    player.StateChange(player.jumpState);
