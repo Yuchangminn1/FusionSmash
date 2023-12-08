@@ -12,14 +12,16 @@ public class LocalCameraHandler : MonoBehaviour
     float cameraRotationY = 0;
 
     //Other component
-    NetworkCharacterControllerPrototypeCustom networkCharacterControllerPrototypeCustom;
+    CharacterMovementHandler characterMovementHandler;
+    //NetworkCharacterControllerPrototypeCustom networkCharacterControllerPrototypeCustom;
 
     Camera localCamera;
 
     void Awake()
     {
         localCamera = GetComponent<Camera>();
-        networkCharacterControllerPrototypeCustom= GetComponentInParent<NetworkCharacterControllerPrototypeCustom>();
+        characterMovementHandler = GetComponentInParent<CharacterMovementHandler>();
+        //networkCharacterControllerPrototypeCustom = GetComponentInParent<NetworkCharacterControllerPrototypeCustom>();
     }
     // Start is called before the first frame update
     void Start()
@@ -44,10 +46,10 @@ public class LocalCameraHandler : MonoBehaviour
         localCamera.transform.position = cameraAnchorPoint.position;
 
         //Calculate rotation
-        cameraRotationX += viewInput.y * Time.deltaTime * networkCharacterControllerPrototypeCustom.viewUpDownRotationSpeed;
+        cameraRotationX += viewInput.y * Time.deltaTime * characterMovementHandler.viewUpDownRotationSpeed;
         cameraRotationX = Mathf.Clamp(cameraRotationX, -90, 90);
 
-        cameraRotationY += viewInput.x * Time.deltaTime * networkCharacterControllerPrototypeCustom.rotationSpeed;
+        cameraRotationY += viewInput.x * Time.deltaTime * characterMovementHandler.rotationSpeed;
 
 
         localCamera.transform.rotation = Quaternion.Euler(cameraRotationX, cameraRotationY, 0);

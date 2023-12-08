@@ -20,10 +20,14 @@ public class JumpState : PlayerState
     public override void Enter()
     {
         player.isJumpButtonPressed = false;
+        Debug.Log("점프스테이트 들어왔음");
+
+        player.JUMPCOUNT();
+        player.SetState2(1);
+
         base.Enter();
         //player.SetState2(player.jumpCount);
         //player.jumpCount += 1;
-
         player.isJumping = true;
        
     }
@@ -54,7 +58,7 @@ public class JumpState : PlayerState
             if (base.Update())
                 return true;
 
-            if (player.IsGround() && player.cc.velocity.y < 0.01f)
+            if (player.IsGround())
             {
                 player.nextState = player.moveState;
                 return true;

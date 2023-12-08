@@ -38,7 +38,8 @@ public class PlayerStateHandler : NetworkBehaviour
     public bool animationTrigger = false;
     [SerializeField] Animator anima;
 
-    public CharacterController cc;
+    //public CharacterController cc;
+    //public Rigidbody rb;
 
     #region FSM
     protected StateMachine stateMachine;
@@ -70,13 +71,20 @@ public class PlayerStateHandler : NetworkBehaviour
     void Awake()
     {
         anima = GetComponent<Animator>();
-        cc = GetComponent<CharacterController>();
+        //cc = GetComponent<CharacterController>();
         //networkCC = GetComponent<NetworkCharacterControllerPrototypeCustom>();
         characterMovementHandler = GetComponent<CharacterMovementHandler>();
 
 
     }
-
+    public void JUMPCOUNT()
+    {
+        characterMovementHandler.JUMPCOUNT();
+    }
+    public void JUMPCOUNTRESET()
+    {
+        characterMovementHandler.JUMPCOUNTRESET();
+    }
     // Start is called before the first frame update
     void Start()
     {

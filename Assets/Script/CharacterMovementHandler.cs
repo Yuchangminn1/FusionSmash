@@ -47,42 +47,65 @@ public class CharacterMovementHandler : NetworkBehaviour
 
     Camera localCamera;
 
-    NetworkCharacterControllerPrototypeCustom networkCharacterControllerPrototypeCustom;
+    //NetworkCharacterControllerPrototypeCustom networkCharacterControllerPrototypeCustom;
+    public Rigidbody rb;
+    public NetworkRigidbody networkRigidbody;
     HPHandler hpHandler;
+
+    float moveSpeed = 10f;
 
 
     float jumpTime = 0f;
 
-    float jumpCooldown = 0.30f;
+    float jumpCooldown = 0.1f;
+
+    float jumpForce = 10f;
+
+    bool doJump = false;
 
     float attackTime = 0f;
 
     float attackComboTime = 0.2f;
 
+    public float rotationSpeed = 15.0f;
+    public float viewUpDownRotationSpeed = 50.0f;
+
 
     //public int playerstate { get; set; }
+    //[Networked(OnChanged = nameof(ChangeJumpCount))]
+    //private int playerJumpCount11 { get; set; }
+    [Networked(OnChanged = nameof(ChangeJump))]
+    private int playerJumpCount { get; set; }
+    private int playerJumpCount11 { get; set; }
 
-    public int playerJumpCount { get; set; }
+    int jumpCountOld { get; set; }
+
 
     public int playerDodgeCount { get; set; }
 
     public int playerAttackCount { get; set; }
 
-
+    private NetworkObject networkObject;
     //public int jumpcount2 = 0;
     void Awake()
     {
 
         characterInputhandler = GetComponent<CharacterInputhandler>();
         hpHandler = GetComponent<HPHandler>();
-        networkCharacterControllerPrototypeCustom = GetComponent<NetworkCharacterControllerPrototypeCustom>();
+        networkRigidbody = GetComponent<NetworkRigidbody>();
+        rb = GetComponent<Rigidbody>();
+        //networkCharacterControllerPrototypeCustom = GetComponent<NetworkCharacterControllerPrototypeCustom>();
         localCamera = GetComponentInChildren<Camera>();
         playerStateHandler = GetComponent<PlayerStateHandler>();
+        networkObject = GetComponent<NetworkObject>();
 
     }
     // Start is called before the first frame update
     void Start()
     {
+        playerJumpCount = 0;
+        jumpForce = 10f;
+
         testWeapon = GetComponentInChildren<TestWeapon>();
 
         ChangeWeapon(0);
@@ -97,9 +120,60 @@ public class CharacterMovementHandler : NetworkBehaviour
         if (newWeaponNum != oldWeaponNum)
         {
             changed.Behaviour.ChangeWeapon(changed.Behaviour.weaponNum);
-
         }
     }
+    static void ChangeJump(Changed<CharacterMovementHandler> changed)
+    {
+        int newWeaponNum = changed.Behaviour.playerJumpCount;
+        changed.LoadOld();
+        int oldWeaponNum = changed.Behaviour.playerJumpCount;
+        Debug.Log($"New {newWeaponNum} / Old {oldWeaponNum}");
+        if (newWeaponNum != oldWeaponNum)
+        {
+            changed.Behaviour.DoJump();
+        }
+    }
+    void DoJump()
+    {
+        //Debug.Log($"점프카운트 = {playerJumpCount}");
+        //if(playerJumpCount!=0)
+        RPC_DoJump();
+        Debug.Log("DOJUMP실행 doJump =  true");
+        //rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+    }
+    //static void ChangeJumpCount(Changed<CharacterMovementHandler> changed)
+    //{
+    //    int newWeaponNum = changed.Behaviour.playerJumpCount11;
+    //    changed.LoadOld();
+    //    int oldWeaponNum = changed.Behaviour.playerJumpCount11;
+    //    if (newWeaponNum!= oldWeaponNum)
+    //    {
+    //        Debug.Log($"전{oldWeaponNum} 후 {newWeaponNum}");
+    //    }
+    //}
+    //public void jumpcountUP()
+    //{
+    //    playerJumpCount11 += 1;
+    //}
+    public void JUMPCOUNT()
+    {
+        playerJumpCount11 += 1;
+        Debug.Log($"playerJumpCount11 = {playerJumpCount11}");
+        playerJumpCount = playerJumpCount11;
+        Debug.Log($"playerJumpCount = {playerJumpCount}");
+    }
+    public void JUMPCOUNTRESET()
+    {
+        ;
+        //playerJumpCount11 = 0;
+        //playerJumpCount = playerJumpCount11;
+    }
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RPC_DoJump(RpcInfo info = default)
+    {
+        doJump = true;
+    }
+
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     public void RPC_WeaponNum(int _weaponNum, RpcInfo info = default)
     {
@@ -134,12 +208,21 @@ public class CharacterMovementHandler : NetworkBehaviour
     }
     private void Update()
     {
-
+        if (Input.GetKeyDown(KeyCode.H))
+        {
+            Debug.Log("QQQ");
+            JUMPCOUNT();
+        }
+        if (Input.GetKeyDown(KeyCode.V))
+        {
+            ;
+        }
     }
 
 
     private void FixedUpdate()
     {
+
 
     }
 
@@ -160,6 +243,7 @@ public class CharacterMovementHandler : NetworkBehaviour
     //서버에서 움직일려면 fixedUpdateNetwork
     public override void FixedUpdateNetwork()
     {
+
         //if (Object.HasInputAuthority)
         //{
         //    playerStateHandler.StateChageUpdate();
@@ -265,53 +349,62 @@ public class CharacterMovementHandler : NetworkBehaviour
             //    return;
 
             //}
+            //networkRigidbody.WriteVelocity(moveDirection);
+            networkRigidbody.Rigidbody.velocity = (new Vector3(moveDirection.x * moveSpeed, networkRigidbody.ReadVelocity().y, moveDirection.z * moveSpeed));
+            //networkRigidbody.WriteVelocity(networkRigidbody.ReadVelocity());
 
-            networkCharacterControllerPrototypeCustom.Move(moveDirection);
+            //networkCharacterControllerPrototypeCustom.Move(moveDirection);
             //점프 
+            
             if (networkInputData.isJumpButtonPressed)
             {
-                bool jumpcount = false;
-
+                // if (playerStateHandler.state2 < 2)
+                //if (playerJumpCount < 2)
+                //{
+                //Debug.Log($"playerJumpCount = {playerJumpCount}");
+                //int nowJumpCount = playerJumpCount;
                 if (Object.HasInputAuthority)
                 {
-                    if (jumpTime + jumpCooldown < Time.time)
-                    {
-                        ++playerJumpCount;
+                    Debug.Log($"playerJumpCount  Network V = {playerJumpCount}");
 
-                        // if (playerStateHandler.state2 < 2)
-                        if (playerJumpCount <= 2)
-                        {
-                            jumpTime = Time.time;
-                            playerStateHandler.isJumpButtonPressed = true;
-                            playerStateHandler.StateChageUpdate();
-                            playerStateHandler.SetState2(playerJumpCount);
-
-                        }
-                        if (playerStateHandler.state == 1)
-                        {
-                            //playerStateHandler.state2 += 1;
-                            
-                        }
-
-                    }
+                    playerStateHandler.isJumpButtonPressed = true;
+                    playerStateHandler.StateChageUpdate();
+                    //playerStateHandler.SetState2(1);
+                    //playerStateHandler.SetState2(playerJumpCount);
                 }
-                if (playerStateHandler.state == 1 && playerJumpCount <= 2)
-                {
-                    networkCharacterControllerPrototypeCustom.Jump();
-                    Debug.Log($"JUMP실행 카운트 = {playerJumpCount}");
-                }
+
+                //rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+                //}
+                
             }
-            else 
+            else
             {
+
                 playerStateHandler.isJumpButtonPressed = false;
+            }
+
+            if (doJump)
+            {
+                //점프 한박자 늦는건 처리하는게 다음 네트워크틱으로 밀려서 그런듯 이것도 수정 해 보장
+                jumpTime = Time.time;
+                Debug.Log("점프해");
+                //rb.AddForceAtPosition(Vector3.up * jumpForce, transform.position, ForceMode.Impulse);
+
+                //rb.AddForce(Vector3.up * jumpForce*300f);
+                if (networkRigidbody.ReadVelocity().y < 0.5f) //안하면 클라이언트 객체들이 점프해서 이상해짐
+                    networkRigidbody.Rigidbody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+
+                doJump = false;
             }
 
             //공격 
             if (networkInputData.isFireButtonPressed)
             {
+
                 if (Object.HasInputAuthority)
                 {
-                    if(attackTime+attackComboTime > Time.time)
+
+                    if (attackTime + attackComboTime > Time.time)
                     {
                         //  com
                         ;
@@ -321,7 +414,7 @@ public class CharacterMovementHandler : NetworkBehaviour
                     playerStateHandler.isFireButtonPressed = true;
                     playerStateHandler.StateChageUpdate();
 
-                    if(playerStateHandler.state != 4)
+                    if (playerStateHandler.state != 4)
                     {
                         playerStateHandler.isFireButtonPressed = false;
                     }
@@ -352,8 +445,11 @@ public class CharacterMovementHandler : NetworkBehaviour
             }
             if (playerStateHandler.IsGround() && playerStateHandler.state == 0)
             {
-                //Debug.Log("점프카운트 초기화");
-                playerJumpCount = 0;
+                if (Object.HasInputAuthority && rb.velocity.y < 0.2f)
+                {
+                    //playerJumpCount = 0;
+                    ;
+                }
                 playerDodgeCount = 0;
                 playerAttackCount = 0;
             }
@@ -427,7 +523,8 @@ public class CharacterMovementHandler : NetworkBehaviour
     void Respawn()
     {
         SetCharacterControllerEnabled(true);
-        networkCharacterControllerPrototypeCustom.TeleportToPosition(Utils.GetRandomSpawnPoint());
+        //networkCharacterControllerPrototypeCustom.TeleportToPosition(Utils.GetRandomSpawnPoint());
+        networkRigidbody.TeleportToPosition(Utils.GetRandomSpawnPoint());
 
         hpHandler.OnRespawned();
 
@@ -438,7 +535,8 @@ public class CharacterMovementHandler : NetworkBehaviour
     /// </summary>
     public void SetCharacterControllerEnabled(bool isEnabled)
     {
-        networkCharacterControllerPrototypeCustom.Controller.enabled = isEnabled;
+        //networkCharacterControllerPrototypeCustom.Controller.enabled = isEnabled;
+        networkRigidbody.enabled = isEnabled;
     }
 
     //ONchage 쓸떄는 스태틱으로 사용해야함

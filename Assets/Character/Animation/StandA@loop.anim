@@ -293,8 +293,7 @@ AnimationClip:
         time: 0
         value: {x: 0.068094835, y: -0.00000006677218, z: 0.000000021009999, w: 0.9976207}
         inSlope: {x: -0.047217138, y: -0.000000029810433, z: -0.000000020837179, w: 0.003432794}
-        outSlope: {x: -0.047217138, y: -0.000000029810433, z: -0.000000020837179,
-          w: 0.003432794}
+        outSlope: {x: -0.047217138, y: -0.000000029810433, z: -0.000000020837179, w: 0.003432794}
         tangentMode: 0
         weightedMode: 0
         inWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334, w: 0.33333334}
@@ -14637,7 +14636,7 @@ AnimationClip:
     m_KeepOriginalOrientation: 0
     m_KeepOriginalPositionY: 0
     m_KeepOriginalPositionXZ: 0
-    m_HeightFromFeet: 0
+    m_HeightFromFeet: 1
     m_Mirror: 0
   m_EditorCurves:
   - serializedVersion: 2

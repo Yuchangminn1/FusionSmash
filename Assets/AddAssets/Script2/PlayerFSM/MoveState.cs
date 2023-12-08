@@ -17,7 +17,8 @@ public class MoveState : PlayerState
     {
         base.Enter();
         
-        
+        player.JUMPCOUNTRESET();
+        Debug.Log("점프카운트 리셋 했어용");
     }
 
     public override bool Update()
