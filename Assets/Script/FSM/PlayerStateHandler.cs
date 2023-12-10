@@ -9,7 +9,7 @@ public class PlayerStateHandler : NetworkBehaviour
 {
     [Networked(OnChanged = nameof(ChangeState))]
     public int state { get; set; }
-    [Networked(OnChanged = nameof(ChangeState2))]
+    //[Networked(OnChanged = nameof(ChangeState2))]
     public int state2 { get; set; }
 
     public NetworkString<_16> nickName { get; set; }
@@ -203,18 +203,18 @@ public class PlayerStateHandler : NetworkBehaviour
 
         }
     }
-    static void ChangeState2(Changed<PlayerStateHandler> changed)
-    {
-        int newS = changed.Behaviour.state2;
-        changed.LoadOld();
-        int oldS = changed.Behaviour.state2;
-        if (newS != oldS)
-        {
-            //changed.Behaviour.SetState2(newS);
-            changed.Behaviour.SetInt("State2", newS);
+    //static void ChangeState2(Changed<PlayerStateHandler> changed)
+    //{
+    //    int newS = changed.Behaviour.state2;
+    //    changed.LoadOld();
+    //    int oldS = changed.Behaviour.state2;
+    //    if (newS != oldS)
+    //    {
+    //        //changed.Behaviour.SetState2(newS);
+    //        changed.Behaviour.SetInt("State2", newS);
 
-        }
-    }
+    //    }
+    //}
     public bool IsGround()
     {
         Vector3 tmp = transform.position;
@@ -298,8 +298,14 @@ public class PlayerStateHandler : NetworkBehaviour
     public void RPC_SetState2(int _state2, RpcInfo info = default)
     {
         //Debug.Log($"[RPC] State2 {state2} ");
-        //SetState2(_state2);
-        state2 = _state2;
+        if (!Object.HasInputAuthority)
+        {
+            SetState2(_state2);
+        }
+
+
+        ;
+        //state2 = _state2;
         //if (state == 1 || state == 2)
         //{
         //    Debug.Log($"_state2 = {state2}");
