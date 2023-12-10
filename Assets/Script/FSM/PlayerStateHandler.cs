@@ -2,6 +2,7 @@ using Fusion;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerStateHandler : NetworkBehaviour
@@ -29,13 +30,14 @@ public class PlayerStateHandler : NetworkBehaviour
     public int healNum;
     public int healNumMax = 3;
 
-
+    public int attackComboCount { get; set; }
+   // public int attackComboInput { get; set; }
 
     [SerializeField] protected float GroundCheckDis = 0.65f;
     public LayerMask groundLayer; // 땅인지 확인하기 위한 레이어 마스크
 
 
-    public bool animationTrigger = false;
+    public bool animationTrigger { get; set; }
     [SerializeField] Animator anima;
 
     //public CharacterController cc;
@@ -68,9 +70,24 @@ public class PlayerStateHandler : NetworkBehaviour
     Vector3 inputVec3;
 
     #endregion
+
+    public float attackTime { get; set; }
+
+    public float attackComboTime { get; set; }
+
+    public float attackCoolDown { get; set; }
+
+    public bool attackCoolDownOn {  get; set; }
+
+    float groundCheckRad = 0.2f;
+
     void Awake()
     {
+        attackTime = 0f;
+        attackComboTime = 1f;
+        attackCoolDown = 1f;
         anima = GetComponent<Animator>();
+        animationTrigger = false;
         //cc = GetComponent<CharacterController>();
         //networkCC = GetComponent<NetworkCharacterControllerPrototypeCustom>();
         characterMovementHandler = GetComponent<CharacterMovementHandler>();
@@ -118,6 +135,19 @@ public class PlayerStateHandler : NetworkBehaviour
             stateMachine.Update();
         }
     }
+    private void OnDrawGizmos()
+    {
+        Vector3 tmp = transform.position;
+        tmp.y += GroundCheckDis / 2f;
+        Gizmos.DrawRay(tmp, Vector3.down * GroundCheckDis);
+
+
+        Gizmos.DrawRay(tmp + Vector3.left * groundCheckRad, Vector3.down * GroundCheckDis);
+        Gizmos.DrawRay(tmp + Vector3.right * groundCheckRad, Vector3.down * GroundCheckDis);
+        Gizmos.DrawRay(tmp + Vector3.forward * groundCheckRad, Vector3.down * GroundCheckDis);
+        Gizmos.DrawRay(tmp + Vector3.back * groundCheckRad, Vector3.down * GroundCheckDis);
+
+    }
     void FixedUpdate()
     {
         if (Object.HasInputAuthority)
@@ -143,7 +173,7 @@ public class PlayerStateHandler : NetworkBehaviour
 
     public void StateChageUpdate()
     {
-        if(stateMachine == null)
+        if (stateMachine == null)
         {
             Debug.Log("stateMachine is Null");
             return;
@@ -187,8 +217,30 @@ public class PlayerStateHandler : NetworkBehaviour
     }
     public bool IsGround()
     {
+        Vector3 tmp = transform.position;
+
+        if (Physics.Raycast(transform.position + Vector3.up * GroundCheckDis / 2f, Vector3.down, GroundCheckDis, groundLayer))
+        {
+            return true;
+        }
+        else
+        {
+            bool _l = Physics.Raycast(transform.position + Vector3.left * groundCheckRad, Vector3.down, GroundCheckDis, groundLayer);
+            bool _r = Physics.Raycast(transform.position + Vector3.right * groundCheckRad, Vector3.down, GroundCheckDis, groundLayer);
+            bool _f = Physics.Raycast(transform.position + Vector3.forward * groundCheckRad, Vector3.down, GroundCheckDis, groundLayer);
+            bool _b = Physics.Raycast(transform.position + Vector3.back * groundCheckRad, Vector3.down, GroundCheckDis, groundLayer);
+            if (_l && _r && _f && _b)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
         //발밑체크
-        return Physics.Raycast(transform.position, Vector3.down, GroundCheckDis, groundLayer);
+
+
     }
     #region Animator
     public void SetInt(string _parameters, int _num) => anima.SetInteger(_parameters, _num);
@@ -246,6 +298,7 @@ public class PlayerStateHandler : NetworkBehaviour
     public void RPC_SetState2(int _state2, RpcInfo info = default)
     {
         //Debug.Log($"[RPC] State2 {state2} ");
+        //SetState2(_state2);
         state2 = _state2;
         //if (state == 1 || state == 2)
         //{

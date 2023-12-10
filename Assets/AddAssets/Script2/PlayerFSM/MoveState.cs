@@ -10,6 +10,7 @@ public class MoveState : PlayerState
     {
         player = _player;
         currentStateNum = _currentStateNum;
+        isAbleFly = false;
 
     }
 
@@ -18,7 +19,7 @@ public class MoveState : PlayerState
         base.Enter();
         
         player.JUMPCOUNTRESET();
-        Debug.Log("점프카운트 리셋 했어용");
+       // Debug.Log("점프카운트 리셋 했어용");
     }
 
     public override bool Update()
@@ -41,6 +42,7 @@ public class MoveState : PlayerState
             player.state2 = 0;
             player.SetState2(player.state2);
         }
+        
 
     }
 

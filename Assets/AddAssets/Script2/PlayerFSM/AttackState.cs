@@ -7,7 +7,6 @@ public class AttackState : PlayerState
 {
     int counter;
     Queue<bool> Combo;
-
     public AttackState(PlayerStateHandler _player, int _currentStateNum) : base(_player, _currentStateNum)
     {
         player = _player;
@@ -22,12 +21,26 @@ public class AttackState : PlayerState
     public override void Enter()
     {
         base.Enter();
+        player.attackTime = Time.time;
         //Combo = new Queue<bool>();
         //counter = 0;
         //player.SetState2(counter);
 
         //player.SetInt("Counter", counter);
+        //Debug.Log($"State2 = {player.state2}");
         player.isFireButtonPressed = false;
+
+
+        if (player.attackComboTime != 0 && player.attackTime + player.attackComboTime < Time.time)
+        {
+            player.attackComboCount = 0;
+            Debug.Log("어택카운트 초기화 무브 스테이트");
+
+        }
+
+        Debug.Log($"player.attackComboCount = {player.attackComboCount}");
+        player.SetState2(player.attackComboCount);
+        player.attackComboCount += 1;
 
         //player.Spawn(counter);
     }
@@ -35,10 +48,7 @@ public class AttackState : PlayerState
 
     public override bool Update()
     {
-        if (player.nextState != this)
-        {
-            return true;
-        }
+
         //if (player.isFireButtonPressed && counter < 2)
         //{
         //    //++counter;
@@ -49,42 +59,42 @@ public class AttackState : PlayerState
         //}
 
         //player.ZeroVelocity();
+
+
+        //if (startTime + 2f < Time.time)
+        //{
+        //    Debug.Log("애니메이션트리거 버그");
+        //    player.animationTrigger = false;
+        //}
+        if (startTime + 0.1f > Time.time)
+        {
+            player.isFireButtonPressed = false;
+
+        }
         if (!player.animationTrigger)
         {
-            Debug.Log("애니메이션 트리거 끝남");
+            if (player.isFireButtonPressed && player.attackComboCount < 3 && !player.attackCoolDownOn)
+            {
+                if (!player.attackCoolDownOn)
+                {
+                    player.nextState = player.attackState;
+                    player.ChangeState();
+                    startTime = Time.time;
+                    return true;
+                }
+                
+            }
 
-            //if (Combo.TryDequeue(out bool Q))
-            //{
-            //    Debug.Log($"카운터 = {counter}");
-
-            //    player.nextState = player.attackState;
-
-
-            //    return true;
-
-            //}
-            //else
-            //{
-            Debug.Log("카운터 없음");
             if (base.Update())
             {
                 return true;
             }
-
-            //player.EndSpawn();
             if (player.IsGround())
+            {
                 player.nextState = player.moveState;
+                return true;
 
-            //player.StateChange(player.moveState);
-            else
-                player.nextState = player.fallState;
-
-            //player.StateChange(player.fallState);
-
-            return true;
-
-            //}
-
+            }
         }
         return false;
 
@@ -106,7 +116,16 @@ public class AttackState : PlayerState
     public override void Exit()
     {
         base.Exit();
-        Debug.Log("Attack Exit");
+        if (player.attackComboCount > 2)
+        {
+            player.attackCoolDownOn = true;
+            Debug.Log("어택 엑시트에서 어택 카운트 초기화");
+
+            player.attackComboCount = 0;
+            player.isFireButtonPressed = false;
+        }
+        player.attackTime = Time.time;
+        //Debug.Log("Attack Exit");
 
     }
 }

@@ -34,6 +34,7 @@ public class PlayerAnimationTrigger : NetworkBehaviour
     {
         if (Object.HasInputAuthority)
         {
+            Debug.Log("트리거에서 OFF");
             player.animationTrigger = false;
         }
     }
@@ -44,7 +45,7 @@ public class PlayerAnimationTrigger : NetworkBehaviour
         {
             //임시로 보관 나중에 웨폰 핸들러든 다른 곳에 배치
             testweapon.SetDirect(true);
-            Debug.Log("공격시도");
+            //Debug.Log("공격시도");
             if (testweapon != null)
                 testweapon.WeaponColOn();
             else
@@ -59,7 +60,7 @@ public class PlayerAnimationTrigger : NetworkBehaviour
         {
             //임시로 보관 나중에 웨폰 핸들러든 다른 곳에 배치
             testweapon.SetDirect(true);
-            Debug.Log("공격시도");
+            //Debug.Log("공격시도");
             if (testweapon != null)
                 testweapon.WeaponColOff();
             else

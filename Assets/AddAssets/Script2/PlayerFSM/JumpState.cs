@@ -5,7 +5,7 @@ using static UnityEngine.CullingGroup;
 
 public class JumpState : PlayerState
 {
-    int chageCount = 0; 
+    int chageCount = 0;
     public JumpState(PlayerStateHandler _player, int _currentStateNum) : base(_player, _currentStateNum)
     {
         player = _player;
@@ -29,25 +29,29 @@ public class JumpState : PlayerState
         //player.SetState2(player.jumpCount);
         //player.jumpCount += 1;
         player.isJumping = true;
-       
+
     }
     public override bool Update()
     {
-        if (player.isDodgeButtonPressed )
+        if (player.isDodgeButtonPressed)
         {
             player.nextState = player.dodgeState;
             return true;
         }
-        if (player.isJumpButtonPressed)
-        {
-            player.nextState = player.jumpState;
-            return true;
-        }
         //if (player.isJumpButtonPressed)
         //{
-        //    player.StateChange(player.jumpState);
-        //    //player.animationTrigger = false;
+        //    player.nextState = player.jumpState;
+        //    return true;
         //}
+        if (player.isFireButtonPressed && !player.attackCoolDownOn)
+        {
+            if (!player.attackCoolDownOn)
+            {
+                player.nextState = player.attackState;
+                return true;
+            }
+
+        }
         if (!player.animationTrigger)
         {
             if (player.nextState != this)
@@ -66,7 +70,7 @@ public class JumpState : PlayerState
             player.nextState = player.fallState;
             return true;
         }
-        
+
         return false;
 
 
@@ -87,6 +91,7 @@ public class JumpState : PlayerState
     {
         base.Exit();
         player.isJumping = false;
+
         chageCount = 0;
     }
 

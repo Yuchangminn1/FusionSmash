@@ -8187,6 +8187,7 @@ MonoBehaviour:
   - {fileID: 7310598976432854536, guid: 7c842d2001f1c1c498836f367aa6ad0b, type: 3}
   - {fileID: 7310598976432854536, guid: 7c842d2001f1c1c498836f367aa6ad0b, type: 3}
   isRespawnRequsted: 0
+  rb: {fileID: 0}
   networkRigidbody: {fileID: 0}
   rotationSpeed: 15
   viewUpDownRotationSpeed: 50
@@ -8374,7 +8375,7 @@ MonoBehaviour:
   fHpHeal: 40
   healNum: 0
   healNumMax: 3
-  GroundCheckDis: 0.12
+  GroundCheckDis: 0.2
   groundLayer:
     serializedVersion: 2
     m_Bits: 64

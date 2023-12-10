@@ -47,9 +47,9 @@ public class LandState : PlayerState
     public override void Exit()
     {
         base.Exit();
-        player.state2 = 0;
+        player.SetState2(0);
+
         player.isStop = false;
-        player.animationTrigger = false;
 
     }
 

@@ -13,6 +13,9 @@ public class FallState : PlayerState
         currentStateNum = _currentStateNum;
         endMotionChange = false;
         isAbleFly = true;
+        isAbleDodge = true;
+        isAbleJump = false;
+        isAbleAttack = true;
     }
 
     public override void Enter()
@@ -25,50 +28,51 @@ public class FallState : PlayerState
     }
     public override bool Update()
     {
-        if (player.nextState != this)
-        {
-            return true;
-        }
         if (base.Update())
             return true;
+
         if (player.IsGround())
         {
-           // Debug.Log("Time = " + (Time.time - startTime));
-            if (Time.time - startTime > 1f)
-            {
-                player.nextState = player.landState;
-
-                //player.StateChange(player.landState);
-                return true;
-            }
-            else
-            {
-                //Debug.Log("Fall to MoveState IS Ground On");
-                player.nextState = player.moveState;
-
-                //player.StateChange(player.moveState);
-                return true;
-
-
-            }
-        }
-        if (player.isDodgeButtonPressed)
-        {
-            player.nextState = player.dodgeState;
-
-            //player.StateChange(player.dodgeState);
+            player.nextState = player.moveState;
             return true;
 
+            //// Debug.Log("Time = " + (Time.time - startTime));
+            //if (Time.time - startTime > 2f)
+            //{
+            //    player.nextState = player.landState;
+
+            //    //player.StateChange(player.landState);
+            //    return true;
+            //}
+            //else
+            //{
+            //    //Debug.Log("Fall to MoveState IS Ground On");
+            //    player.nextState = player.moveState;
+
+            //    //player.StateChange(player.moveState);
+            //    return true;
+
+
+            //}
         }
+        
+        //if (player.isDodgeButtonPressed)
+        //{
+        //    player.nextState = player.dodgeState;
 
-        if (player.isJumpButtonPressed)
-        {
-            player.nextState = player.jumpState;
+        //    //player.StateChange(player.dodgeState);
+        //    return true;
 
-            //player.StateChange(player.jumpState);
-            return true;
+        //}
 
-        }
+        //if (player.isJumpButtonPressed)
+        //{
+        //    player.nextState = player.jumpState;
+
+        //    //player.StateChange(player.jumpState);
+        //    return true;
+
+        //}
         return false;
 
     }
@@ -92,6 +96,8 @@ public class FallState : PlayerState
     {
         //player.PlayerAnimaSetBool("Falling", false);
         //player.ResetGravity();
+        player.SetState2(0);
+
         base.Exit();
     }
 

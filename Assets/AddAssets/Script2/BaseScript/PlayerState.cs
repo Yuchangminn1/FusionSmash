@@ -9,7 +9,7 @@ using static Fusion.Simulation.Statistics;
 public class PlayerState : EntityState
 {
     protected PlayerStateHandler player;
-    
+
     protected float airTime;
 
 
@@ -31,14 +31,26 @@ public class PlayerState : EntityState
         player.state = currentStateNum;
         player.SetState(player.state);
         startTime = Time.time;
-        
 
-        if (endMotionChange) { player.animationTrigger = true; }
+        //Debug.Log($"{currentStateNum}엔터");
+
+        if (endMotionChange)
+        {
+            Debug.Log($"{currentStateNum}에서 트루로 바꿨음");
+            player.animationTrigger = true;
+
+        }
     }
     public override bool Update()
     {
         base.Update();
+
         stateTimer = Time.time;
+
+        if (!isAbleAttack)
+        {
+            player.isFireButtonPressed = false;
+        }
 
         if (player.nextState != this)
         {
@@ -49,11 +61,11 @@ public class PlayerState : EntityState
             //체공 불가능 상태일때
             if (!player.IsGround())
             {
-                if(airTime == 0f)
+                if (airTime == 0f)
                 {
                     airTime = Time.time;
                 }
-                if(Time.time - airTime > 0.4f)
+                if (Time.time - airTime > 0.1f)
                 {
                     player.nextState = player.fallState;
 
@@ -67,14 +79,19 @@ public class PlayerState : EntityState
         }
         if (player.isJumpButtonPressed && isAbleJump)
         {
+            //더블점프용
             player.nextState = player.jumpState;
             return true;
         }
         if (player.isFireButtonPressed && isAbleAttack)
         {
-            player.nextState = player.attackState;
+            if (!player.attackCoolDownOn)
+            {
 
-            return true;
+                player.nextState = player.attackState;
+
+                return true;
+            }
         }
         if (player.isDodgeButtonPressed && isAbleDodge)
         {
@@ -88,7 +105,12 @@ public class PlayerState : EntityState
     public override void FixedUpdate()
     {
         base.FixedUpdate();
-        
+        if (player.attackCoolDownOn && player.attackCoolDown + player.attackTime < Time.time)
+        {
+            player.attackCoolDownOn = false;
+            Debug.Log("attackCoolDownOn 팔스");
+            //player.attackComboCount = 0;
+        }
         //틀어진 애니메이션 맞춰주기 ? 
         if (player.state != currentStateNum)
         {
@@ -96,6 +118,7 @@ public class PlayerState : EntityState
             player.SetState(currentStateNum);
         }
         //Debug.Log($"currentNum = {currentStateNum}");
+        //Debug.Log(currentStateNum);
 
     }
     public override void LateUpdate()
@@ -109,21 +132,30 @@ public class PlayerState : EntityState
     public override void Exit()
     {
         base.Exit();
-        if (endMotionChange) { player.animationTrigger = false; }
+        //  Debug.Log($"{currentStateNum}엑시트");
 
+        if (endMotionChange)
+        {
+            if (player.animationTrigger)
+            {
+                Debug.Log($"{currentStateNum}에서 버그로 에니매이션 트리거 펄스로 바꿨음");
+                player.animationTrigger = false;
+
+            }
+        }
         //if (currentStateNum != 0)
         //{
         //    player.animationTrigger = false;
         //}
     }
-    
 
-    
+
+
     protected bool BaseState()
     {
         if (!player.animationTrigger && endMotionChange)
         {
-            if (player.IsGround()) 
+            if (player.IsGround())
             {
                 player.nextState = player.moveState;
                 return true;

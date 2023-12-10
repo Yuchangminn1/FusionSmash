@@ -57,15 +57,13 @@ public class CharacterMovementHandler : NetworkBehaviour
 
     float jumpTime = 0f;
 
-    float jumpCooldown = 0.1f;
+    float jumpCooldown = 0f;
 
     float jumpForce = 10f;
 
     bool doJump = false;
 
-    float attackTime = 0f;
-
-    float attackComboTime = 0.2f;
+    
 
     public float rotationSpeed = 15.0f;
     public float viewUpDownRotationSpeed = 50.0f;
@@ -355,7 +353,7 @@ public class CharacterMovementHandler : NetworkBehaviour
 
             //networkCharacterControllerPrototypeCustom.Move(moveDirection);
             //점프 
-            
+
             if (networkInputData.isJumpButtonPressed)
             {
                 // if (playerStateHandler.state2 < 2)
@@ -368,14 +366,14 @@ public class CharacterMovementHandler : NetworkBehaviour
                     Debug.Log($"playerJumpCount  Network V = {playerJumpCount}");
 
                     playerStateHandler.isJumpButtonPressed = true;
-                    playerStateHandler.StateChageUpdate();
+                    //playerStateHandler.StateChageUpdate();
                     //playerStateHandler.SetState2(1);
                     //playerStateHandler.SetState2(playerJumpCount);
                 }
 
                 //rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
                 //}
-                
+
             }
             else
             {
@@ -403,30 +401,18 @@ public class CharacterMovementHandler : NetworkBehaviour
 
                 if (Object.HasInputAuthority)
                 {
+                    //attackTime = Time.time;
 
-                    if (attackTime + attackComboTime > Time.time)
-                    {
-                        //  com
-                        ;
-                        //콤보시간 추가할거임;
-                    }
-                    //인풋키 스테이트에 전달하는거 하고있었음 
                     playerStateHandler.isFireButtonPressed = true;
-                    playerStateHandler.StateChageUpdate();
 
-                    if (playerStateHandler.state != 4)
-                    {
-                        playerStateHandler.isFireButtonPressed = false;
-                    }
-                    playerStateHandler.SetState2(playerAttackCount);
-                    ++playerAttackCount;
+                    //Debug.Log($"어택버튼 ON ");
                 }
             }
-            else
-            {
-                playerStateHandler.isFireButtonPressed = false;
+            //else
+            //{
+            //    playerStateHandler.isFireButtonPressed = false;
 
-            }
+            //}
 
             //회피 
             if (networkInputData.isDodgeButtonPressed)
@@ -434,7 +420,7 @@ public class CharacterMovementHandler : NetworkBehaviour
                 if (Object.HasInputAuthority)
                 {
                     playerStateHandler.isDodgeButtonPressed = true;
-                    playerStateHandler.StateChageUpdate();
+                    //playerStateHandler.StateChageUpdate();
                     ++playerDodgeCount;
                 }
             }
@@ -450,8 +436,9 @@ public class CharacterMovementHandler : NetworkBehaviour
                     //playerJumpCount = 0;
                     ;
                 }
+
                 playerDodgeCount = 0;
-                playerAttackCount = 0;
+
             }
 
             //else if (playerStateHandler.state == 0)
