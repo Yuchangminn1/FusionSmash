@@ -21,6 +21,7 @@ public class AttackState : PlayerState
     public override void Enter()
     {
         base.Enter();
+        Debug.Log("어택엔터");
         player.attackTime = Time.time;
         //Combo = new Queue<bool>();
         //counter = 0;
@@ -35,13 +36,11 @@ public class AttackState : PlayerState
         {
             player.attackComboCount = 0;
             Debug.Log("어택카운트 초기화 무브 스테이트");
-
         }
 
         Debug.Log($"player.attackComboCount = {player.attackComboCount}");
         player.SetState2(player.attackComboCount);
         player.attackComboCount += 1;
-
         //player.Spawn(counter);
     }
 
@@ -66,10 +65,9 @@ public class AttackState : PlayerState
         //    Debug.Log("애니메이션트리거 버그");
         //    player.animationTrigger = false;
         //}
-        if (startTime + 0.1f > Time.time)
+        if (startTime + 0.3f > Time.time)
         {
             player.isFireButtonPressed = false;
-
         }
         if (!player.animationTrigger)
         {

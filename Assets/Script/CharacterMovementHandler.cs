@@ -465,7 +465,7 @@ public class CharacterMovementHandler : NetworkBehaviour
 
             //이상하게 떨어지면 정상적으로 리스폰
 
-
+            playerStateHandler.StateChageUpdate();
 
 
         }
