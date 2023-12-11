@@ -134,6 +134,10 @@ public class PlayerStateHandler : NetworkBehaviour
         {
             stateMachine.Update();
         }
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            animationTrigger = false;
+        }
     }
     private void OnDrawGizmos()
     {

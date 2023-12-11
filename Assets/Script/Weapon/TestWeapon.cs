@@ -39,17 +39,17 @@ public class TestWeapon : MonoBehaviour
     }
     public void WeaponColOn()
     {
-        if (!directeAttack)
-            return;
+        //if (!directeAttack)
+        //    return;
         meshcol.enabled = true;
-       // Debug.Log($"무기 콜라이더 {true}");
+        Debug.Log($"무기 콜라이더 {true}");
     }
     public void WeaponColOff()
     {
-        if (!directeAttack)
-            return;
+        //if (!directeAttack)
+        //    return;
         meshcol.enabled = false;
-        //Debug.Log($"무기 콜라이더 {false}");
+        Debug.Log($"무기 콜라이더 {false}");
     }
     public bool IsHit()
     {

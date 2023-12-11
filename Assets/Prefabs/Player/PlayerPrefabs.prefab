@@ -4454,7 +4454,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &3405766737154354343
 RectTransform:
   m_ObjectHideFlags: 0
@@ -8379,7 +8379,6 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
-  animationTrigger: 0
   anima: {fileID: 0}
   characterMovementHandler: {fileID: 0}
   isJumpButtonPressed: 0

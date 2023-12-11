@@ -52,7 +52,7 @@ public class LocalCameraHandler : MonoBehaviour
         cameraRotationY += viewInput.x * Time.deltaTime * characterMovementHandler.rotationSpeed;
 
 
-        localCamera.transform.rotation = Quaternion.Euler(cameraRotationX, cameraRotationY, 0);
+        localCamera.transform.rotation = Quaternion.Euler(cameraRotationX/2, cameraRotationY/2, 0);
     }
 
     public void SetViewInputVector(Vector2 viewInput)

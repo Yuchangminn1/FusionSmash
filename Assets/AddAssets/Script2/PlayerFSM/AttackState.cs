@@ -65,23 +65,23 @@ public class AttackState : PlayerState
         //    Debug.Log("애니메이션트리거 버그");
         //    player.animationTrigger = false;
         //}
-        if (startTime + 0.3f > Time.time)
+        if (startTime + 0.1f > Time.time)
         {
             player.isFireButtonPressed = false;
         }
         if (!player.animationTrigger)
         {
-            if (player.isFireButtonPressed && player.attackComboCount < 3 && !player.attackCoolDownOn)
-            {
-                if (!player.attackCoolDownOn)
-                {
-                    player.nextState = player.attackState;
-                    player.ChangeState();
-                    startTime = Time.time;
-                    return true;
-                }
+            //if (player.isFireButtonPressed && player.attackComboCount < 3 && !player.attackCoolDownOn)
+            //{
+            //    if (!player.attackCoolDownOn)
+            //    {
+            //        player.nextState = player.attackState;
+            //        player.ChangeState();
+            //        startTime = Time.time;
+            //        return true;
+            //    }
                 
-            }
+            //}
 
             if (base.Update())
             {
