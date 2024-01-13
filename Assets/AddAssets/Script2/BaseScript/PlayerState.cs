@@ -32,11 +32,8 @@ public class PlayerState : EntityState
         player.SetState(player.state);
         startTime = Time.time;
 
-        //Debug.Log($"{currentStateNum}엔터");
-
         if (endMotionChange)
         {
-            Debug.Log($"{currentStateNum}에서 트루로 바꿨음");
             player.animationTrigger = true;
 
         }
@@ -132,7 +129,6 @@ public class PlayerState : EntityState
     public override void Exit()
     {
         base.Exit();
-        //  Debug.Log($"{currentStateNum}엑시트");
 
         if (endMotionChange)
         {
@@ -143,10 +139,7 @@ public class PlayerState : EntityState
 
             }
         }
-        //if (currentStateNum != 0)
-        //{
-        //    player.animationTrigger = false;
-        //}
+        
     }
 
 

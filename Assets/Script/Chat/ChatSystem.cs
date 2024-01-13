@@ -11,7 +11,6 @@ public class ChatSystem : NetworkBehaviour
 {
     public PlayerInputAction playerControls;
     private InputAction sumit;
-    
 
     [Networked(OnChanged = nameof(OnChangeChatLog))]
     public NetworkString<_16> myChat { get; set; }
@@ -33,55 +32,34 @@ public class ChatSystem : NetworkBehaviour
 
     bool chatDown = false;
 
-
+    [Networked]
+    public NetworkBool ischating { get; set; }
 
     //클라이언트에서 쳇이 onoffonoff반복하는거 방지
     float inputTime = 0f;
     // Checks if there is anything entered into the input field.
+    CharacterMovementHandler characterMovementHandler;
     public void Awake()
     {
         //이걸 어웨이크에서 안하면 null이라 오류남 
         playerControls = new PlayerInputAction();
         chatLog = GameObject.FindWithTag("ChatDisplay").GetComponentInChildren<TMP_Text>();
         scrollV = GameObject.FindWithTag("ScrollV").GetComponent<Scrollbar>();
-
+        characterMovementHandler = GetComponent<CharacterMovementHandler>();
     }
     public void Start()
     {
-
-
         mainInputField.characterLimit = 1024;
-        if (Object.HasInputAuthority)
+        if (Object.HasInputAuthority || HasStateAuthority)
         {
             mainInputField.enabled = true;
         }
         Debug.Log("chatLog = " + chatLog);
-
-
-
     }
 
-    public override void FixedUpdateNetwork()
-    {
-
-    }
-    private void Update()
-    {
-
-    }
     private void FixedUpdate()
     {
-        
-        if (chatDown)
-        {
-            Debug.Log("chatDown");
-
-            Summit();
-            Debug.Log("Enter로  Summit 실행");
-            chatDown = false;
-        }
         scrollV.value = 0;
-
     }
     public void Summit()
     {
@@ -99,14 +77,17 @@ public class ChatSystem : NetworkBehaviour
 
             }
             mainInputField.interactable = false;
+            ischating = false;
 
         }
         else
         {
             Debug.Log("채팅 활성화");
             mainInputField.interactable = true;
+            ischating = true;
             mainInputField.Select();
         }
+        
 
     }
 

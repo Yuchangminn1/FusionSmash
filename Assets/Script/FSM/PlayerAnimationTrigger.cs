@@ -18,12 +18,11 @@ public class PlayerAnimationTrigger : NetworkBehaviour
     void Start()
     {
         testweapon = GetComponentInChildren<TestWeapon>();
-        testweapon.meshcol.enabled = false;
+        if(testweapon != null)
+        {
+            testweapon.meshcol.enabled = false;
+        }
     }
-
-    
-
-
     // Update is called once per frame
     void Update()
     {

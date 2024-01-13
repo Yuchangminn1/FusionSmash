@@ -42,8 +42,15 @@ public class NetworkPlayer : NetworkBehaviour,IPlayerLeft
 
             //Disable main camera 메인 카메라 제거
             //Camera.main.gameObject.SetActive(false);
+            if(PlayerPrefs.GetString("PlayerNickname") == "" || PlayerPrefs.GetString("PlayerNickname") == null)
+            {
+                RPC_SetNickName(PlayerPrefs.GetString("닉네임"));
 
-            RPC_SetNickName(PlayerPrefs.GetString("PlayerNickname"));
+            }
+            else
+            {
+                RPC_SetNickName(PlayerPrefs.GetString("PlayerNickname"));
+            }
             Debug.Log("Spawned local player");
         }
         else
@@ -66,14 +73,9 @@ public class NetworkPlayer : NetworkBehaviour,IPlayerLeft
 
             Debug.Log("spawned remote player");
         }
-        //이름 Clone말고 번호로 하는법
-        //string Q = $"{Object.Id}";
+        
         transform.name = transform.GetComponent<NetworkPlayer>().nickName.Value;
-            //PlayerPrefs.GetString("PlayerNickname");
-        //Q =$"{Q[4]}";
-        //mySNum = int.Parse(Q);
-        //Debug.Log(mySNum);
-
+        
         //체력바 파티로 보이게 할려고 번호 한건디 흠 별로인듯 모르겠다 모르겠 어
     }
     public void PlayerLeft(PlayerRef player)
@@ -93,8 +95,6 @@ public class NetworkPlayer : NetworkBehaviour,IPlayerLeft
     {
         Debug.Log($"Nickname chaged for player to {nickName} for player {gameObject.name}");
 
-
-
         playerNickNameTM.text = nickName.ToString();
         chatSystem.myName = nickName.ToString();
 
@@ -106,10 +106,5 @@ public class NetworkPlayer : NetworkBehaviour,IPlayerLeft
         Debug.Log($"[RPC] SetNickname : {nickName}");
         this.nickName = nickName;
     }
-    //[Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority)]
-    //public void RPC_SetNickNameTOIn(string nickName, RpcInfo info = default)
-    //{
-    //    Debug.Log($"[RPC] SetNickname : {nickName}");
-    //    this.nickName = nickName;
-    //}
+    
 }

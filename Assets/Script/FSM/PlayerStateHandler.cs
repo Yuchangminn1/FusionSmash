@@ -35,6 +35,7 @@ public class PlayerStateHandler : NetworkBehaviour
 
     [SerializeField] protected float GroundCheckDis = 0.65f;
     public LayerMask groundLayer; // 땅인지 확인하기 위한 레이어 마스크
+    float groundCheckRad = 0.2f;
 
 
     public bool animationTrigger { get; set; }
@@ -79,7 +80,6 @@ public class PlayerStateHandler : NetworkBehaviour
 
     public bool attackCoolDownOn {  get; set; }
 
-    float groundCheckRad = 0.2f;
 
     void Awake()
     {
@@ -94,14 +94,8 @@ public class PlayerStateHandler : NetworkBehaviour
 
 
     }
-    public void JUMPCOUNT()
-    {
-        characterMovementHandler.JUMPCOUNT();
-    }
-    public void JUMPCOUNTRESET()
-    {
-        characterMovementHandler.JUMPCOUNTRESET();
-    }
+    
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -220,30 +214,7 @@ public class PlayerStateHandler : NetworkBehaviour
     }
     public bool IsGround()
     {
-        Vector3 tmp = transform.position;
-
-        if (Physics.Raycast(transform.position + Vector3.up * GroundCheckDis / 2f, Vector3.down, GroundCheckDis, groundLayer))
-        {
-            return true;
-        }
-        else
-        {
-            bool _l = Physics.Raycast(transform.position + Vector3.left * groundCheckRad, Vector3.down, GroundCheckDis, groundLayer);
-            bool _r = Physics.Raycast(transform.position + Vector3.right * groundCheckRad, Vector3.down, GroundCheckDis, groundLayer);
-            bool _f = Physics.Raycast(transform.position + Vector3.forward * groundCheckRad, Vector3.down, GroundCheckDis, groundLayer);
-            bool _b = Physics.Raycast(transform.position + Vector3.back * groundCheckRad, Vector3.down, GroundCheckDis, groundLayer);
-            if (_l && _r && _f && _b)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        //발밑체크
-
-
+        return characterMovementHandler.IsGround();
     }
     #region Animator
     public void SetInt(string _parameters, int _num) => anima.SetInteger(_parameters, _num);

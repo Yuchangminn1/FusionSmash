@@ -9,8 +9,9 @@ public class HPHandler : NetworkBehaviour
     
     int MaxHp { get; set; }
 
-    [Networked(OnChanged = nameof(OnHPChanged))]
-    public int HP { get; set; }
+    //[Networked(OnChanged = nameof(OnHPChanged))]
+    [Networked]
+    public int HP { get; private set; }
 
     [Networked(OnChanged = nameof(OnStateChanged))]
     public bool isDead { get; set; }
@@ -89,6 +90,7 @@ public class HPHandler : NetworkBehaviour
     {
         
     }
+    
 
 
 
@@ -98,12 +100,12 @@ public class HPHandler : NetworkBehaviour
         {
             return;
         }
-        Debug.Log($"OnTakeDamage{HP}전");
-
-        HP -= 1;
+        //Debug.Log($"OnTakeDamage{HP}전");
+        
+        HP -= _attackDamage;
         localUICanvas.ChangeHPBar(HP, MaxHp, transform);
-        Debug.Log($"OnTakeDamage{HP}후");
-        Debug.Log($"{Time.time} {transform.name}took damage get {HP} left");
+        //Debug.Log($"OnTakeDamage{HP}후");
+        //Debug.Log($"{Time.time} {transform.name}took damage get {HP} left");
         if (HP <= 0)
         {
             Debug.Log($"{transform.name} isDead");
@@ -116,31 +118,9 @@ public class HPHandler : NetworkBehaviour
 
     }
     //변하면 호출인데 아직 잘 모름 
-    static void OnHPChanged(Changed<HPHandler> changed)
-    {
-        Debug.Log($" OnHPChanged()");
-
-
-        int newHP = changed.Behaviour.HP;
-        
-        //load the old value
-        changed.LoadOld();
-
-        int oldHP = changed.Behaviour.HP;
-        changed.LoadNew();
-
-        //check if the HP has been decreased
-        if (newHP != oldHP)
-        {
-            //changed.Behaviour.HPBarValue(); 이런 호스트 체력을 다른 플레이어들 UI로 공유해주네 
-            //changed에서 변경된 지역함수? 는 이 함수로 호출 되는 모든 함수에서 그 값으로 작용 ???
-            //여기서 쓰는 함수는 static 이기 떄문에 ? changed.Behaviour를 써야하네 공부 해봐야할듯
-            changed.Behaviour.OnHPReduced();
-
-        }
-    }
     
-    
+
+
 
     void OnHPReduced()
     {
@@ -152,7 +132,27 @@ public class HPHandler : NetworkBehaviour
         }
         StartCoroutine(OnHitCo());
     }
+    static void OnHPChanged(Changed<HPHandler> changed)
+    {
+        Debug.Log($" OnHPChanged()");
 
+
+        int newHP = changed.Behaviour.HP;
+
+        changed.LoadOld();
+
+        int oldHP = changed.Behaviour.HP;
+
+        //check if the HP has been decreased
+        if (newHP != oldHP)
+        {
+            //changed.Behaviour.HPBarValue(); 이런 호스트 체력을 다른 플레이어들 UI로 공유해주네 
+            //changed에서 변경된 지역함수? 는 이 함수로 호출 되는 모든 함수에서 그 값으로 작용 ???
+            //여기서 쓰는 함수는 static 이기 떄문에 ? changed.Behaviour를 써야하네 공부 해봐야할듯
+            changed.Behaviour.OnHPReduced();
+            //changed.Behaviour.HP = newHP;
+        }
+    }
     static void OnStateChanged(Changed<HPHandler> changed)
     {
         //Debug.Log($"OnHPReduced()");
@@ -172,8 +172,6 @@ public class HPHandler : NetworkBehaviour
             //이러니까 한방이네 ?
             //changed.Behaviour.HpReset();
         }
-
-
     }
     void OnDeath()
     {
@@ -215,6 +213,7 @@ public class HPHandler : NetworkBehaviour
 
     void HpReset()
     {
+        Debug.Log("ResetHP");
         HP = 0;
         HP = MaxHp;
         localUICanvas.ChangeHPBar(HP, MaxHp, transform);

@@ -55,25 +55,25 @@ public class TestWeapon : MonoBehaviour
     {
         return isHit;
     }
-    public void AttackPlayer()
-    {
-        if (hitPlayer.Count == 0)
-        {
-            Debug.Log("충돌한 플레이어가 없음 ");
-            return;
-        }
-        int i = 0;
+    //public void AttackPlayer()
+    //{
+    //    if (hitPlayer.Count == 0)
+    //    {
+    //        Debug.Log("충돌한 플레이어가 없음 ");
+    //        return;
+    //    }
+    //    int i = 0;
         
-        foreach(GameObject player in hitPlayer)
-        {
-            Debug.Log($"{i} / {player.name}");
-            player.GetComponent<HPHandler>().OnTakeDamage();
-            ++i;
-        }
-        hitPlayer.Clear();
-        isHit = false;
-        Debug.Log("충돌 플레이어 리스트 클리어");
-    }
+    //    foreach(GameObject player in hitPlayer)
+    //    {
+    //        Debug.Log($"{i} / {player.name}");
+    //        player.GetComponent<HPHandler>().OnTakeDamage();
+    //        ++i;
+    //    }
+    //    hitPlayer.Clear();
+    //    isHit = false;
+    //    Debug.Log("충돌 플레이어 리스트 클리어");
+    //}
     private void OnTriggerEnter(Collider other)
     {
 

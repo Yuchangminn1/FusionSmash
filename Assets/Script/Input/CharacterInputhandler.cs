@@ -14,7 +14,7 @@ public class CharacterInputhandler : MonoBehaviour
     private InputAction jump;
     private InputAction fire;
     private InputAction dodge;
-
+    private InputAction chat;
     private InputAction look;
 
     Vector2 moveDirection = Vector2.zero;
@@ -26,7 +26,7 @@ public class CharacterInputhandler : MonoBehaviour
     Vector2 viewInputVector = Vector2.zero;
     public bool isJumpButtonPressed = false;
     bool isFireButtonPressed = false;
-    bool isRightEnterPressed = false;
+    bool isChatButtonPressed = false;
     bool isDodgeButtonPressed = false;
     int fireNum;
 
@@ -95,14 +95,15 @@ public class CharacterInputhandler : MonoBehaviour
 
         networkInputData.isFireButtonPressed = isFireButtonPressed;
 
-        
+        networkInputData.isChatButtonPressed = isChatButtonPressed;
+
 
 
         networkInputData.fireNum = fireNum;
 
         isJumpButtonPressed = false;
         isFireButtonPressed = false;
-        isRightEnterPressed = false;
+        isChatButtonPressed = false;
         isDodgeButtonPressed = false;
         return networkInputData;
 
@@ -125,9 +126,13 @@ public class CharacterInputhandler : MonoBehaviour
         dodge = playerControls.Player.Dodge;
         dodge.Enable();
 
+        chat = playerControls.Player.Chat;
+        chat.Enable();
+
         jump.performed += Jump;
         fire.performed += Fire;
         dodge.performed += Dodge;
+        chat.performed += Chat;
 
     }
     private void OnDisable()
@@ -136,6 +141,7 @@ public class CharacterInputhandler : MonoBehaviour
         fire.Disable();
         jump.Disable();
         dodge.Disable();
+        chat.Disable();
 
         look.Disable();
 
@@ -157,11 +163,13 @@ public class CharacterInputhandler : MonoBehaviour
     private void Dodge(InputAction.CallbackContext context)
     {
         //Debug.Log("Dodge!!!");
-
         isDodgeButtonPressed = true;
-        
     }
-
+    private void Chat(InputAction.CallbackContext context)
+    {
+        //Debug.Log("Dodge!!!");
+        isChatButtonPressed = true;
+    }
     private float MYCut(float _float)
     {
         //input xy 값을 getaxis화 시켜줄려고 해본거 너무 적은 변화는 그냥 빨리 진행시켜 

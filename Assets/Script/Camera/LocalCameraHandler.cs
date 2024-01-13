@@ -8,12 +8,10 @@ public class LocalCameraHandler : MonoBehaviour
 
     Vector2 viewInput;
 
-    float cameraRotationX = 0;
-    float cameraRotationY = 0;
+    public float cameraRotationX { get; private set; } = 0;
+    public float cameraRotationY { get; private set; } = 0;
 
-    //Other component
     CharacterMovementHandler characterMovementHandler;
-    //NetworkCharacterControllerPrototypeCustom networkCharacterControllerPrototypeCustom;
 
     Camera localCamera;
 
@@ -21,7 +19,6 @@ public class LocalCameraHandler : MonoBehaviour
     {
         localCamera = GetComponent<Camera>();
         characterMovementHandler = GetComponentInParent<CharacterMovementHandler>();
-        //networkCharacterControllerPrototypeCustom = GetComponentInParent<NetworkCharacterControllerPrototypeCustom>();
     }
     // Start is called before the first frame update
     void Start()
@@ -34,7 +31,13 @@ public class LocalCameraHandler : MonoBehaviour
 
     void LateUpdate()
     {
-        if(cameraAnchorPoint == null)
+        LocalCameraRotation();
+    }
+
+    public void LocalCameraRotation()
+    {
+        //로컬 카메라 회전 
+        if (cameraAnchorPoint == null)
         {
             return;
         }
@@ -52,9 +55,10 @@ public class LocalCameraHandler : MonoBehaviour
         cameraRotationY += viewInput.x * Time.deltaTime * characterMovementHandler.rotationSpeed;
 
 
-        localCamera.transform.rotation = Quaternion.Euler(cameraRotationX/2, cameraRotationY/2, 0);
-    }
 
+        localCamera.transform.rotation = Quaternion.Euler(cameraRotationX / 2, 0, 0);
+
+    }
     public void SetViewInputVector(Vector2 viewInput)
     {
         this.viewInput = viewInput;

@@ -9,7 +9,7 @@ public struct NetworkInputData : INetworkInput
     public Vector3 aimFowardVector;
     public NetworkBool isJumpButtonPressed;
     public NetworkBool isFireButtonPressed;
-    public NetworkBool isRightEnterPressed;
+    public NetworkBool isChatButtonPressed;
     public NetworkBool isDodgeButtonPressed;
 
     public int fireNum;

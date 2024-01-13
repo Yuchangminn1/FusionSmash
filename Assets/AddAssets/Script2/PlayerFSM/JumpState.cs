@@ -22,7 +22,6 @@ public class JumpState : PlayerState
         player.isJumpButtonPressed = false;
         Debug.Log("점프스테이트 들어왔음");
 
-        player.JUMPCOUNT();
         player.SetState2(1);
 
         base.Enter();
