@@ -92,7 +92,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7687258598224365598}
-  - component: {fileID: -1072272708781736914}
   - component: {fileID: 7870672004196155283}
   m_Layer: 0
   m_Name: Pistol
@@ -117,30 +116,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &-1072272708781736914
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5919749264513890419}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObjectInterest: 1
-  DefaultInterestGroups: []
-  DestroyWhenStateAuthorityLeaves: 0
-  AllowStateAuthorityOverride: 1
-  AoiPositionSource: {fileID: 0}
-  Flags: 2305
-  NetworkGuid:
-    RawGuidValue: b07dbf437a250cb419ccd396ab3cd81b
-  NestedObjects: []
-  NetworkedBehaviours:
-  - {fileID: 7870672004196155283}
-  SimulationBehaviours: []
 --- !u!114 &7870672004196155283
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -162,12 +137,11 @@ MonoBehaviour:
   Dispersion: 0
   HitMask:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 192
   MaxHitDistance: 100
   MaxClipAmmo: 12
   StartAmmo: 25
   ReloadTime: 2
-  MuzzleTransform: {fileID: 0}
   ProjectilePrefab: {fileID: -2562679159548286440, guid: 38ee3e1b7b4c62349b0db316fb30b3f7, type: 3}
   _IsCollected:
     _value: 0

@@ -10,6 +10,7 @@ using TMPro;
 public class NetworkPlayer : NetworkBehaviour,IPlayerLeft
 {
     public TextMeshProUGUI playerNickNameTM;
+
     public static NetworkPlayer Local { get; set; }
     public int mySNum = 0;
 
@@ -52,7 +53,8 @@ public class NetworkPlayer : NetworkBehaviour,IPlayerLeft
                 RPC_SetNickName(PlayerPrefs.GetString("PlayerNickname"));
             }
             Debug.Log("Spawned local player");
-        }
+
+}
         else
         {
             //RPC_SetNickNameTOIn(PlayerPrefs.GetString("PlayerNickname"));
@@ -75,7 +77,13 @@ public class NetworkPlayer : NetworkBehaviour,IPlayerLeft
         }
         
         transform.name = transform.GetComponent<NetworkPlayer>().nickName.Value;
+
+        if (HasInputAuthority)
+        {
+            playerNickNameTM.enabled = false;
+        }
         
+
         //체력바 파티로 보이게 할려고 번호 한건디 흠 별로인듯 모르겠다 모르겠 어
     }
     public void PlayerLeft(PlayerRef player)
@@ -106,5 +114,6 @@ public class NetworkPlayer : NetworkBehaviour,IPlayerLeft
         Debug.Log($"[RPC] SetNickname : {nickName}");
         this.nickName = nickName;
     }
+    
     
 }

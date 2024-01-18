@@ -1,16 +1,13 @@
 using Fusion;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Animations;
-
-
-
-
+using UnityEngine.UI;
 
 public enum EWeaponType
 {
-    None,
     Pistol,
     Rifle,
     Shotgun,
@@ -19,6 +16,15 @@ public class PlayerWeapon : NetworkBehaviour
 {
     // 총기 유형
     public EWeaponType Type;
+
+    [Header("Weapon UI")]
+    public GameObject _weaponUI;    //아  스프라이트 받고 교체하는 걸로 바꾸자 
+    public Sprite _weaponSprite;    //무기 이미지 스프라이트
+    public TMP_Text _weaponAmmoText;//총알 여부
+    public Image _weaponAimImage;   //크로스헤어
+    public Image _killIcon;         //킬 이미지
+    
+    
 
     [Header("Fire Setup")]
     public bool IsAutomatic = true; // 자동 발사 여부
@@ -53,7 +59,7 @@ public class PlayerWeapon : NetworkBehaviour
     public bool HasAmmo => ClipAmmo > 0 || RemainingAmmo > 0; // 탄약이 있는지 여부
 
     [Networked]
-    public NetworkBool IsCollected { get; set; } // 획득 여부
+    public NetworkBool IsCollected { get; set; }  // 획득 여부
     [Networked]
     public NetworkBool IsReloading { get; set; } // 재장전 여부
     [Networked]
@@ -78,16 +84,17 @@ public class PlayerWeapon : NetworkBehaviour
     // 총을 발사하는 메소드
     public void Fire(Vector3 firePosition, Vector3 fireDirection, bool justPressed)
     {
+
         // 총이 획득되지 않았거나 자동 발사가 아니거나 재장전 중이거나 발사 쿨다운이 남아있으면 무시
         if (IsCollected == false || (justPressed == false && !IsAutomatic) || IsReloading || !_fireCooldown.ExpiredOrNotRunning(Runner))
             return;
 
-        // 탄창에 탄약이 없을 경우 빈 탄창 사운드 재생 후 리턴
-        //if (ClipAmmo <= 0)
-        //{
-        //    PlayEmptyClipSound(justPressed);
-        //    return;
-        //}
+        //탄창에 탄약이 없을 경우 빈 탄창 사운드 재생 후 리턴
+        if (ClipAmmo <= 0)
+        {
+            //PlayEmptyClipSound(justPressed);
+            return;
+        }
 
         // 투사체 발사
         for (int i = 0; i < ProjectilesPerShot; i++)
@@ -101,14 +108,32 @@ public class PlayerWeapon : NetworkBehaviour
                 projectileDirection = dispersionRotation * fireDirection;
             }
 
-            FireProjectile(firePosition, projectileDirection);
+            //FireProjectile(firePosition, projectileDirection);
+            FireProjectile(firePosition, fireDirection);
+
         }
 
         // 발사 쿨다운 설정 및 탄약 감소
         _fireCooldown = TickTimer.CreateFromTicks(Runner, _fireTicks);
         ClipAmmo--;
+        AmmoInfoUpdate();
+        Debug.Log($"ClipAmmo = {ClipAmmo}");
     }
 
+    public void Equip()
+    {
+        _weaponUI.SetActive(true);
+        AmmoInfoUpdate();
+    }
+
+    public void DisEquip()
+    {
+        _weaponUI.SetActive(false);
+    }
+    public void AmmoInfoUpdate()
+    {
+        _weaponAmmoText.text = $"   {ClipAmmo}  /  {RemainingAmmo}";
+    }
     // 재장전 메소드
     public void Reload()
     {
@@ -119,6 +144,11 @@ public class PlayerWeapon : NetworkBehaviour
         // 재장전 중으로 설정하고 재장전 쿨다운 시작
         IsReloading = true;
         _fireCooldown = TickTimer.CreateFromSeconds(Runner, ReloadTime);
+    }
+
+    public void AmmoInfo(TMP_Text _text)
+    {
+        _text.text = $"{ClipAmmo} / {MaxClipAmmo}";
     }
 
     // 탄약 추가 메소드
@@ -143,20 +173,26 @@ public class PlayerWeapon : NetworkBehaviour
     public override void Spawned()
     {
         // 상태 권한이 있는 경우에만 초기화 코드 실행
+
         if (HasStateAuthority)
         {
             ClipAmmo = Mathf.Clamp(StartAmmo, 0, MaxClipAmmo);
             RemainingAmmo = StartAmmo - ClipAmmo;
         }
-        
+
         _visibleFireCount = _fireCount;
 
         float fireTime = 60f / FireRate;
         _fireTicks = Mathf.CeilToInt(fireTime / Runner.DeltaTime);
 
+        if (HasStateAuthority)
+        {
+            IsCollected = true;
+        }
+
         // 발사 효과 인스턴스 생성 및 비활성화
-       // _muzzleEffectInstance = Instantiate(MuzzleEffectPrefab, MuzzleTransform);
-        _muzzleEffectInstance.SetActive(false);
+        // _muzzleEffectInstance = Instantiate(MuzzleEffectPrefab, MuzzleTransform);
+        // _muzzleEffectInstance.SetActive(false);
 
         // SceneObjects 클래스 참조
         //_sceneObjects = Runner.GetSingleton<SceneObjects>();
@@ -186,6 +222,7 @@ public class PlayerWeapon : NetworkBehaviour
             // 탄약 추가 및 남은 탄약 감소
             ClipAmmo += reloadAmmo;
             RemainingAmmo -= reloadAmmo;
+            AmmoInfoUpdate();
 
             // 재장전 후 준비 시간 추가
             _fireCooldown = TickTimer.CreateFromSeconds(Runner, 0.25f);
@@ -221,20 +258,25 @@ public class PlayerWeapon : NetworkBehaviour
             if (IsReloading)
             {
                 // 재장전 중에는 리로딩 사운드를 재생합니다.
-               // ReloadingSound.Play();
+                // ReloadingSound.Play();
             }
 
             _reloadingVisible = IsReloading;
         }
     }
-
+   
     private void FireProjectile(Vector3 firePosition, Vector3 fireDirection)
     {
+
         var projectileData = new ProjectileData();
 
         var hitOptions = HitOptions.IncludePhysX | HitOptions.IgnoreInputAuthority;
 
         // 전체 발사체 경로 및 효과를 즉시 처리합니다(히트스캔 발사체).
+        //Runner.LagCompensation.Raycast(aimPoint.position + aimForwardVector * 2.5f, aimForwardVector,
+        //hitDistance, Object.InputAuthority, out var hitnfo, collisionLayer, HitOptions.IncludePhysX);
+        Debug.DrawRay(firePosition + fireDirection * 2.5f, fireDirection * MaxHitDistance, Color.green, 1);
+
         if (Runner.LagCompensation.Raycast(firePosition, fireDirection, MaxHitDistance,
                 Object.InputAuthority, out var hit, HitMask, hitOptions))
         {
@@ -243,18 +285,92 @@ public class PlayerWeapon : NetworkBehaviour
 
             if (hit.Hitbox != null)
             {
+                HPHandler tmp = hit.Hitbox.transform.root.GetComponent<HPHandler>();
+                if (tmp.isDead)
+                {
+                    return;
+                }
+                string KN = gameObject.GetComponentInParent<NetworkPlayer>().nickName.ToString();
+                string DN = hit.GameObject.GetComponentInParent<NetworkPlayer>().nickName.ToString();
+                
+                tmp.OnTakeDamage();
+                if (tmp.isDead)
+                {
+                    tmp.KillLogUpdate(KN, DN, _weaponSprite);
+
+                    if (HasInputAuthority)
+                        StartCoroutine(KillEffect());
+                }
+                else
+                {
+                    if (HasInputAuthority)
+                        StartCoroutine(EnemyHitEffect());
+                }
+
                 // 히트박스가 있는 경우 데미지를 적용합니다.
                 ApplyDamage(hit.Hitbox, hit.Point, fireDirection);
             }
             else
             {
+                Debug.Log("없음");
+
                 // 플레이어가 단단한 물체에 충돌했을 때만 히트 효과를 표시합니다.
                 projectileData.ShowHitEffect = true;
             }
         }
+        //Instantiate(ProjectilePrefab, firePosition, transform.rotation);
 
         _projectileData.Set(_fireCount % _projectileData.Length, projectileData);
         _fireCount++;
+        Debug.Log($"발사횟수 {_fireCount}");
+    }
+    
+
+    
+    IEnumerator EnemyHitEffect()
+    {
+        int i = 0;
+        int goal = 20;
+        while (i < goal)
+        {
+            _weaponAimImage.color = Color.Lerp(_weaponAimImage.color, Color.red, 0.3f);
+            ++i;
+            yield return null;
+        }
+        i = 0;
+        while (i < goal)
+        {
+            _weaponAimImage.color = Color.Lerp(_weaponAimImage.color, Color.white, 0.3f);
+            ++i;
+            yield return null;
+        }
+        _weaponAimImage.color = Color.white;
+
+        yield return null;
+    }
+    IEnumerator KillEffect()
+    {
+        Color mirror = new Color(1, 1, 1, 0);
+        int i = 0;
+        int goal = 100;
+        _weaponAimImage.color = mirror;
+        while (i < goal)
+        {
+            _killIcon.color = Color.Lerp(_killIcon.color, Color.white, 0.25f);
+            ++i;
+            yield return null;
+        }
+        i = 0;
+        while (i < goal / 4)
+        {
+            _killIcon.color = Color.Lerp(_killIcon.color, mirror, 0.5f);
+            ++i;
+            yield return null;
+        }
+        _weaponAimImage.color = Color.white;
+        _killIcon.color = mirror;
+
+        yield return null;
     }
 
     //private void PlayFireEffect()

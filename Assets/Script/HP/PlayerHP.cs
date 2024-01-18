@@ -17,7 +17,7 @@ public class PlayerHP : NetworkBehaviour
     {
         if (!Object.HasStateAuthority)
             return;
-
+        
         HP -= 1;
     }
 }

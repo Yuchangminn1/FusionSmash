@@ -31,17 +31,20 @@ public class CharacterMovementHandler : NetworkBehaviour
     NetworkBool canMove { get; set; } = true;
 
     [Header("Weapon")]
-    public GameObject playerWeaponHandle;
-    public GameObject playerEquipWeapon;
-    public List<GameObject> playerWeaponPrefab;
-    WeaponHandler weaponHandler { get; set; }
-    [Networked(OnChanged = nameof(ChangeWeaponNum))]
-    int weaponNum { get; set; }
+    //public GameObject playerWeaponHandle;
+    //public GameObject playerEquipWeapon;
+    //public List<GameObject> playerWeaponPrefab;
+    //[Networked(OnChanged = nameof(ChangeWeaponNum))]
+    //int weaponNum { get; set; }
+    WeaponHandler weaponHandler;
+
     [Header("Script")]
     public CharacterInputhandler characterInputhandler;
     PlayerInput input;
     HPHandler hpHandler;
+
     CameraAimAngle cameraAimAngle;
+
     ChatSystem chatSystem;
 
     [Header("State")]
@@ -52,7 +55,8 @@ public class CharacterMovementHandler : NetworkBehaviour
     [Header("Component")]
     public NetworkRigidbody networkRigidbody;
     public Rigidbody rb;
-    public Camera localCamera { get; private set; }
+    public GameObject localCamera;
+    public Camera camera;
     private NetworkObject networkObject;
 
     [Header("Camera")]
@@ -65,6 +69,7 @@ public class CharacterMovementHandler : NetworkBehaviour
     float groundCheckRad = 0.2f;
 
     public bool isRespawnRequsted = false;
+    //public GameObject _nickName;
 
     //public int jumpcount2 = 0;
     void Awake()
@@ -73,73 +78,39 @@ public class CharacterMovementHandler : NetworkBehaviour
         hpHandler = GetComponent<HPHandler>();
         networkRigidbody = GetComponent<NetworkRigidbody>();
         rb = GetComponent<Rigidbody>();
-        localCamera = GetComponentInChildren<Camera>();
         playerStateHandler = GetComponent<PlayerStateHandler>();
         networkObject = GetComponent<NetworkObject>();
         weaponHandler = GetComponent<WeaponHandler>();
         cameraAimAngle = GetComponentInChildren<CameraAimAngle>();
-        chatSystem = GetComponent<ChatSystem>();    
+        chatSystem = GetComponent<ChatSystem>();
+        camera = localCamera.GetComponent<Camera>();
     }
     // Start is called before the first frame update
     void Start()
     {
+        weaponHandler.SetEq();
         //playerJumpCount = 0;
         jumpForce = 10f;
-        cameraAimAngle.camera = localCamera;
+        cameraAimAngle.camera = camera;
 
         ChangeWeapon(0);
 
+        //if (HasInputAuthority)
+        //{
+        //    //조작하는 캐릭터 닉네임 끄기
+        //    _nickName.SetActive(false);
+        //}
     }
     public void PlayFireEffect()
     {
         ;
     }
-    static void ChangeWeaponNum(Changed<CharacterMovementHandler> changed)
+    public void ChangeWeapon(int _weaponNum)
     {
-        int newWeaponNum = changed.Behaviour.weaponNum;
-        changed.LoadOld();
-        int oldWeaponNum = changed.Behaviour.weaponNum;
-        if (newWeaponNum != oldWeaponNum)
-        {
-            changed.Behaviour.ChangeWeapon(changed.Behaviour.weaponNum);
-        }
+        weaponHandler.ChangeWeapon(_weaponNum);
     }
-    
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    public void RPC_WeaponNum(int _weaponNum, RpcInfo info = default)
-    {
-        if (playerEquipWeapon == null)
-            return;
-        if (playerEquipWeapon.transform.localPosition != Vector3.zero)
-        {
-            playerEquipWeapon.transform.localPosition = Vector3.zero;
-        }
-        weaponNum = _weaponNum;
-    }
-    
 
-    void ChangeWeapon(int num)
-    {
-        if (playerEquipWeapon != null)
-            Destroy(playerEquipWeapon);
 
-        weaponNum = num;
-
-        if (Object.HasInputAuthority)
-        {
-            RPC_WeaponNum(weaponNum);
-        }
-
-        if (playerWeaponPrefab.Count > num && playerWeaponPrefab[num] != null)
-        {
-            playerEquipWeapon = Instantiate(playerWeaponPrefab[num], Vector3.zero, Quaternion.identity);
-            playerEquipWeapon.transform.parent = playerWeaponHandle.transform;
-            playerEquipWeapon.transform.localPosition = Vector3.zero;
-            playerEquipWeapon.transform.localRotation = Quaternion.identity;
-        }
-
-    }
-    
     void OnMove(InputValue value)
     {
         Vector2 dir = value.Get<Vector2>();
@@ -199,7 +170,19 @@ public class CharacterMovementHandler : NetworkBehaviour
                 chatSystem.Summit();
         }
     }
+    private void Move(NetworkInputData networkInputData)
+    {
+        
+        Vector3 tmp = new Vector3(networkInputData.aimFowardVector.x, 0, networkInputData.aimFowardVector.z);
+        transform.forward = tmp;
 
+        Vector3 moveDirection = transform.forward * networkInputData.movementInput.y + transform.right * networkInputData.movementInput.x;
+        moveDirection.Normalize();
+        playerStateHandler.SetInputVec(networkInputData.movementInput);
+        networkRigidbody.Rigidbody.velocity = (new Vector3(moveDirection.x * moveSpeed, rb.velocity.y, moveDirection.z * moveSpeed));
+
+        //networkRigidbody.Rigidbody.velocity = (new Vector3(moveDirection.x * moveSpeed, networkRigidbody.ReadVelocity().y, moveDirection.z * moveSpeed));
+    }
     private void Action(NetworkInputData networkInputData)
     {
 
@@ -232,7 +215,7 @@ public class CharacterMovementHandler : NetworkBehaviour
 
         if (playerStateHandler.IsGround() && (rb.velocity.y < 0.03 && rb.velocity.y > -0.03))
         {
-            Debug.Log("Ground초기화");
+            //Debug.Log("Ground초기화");
             if (HasStateAuthority)
             {
                 _jumpCount = 0;
@@ -243,7 +226,7 @@ public class CharacterMovementHandler : NetworkBehaviour
         //공격
         if (networkInputData.isFireButtonPressed)
         {
-            weaponHandler.Fire(localCamera.transform.forward);
+            weaponHandler.Fire(localCamera.transform.position, networkInputData.aimFowardVector, networkInputData.isFireButtonPressed);
             if (Object.HasInputAuthority)
                 playerStateHandler.isFireButtonPressed = true;
             else
@@ -252,20 +235,11 @@ public class CharacterMovementHandler : NetworkBehaviour
         }
         
     }
-    private void Move(NetworkInputData networkInputData)
-    {
-        Quaternion rotation = transform.rotation;
-        rotation.eulerAngles = new Vector3(0, rotation.eulerAngles.y, rotation.eulerAngles.z);
-        transform.rotation = rotation;
-
-
-        Vector3 moveDirection = transform.forward * networkInputData.movementInput.y + transform.right * networkInputData.movementInput.x;
-        moveDirection.Normalize();
-        playerStateHandler.SetInputVec(networkInputData.movementInput);
-
-        networkRigidbody.Rigidbody.velocity = (new Vector3(moveDirection.x * moveSpeed, networkRigidbody.ReadVelocity().y, moveDirection.z * moveSpeed));
-    }
-
+    
+    //public void Rotation(float _y)
+    //{
+    //    transform.rotation = Quaternion.Euler(0, _y, 0);
+    //}
     /// <summary>
     /// 이상하게 떨어지면 정상적으로 리스폰
     /// </summary>
@@ -333,4 +307,5 @@ public class CharacterMovementHandler : NetworkBehaviour
             }
         }
     }
+    
 }

@@ -9,12 +9,14 @@ public class HPHandler : NetworkBehaviour
     
     int MaxHp { get; set; }
 
-    //[Networked(OnChanged = nameof(OnHPChanged))]
-    [Networked]
+    [Networked(OnChanged = nameof(OnHPChanged))]
     public int HP { get; private set; }
 
     [Networked(OnChanged = nameof(OnStateChanged))]
     public bool isDead { get; set; }
+    [Header("KillLog UI")]
+    public GameObject _killLogPanel; // 킬로그 패널
+    public GameObject _killLogPrefab;// 킬로그 프리팹
 
     bool isInitialized = false;
 
@@ -90,29 +92,28 @@ public class HPHandler : NetworkBehaviour
     {
         
     }
-    
+
+    public override void Spawned()
+    {
+        _killLogPanel = GameObject.Find("KillLogPanel").gameObject;
+
+    }
 
 
 
     public void OnTakeDamage(int _attackDamage = 1)
     {
-        if (isDead)
+        if (isDead && !Object.HasStateAuthority)
         {
             return;
         }
-        //Debug.Log($"OnTakeDamage{HP}전");
-        
         HP -= _attackDamage;
-        localUICanvas.ChangeHPBar(HP, MaxHp, transform);
-        //Debug.Log($"OnTakeDamage{HP}후");
-        //Debug.Log($"{Time.time} {transform.name}took damage get {HP} left");
         if (HP <= 0)
         {
             Debug.Log($"{transform.name} isDead");
-
             StartCoroutine(ServerReviveCO());
-
             isDead = true;
+            
 
         }
 
@@ -120,12 +121,14 @@ public class HPHandler : NetworkBehaviour
     //변하면 호출인데 아직 잘 모름 
     
 
-
+    public void HPUIUpdate()
+    {
+        localUICanvas.ChangeHPBar(HP, MaxHp, transform);
+    }
 
     void OnHPReduced()
     {
         Debug.Log($"OnHPReduced 의 HP = {HP}");
-
         if (!isInitialized)
         {
             return;
@@ -142,10 +145,12 @@ public class HPHandler : NetworkBehaviour
         changed.LoadOld();
 
         int oldHP = changed.Behaviour.HP;
+        changed.LoadNew();
 
         //check if the HP has been decreased
         if (newHP != oldHP)
         {
+            changed.Behaviour.HPUIUpdate();
             //changed.Behaviour.HPBarValue(); 이런 호스트 체력을 다른 플레이어들 UI로 공유해주네 
             //changed에서 변경된 지역함수? 는 이 함수로 호출 되는 모든 함수에서 그 값으로 작용 ???
             //여기서 쓰는 함수는 static 이기 떄문에 ? changed.Behaviour를 써야하네 공부 해봐야할듯
@@ -188,6 +193,13 @@ public class HPHandler : NetworkBehaviour
         Instantiate(deathGameObjectPrefab,transform.position,Quaternion.identity);
 
     }
+    public void KillLogUpdate(string killPlayer, string deadPlayer, Sprite weapon)
+    {
+        Debug.Log("ㅇㅇㅇㅇㅇㅇㅇ");
+        var Q = Instantiate(_killLogPrefab);
+        Q.transform.parent = _killLogPanel.transform;
+        Q.GetComponent<KillLog>().SetLog(killPlayer, deadPlayer, weapon);
+    }
     void OnReive()
     {
         if (playerModel == null)
@@ -216,7 +228,7 @@ public class HPHandler : NetworkBehaviour
         Debug.Log("ResetHP");
         HP = 0;
         HP = MaxHp;
-        localUICanvas.ChangeHPBar(HP, MaxHp, transform);
+        HPUIUpdate();
 
     }
     public int ReturnMaxHP()

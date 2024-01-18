@@ -61,7 +61,7 @@ public class CharacterInputhandler : MonoBehaviour
 
         localCameraHandler.SetViewInputVector(viewInputVector);
 
-        
+
 
 
     }

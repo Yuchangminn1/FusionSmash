@@ -69,15 +69,16 @@ public class ChatSystem : NetworkBehaviour
             if (mainInputField.text != "" && mainInputField.text != " ")
             {
                 Debug.Log(mainInputField.text.Length);
-                myChat = mainInputField.text;
-                chatLog.text += $"\n {myName} : {myChat}";
-                RPC_SetChat(myChat.ToString(), myName);
-                Debug.Log($"Send MyChat = {myChat}");
-                mainInputField.text = "";
+                StartCoroutine(SumitE());
+                //SendMassage();
 
             }
-            mainInputField.interactable = false;
-            ischating = false;
+            else
+            {
+                mainInputField.interactable = false;
+                ischating = false;
+            }
+            
 
         }
         else
@@ -89,6 +90,17 @@ public class ChatSystem : NetworkBehaviour
         }
         
 
+    }
+
+    private void SendMassage()
+    {
+        myChat = mainInputField.text;
+        chatLog.text += $"\n {myName} : {myChat}";
+        RPC_SetChat(myChat.ToString(), myName);
+        //Debug.Log($"Send MyChat = {myChat}");
+        mainInputField.text = "";
+        mainInputField.interactable = false;
+        ischating = false;
     }
 
     static void OnChangeChatLog(Changed<ChatSystem> changed)
@@ -112,7 +124,7 @@ public class ChatSystem : NetworkBehaviour
         {
             nullcheck += chatSystem;
 
-            Debug.Log($"이거{chatSystem}이거");
+            //Debug.Log($"이거{chatSystem}이거");
         }
         if (Object.HasInputAuthority)
         {
@@ -154,5 +166,10 @@ public class ChatSystem : NetworkBehaviour
     {
         Debug.Log("chatDown change true ");
         chatDown = true;
+    }
+    IEnumerator SumitE()
+    {
+        yield return new WaitForFixedUpdate();
+        SendMassage();
     }
 }

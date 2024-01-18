@@ -24,11 +24,11 @@ public class Projectile : MonoBehaviour
     private float _duration;
 
     /// <summary>
-    /// Set where the projectile visual should land.
+    /// Set where the projectile visual should land.                                탄알 비주얼이 착탄할 위치를 설정합니다.
     /// </summary>
-    /// <param name="hitPosition">Position where projectile hit geometry</param>
-    /// <param name="hitNormal">Normal of the hit surface</param>
-    /// <param name="showHitEffect">Whether projectile impact should be displayed
+    /// <param name="hitPosition">Position where projectile hit geometry</param>    탄알이 기하체에 맞은 위치
+    /// <param name="hitNormal">Normal of the hit surface</param>                   맞은 표면의 법선 벡터
+    /// <param name="showHitEffect">Whether projectile impact should be displayed   탄알 충돌 효과를 표시할지 여부
     /// (e.g. we don't want static impact effect displayed on other player's body)</param>
     public void SetHit(Vector3 hitPosition, Vector3 hitNormal, bool showHitEffect)
     {

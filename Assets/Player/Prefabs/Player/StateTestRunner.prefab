@@ -961,6 +961,7 @@ MonoBehaviour:
   - {fileID: 4151183343878407558}
   - {fileID: 6938089165380881423}
   - {fileID: -5338822107721316203}
+  - {fileID: 7633569633282759430}
   SimulationBehaviours: []
 --- !u!114 &6537298461557146503
 MonoBehaviour:
@@ -1012,6 +1013,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  characterInputhandler: {fileID: 0}
+  networkRigidbody: {fileID: 0}
+  rb: {fileID: 0}
+  rotationSpeed: 15
+  viewUpDownRotationSpeed: 50
+  GroundCheckDis: 0.65
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
   isRespawnRequsted: 0
 --- !u!114 &6271821544113871149
 MonoBehaviour:
@@ -1025,6 +1035,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fa4f3d31f40bc54f97585ce791316af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isJumpButtonPressed: 0
 --- !u!114 &111362530461062036
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1038,9 +1049,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  _isFiring: 0
-  fireParticleSystem: {fileID: 5452981029168007953}
-  aimPoint: {fileID: 4043942900165244236}
+  playerWeaponPrefab: []
   collisionLayer:
     serializedVersion: 2
     m_Bits: 129
@@ -1075,6 +1084,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  _HP: 0
   _isDead: 0
   uiOnHitColor: {r: 0.9716981, g: 0.3254272, b: 0.3254272, a: 0.84313726}
   uiONHitImage: {fileID: 6316703970738344446}
@@ -1138,11 +1148,13 @@ MonoBehaviour:
     _data:
       Data: 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   _sendName: 
-  sendPlayer: {fileID: 8897015954960035588}
+  myNameText: {fileID: 0}
   myName: 
   mainInputField: {fileID: 1043394717398000542}
   chatLog: {fileID: 0}
   scrollV: {fileID: 0}
+  _ischating:
+    _value: 0
 --- !u!114 &620067535770517586
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1186,10 +1198,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  dodgeCount: 0
-  jumpCount: 0
+  _state: 0
+  _state2: 0
   isdead: 0
   isStop: 0
+  isJumping: 0
   isHeal: 0
   fHpHeal: 40
   healNum: 0
@@ -1198,8 +1211,11 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 0
-  animationTrigger: 0
   anima: {fileID: 0}
+  characterMovementHandler: {fileID: 0}
+  isJumpButtonPressed: 0
+  isFireButtonPressed: 0
+  isDodgeButtonPressed: 0
 --- !u!1 &1443194376284472811
 GameObject:
   m_ObjectHideFlags: 0
@@ -5413,6 +5429,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1f91a00fcfff17428fdec0de28c11e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
   cameraAnchorPoint: {fileID: 5721601502422805880}
 --- !u!1 &6429258761291312264
 GameObject:
@@ -8307,10 +8324,5 @@ PrefabInstance:
 --- !u!4 &1901791144232353275 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 9156264314065302135, guid: 582736ff05205694b9ea75ca2842468c, type: 3}
-  m_PrefabInstance: {fileID: 7310768371350458252}
-  m_PrefabAsset: {fileID: 0}
---- !u!198 &5452981029168007953 stripped
-ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 3375993567771198621, guid: 582736ff05205694b9ea75ca2842468c, type: 3}
   m_PrefabInstance: {fileID: 7310768371350458252}
   m_PrefabAsset: {fileID: 0}

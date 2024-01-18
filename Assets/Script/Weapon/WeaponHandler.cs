@@ -5,126 +5,76 @@ using Fusion;
 using UnityEditor;
 using System;
 using Unity.VisualScripting;
+using System.IO.Pipes;
+using TMPro;
+using UnityEngine.UI;
 
 public class WeaponHandler : NetworkBehaviour
 {
-    [Networked(OnChanged = nameof(OnFireChanged))]
-    //"OnFireChanged"를 전부에게 공유 아마 
-    public bool isFiring { get; set; }
+    public List<GameObject> playerWeaponPrefab;
+    PlayerWeapon _equipWeapon;
 
-    public ParticleSystem fireParticleSystem;
-    public Transform aimPoint;
+    //public ParticleSystem fireParticleSystem;
     public LayerMask collisionLayer;
-
 
     float lastTimeFire = 0;
 
-    HPHandler hpHandler;
+    
+
+
+    //HPHandler hpHandler;
 
     void Awake()
     {
-        hpHandler = GetComponent<HPHandler>();
+        //hpHandler = GetComponent<HPHandler>();
+
     }
+
 
 
     public override void FixedUpdateNetwork()
     {
-        if (hpHandler.isDead)
-        {
-            return;
-        }
-        //if (GetInput(out NetworkInputData networkInputData))
+
+        //if (hpHandler.isDead)
         //{
-        //    if (networkInputData.isFireButtonPressed)
-        //    {
-        //        Fire(networkInputData.aimFowardVector);
-        //    }
+        //    return;
         //}
-        //Debug.Log(aimPoint.position);
-
 
     }
-
-
-
-
     //플레이어가 발사버튼을 누름
-    public void Fire(Vector3 aimForwardVector)
+    public void Fire(Vector3 _firePosition, Vector3 _fireDirection, bool _isFireButtonPressed)
     {
-        //Debug.Log("Fire Gun");
-        Debug.Log($"{Object.name} , {Object.HasStateAuthority}");
-
-        if (Time.time - lastTimeFire < 0.15f)
-            return;
         float hitDistance = 100;
-
-        Runner.LagCompensation.Raycast(aimPoint.position + aimForwardVector * 2.5f, aimForwardVector, hitDistance, Object.InputAuthority, out var hitnfo, collisionLayer, HitOptions.IncludePhysX);
-        Debug.DrawRay(aimPoint.position + aimForwardVector * 2.5f, aimForwardVector * hitDistance, Color.green, 1);
-
-        bool ishitOtherPlayer = false;
-
-        if (hitnfo.Distance > 0)
-        {
-            hitDistance = hitnfo.Distance;
-        }
-        if (hitnfo.Hitbox != null)
-        {
-
-            hitnfo.Hitbox.transform.root.GetComponent<PlayerHP>().OnTakeDamage();
-
-            ishitOtherPlayer = true;
-        }
-        else if (hitnfo.Collider != null)
-        {
-
-        }
-        //Debug
-        if (ishitOtherPlayer)
-        {
-            Debug.DrawRay(aimPoint.position + aimForwardVector * 2.5f, aimForwardVector * hitDistance, Color.red, 1);
-        }
-        else
-        {
-            Debug.DrawRay(aimPoint.position + aimForwardVector * 2.5f, aimForwardVector * hitDistance, Color.green, 1);
-        }
-        //발사시간 저장
-        lastTimeFire = Time.time;
+        _equipWeapon.Fire(_firePosition, _fireDirection, _isFireButtonPressed);
     }
-    //서버가 값을 전달하기까지 기다리기 
-    IEnumerator FireEffectCO()
+    public void ChangeWeapon(int num)
     {
-        if (fireParticleSystem.isPlaying != true)
+        //총 오브젝트 체인지
+        if (_equipWeapon != null)
         {
-            isFiring = true;
-            fireParticleSystem.Play();
-            Debug.Log(fireParticleSystem.transform.position);
-            yield return new WaitForSeconds(0.09f);
+            _equipWeapon.gameObject.SetActive(false);
+            _equipWeapon.DisEquip();
+
         }
-        isFiring = false;
+        _equipWeapon = playerWeaponPrefab[num].GetComponent<PlayerWeapon>();
+
+        _equipWeapon.gameObject.SetActive(true);
+        _equipWeapon.Equip();
     }
 
-    static void OnFireChanged(Changed<WeaponHandler> changed)
+
+    public void SetEq()
     {
-
-        //Debug.Log($"{Time.time} OnFireChange value {changed.Behaviour.isFiring}");
-        bool isFiringCurrent = changed.Behaviour.isFiring;
-
-        //Load the old value
-        changed.LoadOld();
-
-        bool isFiringOld = changed.Behaviour.isFiring;
-
-        if (isFiringCurrent && !isFiringOld)
-            changed.Behaviour.OnFireRemote();
-    }
-
-    void OnFireRemote()
-    {
-        if (!Object.HasInputAuthority)
+        //안쓰는 무기 끄기
+        if (playerWeaponPrefab != null)
         {
-            fireParticleSystem.Play();
+            foreach (GameObject t in playerWeaponPrefab)
+            {
+                t.SetActive(false);
+            }
         }
-    }
+        
 
+    }
 
 }
