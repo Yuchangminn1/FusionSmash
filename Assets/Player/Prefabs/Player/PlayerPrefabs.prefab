@@ -5521,7 +5521,10 @@ MonoBehaviour:
   Flags: 2305
   NetworkGuid:
     RawGuidValue: 647094daaacd6764fb7c54f15d575e97
-  NestedObjects: []
+  NestedObjects:
+  - {fileID: 552923408063021413}
+  - {fileID: 4327999301599740422}
+  - {fileID: 2579974461912176530}
   NetworkedBehaviours:
   - {fileID: 1461197055936117296}
   - {fileID: 6691285900580924324}
@@ -5532,9 +5535,6 @@ MonoBehaviour:
   - {fileID: 6228978571261140216}
   - {fileID: 5074550767049634496}
   - {fileID: 2318200589270887298}
-  - {fileID: 4558432368492276953}
-  - {fileID: 2350601258084661581}
-  - {fileID: 1955485707902220846}
   - {fileID: 4411337029331231604}
   - {fileID: 2204535889741826049}
   SimulationBehaviours: []
@@ -10618,6 +10618,22 @@ PrefabInstance:
       propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -1029888969833446184, guid: b07dbf437a250cb419ccd396ab3cd81b, type: 3}
+      propertyPath: Flags
+      value: 3073
+      objectReference: {fileID: 0}
+    - target: {fileID: -1029888969833446184, guid: b07dbf437a250cb419ccd396ab3cd81b, type: 3}
+      propertyPath: NetworkedBehaviours.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -1029888969833446184, guid: b07dbf437a250cb419ccd396ab3cd81b, type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -1029888969833446184, guid: b07dbf437a250cb419ccd396ab3cd81b, type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5919749264513890419, guid: b07dbf437a250cb419ccd396ab3cd81b, type: 3}
       propertyPath: m_Name
       value: Rifle
@@ -10698,6 +10714,10 @@ PrefabInstance:
       propertyPath: _weaponAmmoText
       value: 
       objectReference: {fileID: 6299923617332011727}
+    - target: {fileID: 7870672004196155283, guid: b07dbf437a250cb419ccd396ab3cd81b, type: 3}
+      propertyPath: _localCameraRotation
+      value: 
+      objectReference: {fileID: 1327224185486374839}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -10724,6 +10744,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7687258598224365598, guid: b07dbf437a250cb419ccd396ab3cd81b, type: 3}
   m_PrefabInstance: {fileID: 5594945316991387358}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &4327999301599740422 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: -1029888969833446184, guid: b07dbf437a250cb419ccd396ab3cd81b, type: 3}
+  m_PrefabInstance: {fileID: 5594945316991387358}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2270396441647857325}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &5942764049881551690
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10753,6 +10784,34 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -1072272708781736914, guid: b07dbf437a250cb419ccd396ab3cd81b, type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -1029888969833446184, guid: b07dbf437a250cb419ccd396ab3cd81b, type: 3}
+      propertyPath: Flags
+      value: 3073
+      objectReference: {fileID: 0}
+    - target: {fileID: -1029888969833446184, guid: b07dbf437a250cb419ccd396ab3cd81b, type: 3}
+      propertyPath: NetworkedBehaviours.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: -1029888969833446184, guid: b07dbf437a250cb419ccd396ab3cd81b, type: 3}
+      propertyPath: NetworkedBehaviours.Array.data[0]
+      value: 
+      objectReference: {fileID: 4558432368492276953}
+    - target: {fileID: -1029888969833446184, guid: b07dbf437a250cb419ccd396ab3cd81b, type: 3}
+      propertyPath: NetworkedBehaviours.Array.data[1]
+      value: 
+      objectReference: {fileID: 2350601258084661581}
+    - target: {fileID: -1029888969833446184, guid: b07dbf437a250cb419ccd396ab3cd81b, type: 3}
+      propertyPath: NetworkedBehaviours.Array.data[2]
+      value: 
+      objectReference: {fileID: 1955485707902220846}
+    - target: {fileID: -1029888969833446184, guid: b07dbf437a250cb419ccd396ab3cd81b, type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -1029888969833446184, guid: b07dbf437a250cb419ccd396ab3cd81b, type: 3}
       propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
       value: 0
       objectReference: {fileID: 0}
@@ -10836,6 +10895,10 @@ PrefabInstance:
       propertyPath: _weaponAmmoText
       value: 
       objectReference: {fileID: 6299923617332011727}
+    - target: {fileID: 7870672004196155283, guid: b07dbf437a250cb419ccd396ab3cd81b, type: 3}
+      propertyPath: _localCameraRotation
+      value: 
+      objectReference: {fileID: 1327224185486374839}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -10846,6 +10909,17 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 5919749264513890419, guid: b07dbf437a250cb419ccd396ab3cd81b, type: 3}
   m_PrefabInstance: {fileID: 5942764049881551690}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2579974461912176530 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: -1029888969833446184, guid: b07dbf437a250cb419ccd396ab3cd81b, type: 3}
+  m_PrefabInstance: {fileID: 5942764049881551690}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 26983103442201401}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &4095549548705733460 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7687258598224365598, guid: b07dbf437a250cb419ccd396ab3cd81b, type: 3}
@@ -10883,6 +10957,22 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -1072272708781736914, guid: b07dbf437a250cb419ccd396ab3cd81b, type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -1029888969833446184, guid: b07dbf437a250cb419ccd396ab3cd81b, type: 3}
+      propertyPath: Flags
+      value: 3073
+      objectReference: {fileID: 0}
+    - target: {fileID: -1029888969833446184, guid: b07dbf437a250cb419ccd396ab3cd81b, type: 3}
+      propertyPath: NetworkedBehaviours.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -1029888969833446184, guid: b07dbf437a250cb419ccd396ab3cd81b, type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -1029888969833446184, guid: b07dbf437a250cb419ccd396ab3cd81b, type: 3}
       propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
       value: 0
       objectReference: {fileID: 0}
@@ -10966,11 +11056,26 @@ PrefabInstance:
       propertyPath: _weaponAmmoText
       value: 
       objectReference: {fileID: 4174690435244204827}
+    - target: {fileID: 7870672004196155283, guid: b07dbf437a250cb419ccd396ab3cd81b, type: 3}
+      propertyPath: _localCameraRotation
+      value: 
+      objectReference: {fileID: 1327224185486374839}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b07dbf437a250cb419ccd396ab3cd81b, type: 3}
+--- !u!114 &552923408063021413 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: -1029888969833446184, guid: b07dbf437a250cb419ccd396ab3cd81b, type: 3}
+  m_PrefabInstance: {fileID: 8509966667846272445}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2611618357805235662}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1955485707902220846 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7870672004196155283, guid: b07dbf437a250cb419ccd396ab3cd81b, type: 3}

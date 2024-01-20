@@ -93,6 +93,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7687258598224365598}
   - component: {fileID: 7870672004196155283}
+  - component: {fileID: -1029888969833446184}
   m_Layer: 0
   m_Name: Pistol
   m_TagString: Untagged
@@ -130,6 +131,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
   Type: 0
+  _weaponUI: {fileID: 0}
+  _weaponAmmoText: {fileID: 0}
+  _weaponAimImage: {fileID: 0}
+  _killIcon: {fileID: 0}
+  _weaponNum: 0
   IsAutomatic: 1
   Damage: 10
   FireRate: 100
@@ -149,3 +155,27 @@ MonoBehaviour:
     _value: 0
   _ClipAmmo: 0
   _RemainingAmmo: 0
+--- !u!114 &-1029888969833446184
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5919749264513890419}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectInterest: 1
+  DefaultInterestGroups: []
+  DestroyWhenStateAuthorityLeaves: 0
+  AllowStateAuthorityOverride: 1
+  AoiPositionSource: {fileID: 0}
+  Flags: 2305
+  NetworkGuid:
+    RawGuidValue: b07dbf437a250cb419ccd396ab3cd81b
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 7870672004196155283}
+  SimulationBehaviours: []

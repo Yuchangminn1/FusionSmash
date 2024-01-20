@@ -25,9 +25,11 @@ public class PlayerWeapon : NetworkBehaviour
     public Image _weaponAimImage;   //크로스헤어
     public Image _killIcon;         //킬 이미지
     public int _weaponNum = 0;
-    
+
 
     [Header("Fire Setup")]
+    public GameObject _localCameraRotation;
+
     public bool IsAutomatic = true; // 자동 발사 여부
     public float Damage = 10f; // 데미지
     public int FireRate = 100; // 발사 속도
@@ -277,7 +279,8 @@ public class PlayerWeapon : NetworkBehaviour
         //Runner.LagCompensation.Raycast(aimPoint.position + aimForwardVector * 2.5f, aimForwardVector,
         //hitDistance, Object.InputAuthority, out var hitnfo, collisionLayer, HitOptions.IncludePhysX);
         Debug.DrawRay(firePosition + fireDirection * 2.5f, fireDirection * MaxHitDistance, Color.green, 1);
-
+        
+        
         if (Runner.LagCompensation.Raycast(firePosition, fireDirection, MaxHitDistance,
                 Object.InputAuthority, out var hit, HitMask, hitOptions))
         {
@@ -294,15 +297,13 @@ public class PlayerWeapon : NetworkBehaviour
                 }
                 HPHandler KN = gameObject.GetComponentInParent<HPHandler>();
                 tmpHP.enemyHPHandler = KN;
-                //string DN = hit.GameObject.GetComponentInParent<NetworkPlayer>().nickName.ToString();
 
                 tmpHP.OnTakeDamage(KN._nickName, ((int)Type));
                 if (tmpHP.isDead)
                 {
                     if (KN.HasStateAuthority)
                     {
-                        //tmpHP.KillLogUpdate(KN, DN, _weaponSprite);
-                        //tmpMove.KilledPlayer(DN, _weaponNum);
+                        
                     }
 
                     if (HasInputAuthority)
@@ -325,7 +326,8 @@ public class PlayerWeapon : NetworkBehaviour
                 projectileData.ShowHitEffect = true;
             }
         }
-        //Instantiate(ProjectilePrefab, firePosition, transform.rotation);
+        
+        Instantiate(ProjectilePrefab, firePosition + fireDirection * 2.5f, _localCameraRotation.transform.rotation);
 
         _projectileData.Set(_fireCount % _projectileData.Length, projectileData);
         _fireCount++;
