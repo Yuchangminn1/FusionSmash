@@ -20,7 +20,7 @@ public class ChatSystem : NetworkBehaviour
 
     public TMP_Text myNameText;
 
-    public string myName;
+    public string _nickName;
 
     [SerializeField] InputField mainInputField;
 
@@ -32,21 +32,20 @@ public class ChatSystem : NetworkBehaviour
 
     bool chatDown = false;
 
-    [Networked]
+    [Networked(OnChanged = nameof(OnChangeSumit))]
     public NetworkBool ischating { get; set; }
 
     //클라이언트에서 쳇이 onoffonoff반복하는거 방지
     float inputTime = 0f;
     // Checks if there is anything entered into the input field.
-    CharacterMovementHandler characterMovementHandler;
     public void Awake()
     {
         //이걸 어웨이크에서 안하면 null이라 오류남 
         playerControls = new PlayerInputAction();
         chatLog = GameObject.FindWithTag("ChatDisplay").GetComponentInChildren<TMP_Text>();
         scrollV = GameObject.FindWithTag("ScrollV").GetComponent<Scrollbar>();
-        characterMovementHandler = GetComponent<CharacterMovementHandler>();
     }
+    
     public void Start()
     {
         mainInputField.characterLimit = 1024;
@@ -55,48 +54,51 @@ public class ChatSystem : NetworkBehaviour
             mainInputField.enabled = true;
         }
         Debug.Log("chatLog = " + chatLog);
+
     }
 
     private void FixedUpdate()
     {
         scrollV.value = 0;
     }
-    public void Summit()
+    static void OnChangeSumit(Changed<ChatSystem> changed)
     {
+        changed.Behaviour.Sumit(changed.Behaviour.ischating);
+    }
 
-        if (mainInputField.interactable)
+    public void Sumit(bool ischating)
+    {
+        if (!ischating)
         {
             if (mainInputField.text != "" && mainInputField.text != " ")
             {
+                // 공백 시 취소 
                 Debug.Log(mainInputField.text.Length);
                 StartCoroutine(SumitE());
-                //SendMassage();
-
             }
             else
             {
                 mainInputField.interactable = false;
-                ischating = false;
             }
-            
-
         }
         else
         {
-            Debug.Log("채팅 활성화");
             mainInputField.interactable = true;
-            ischating = true;
             mainInputField.Select();
         }
-        
 
+    }
+    public void IsChatChange()
+    {
+        if (HasStateAuthority)
+            ischating = !ischating;
     }
 
     private void SendMassage()
     {
         myChat = mainInputField.text;
-        chatLog.text += $"\n {myName} : {myChat}";
-        RPC_SetChat(myChat.ToString(), myName);
+        chatLog.text += $"\n {_nickName} : {myChat}";
+        RPC_SetChat(myChat.ToString(), _nickName);
         //Debug.Log($"Send MyChat = {myChat}");
         mainInputField.text = "";
         mainInputField.interactable = false;
@@ -114,6 +116,9 @@ public class ChatSystem : NetworkBehaviour
 
         changed.Behaviour.PushMessage();
 
+    }
+    public override void Spawned()
+    {
     }
 
 

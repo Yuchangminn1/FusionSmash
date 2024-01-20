@@ -12,7 +12,7 @@ using UnityEngine.UI;
 public class WeaponHandler : NetworkBehaviour
 {
     public List<GameObject> playerWeaponPrefab;
-    PlayerWeapon _equipWeapon;
+    public PlayerWeapon _equipWeapon { get; private set; }
 
     //public ParticleSystem fireParticleSystem;
     public LayerMask collisionLayer;

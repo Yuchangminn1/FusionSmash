@@ -16,6 +16,7 @@ public class CharacterInputhandler : MonoBehaviour
     private InputAction dodge;
     private InputAction chat;
     private InputAction look;
+    private InputAction showBoard;
 
     Vector2 moveDirection = Vector2.zero;
     Vector2 dir;
@@ -28,6 +29,7 @@ public class CharacterInputhandler : MonoBehaviour
     bool isFireButtonPressed = false;
     bool isChatButtonPressed = false;
     bool isDodgeButtonPressed = false;
+    bool isShowBoardButtonPressed = false;
     int fireNum;
 
     CharacterMovementHandler characterMovementHandler;
@@ -97,6 +99,7 @@ public class CharacterInputhandler : MonoBehaviour
 
         networkInputData.isChatButtonPressed = isChatButtonPressed;
 
+        networkInputData.isShowBoardButtonPressed = isShowBoardButtonPressed;
 
 
         networkInputData.fireNum = fireNum;
@@ -105,6 +108,7 @@ public class CharacterInputhandler : MonoBehaviour
         isFireButtonPressed = false;
         isChatButtonPressed = false;
         isDodgeButtonPressed = false;
+        isShowBoardButtonPressed = false;
         return networkInputData;
 
     }
@@ -129,10 +133,15 @@ public class CharacterInputhandler : MonoBehaviour
         chat = playerControls.Player.Chat;
         chat.Enable();
 
+        showBoard = playerControls.Player.ShowBoard;
+        showBoard.Enable();
+
+
         jump.performed += Jump;
         fire.performed += Fire;
         dodge.performed += Dodge;
         chat.performed += Chat;
+        showBoard.performed += ShowBoard;
 
     }
     private void OnDisable()
@@ -142,7 +151,7 @@ public class CharacterInputhandler : MonoBehaviour
         jump.Disable();
         dodge.Disable();
         chat.Disable();
-
+        showBoard.Disable();
         look.Disable();
 
 
@@ -169,6 +178,10 @@ public class CharacterInputhandler : MonoBehaviour
     {
         //Debug.Log("Dodge!!!");
         isChatButtonPressed = true;
+    }
+    private void ShowBoard(InputAction.CallbackContext context)
+    {
+        isShowBoardButtonPressed = true;
     }
     private float MYCut(float _float)
     {

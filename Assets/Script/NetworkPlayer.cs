@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
 using TMPro;
+using Unity.VisualScripting;
 
 /// <summary>
 /// 플레이어 소환할 때 뭔가 추가하고싶으면 여기다가 추가하세용
 /// </summary>
 public class NetworkPlayer : NetworkBehaviour,IPlayerLeft
 {
-    public TextMeshProUGUI playerNickNameTM;
+    public TMP_Text playerNickNameTM;
 
     public static NetworkPlayer Local { get; set; }
     public int mySNum = 0;
@@ -17,6 +18,8 @@ public class NetworkPlayer : NetworkBehaviour,IPlayerLeft
     [Networked(OnChanged = nameof(OnNickNameChanged))]
     public NetworkString<_16> nickName { get; set; }
 
+    CharacterMovementHandler characterMovementHandler;
+    HPHandler hphandler;
     ChatSystem chatSystem;
 
     //특정 부분 안보이게
@@ -26,6 +29,8 @@ public class NetworkPlayer : NetworkBehaviour,IPlayerLeft
 
     private void Awake()
     {
+        characterMovementHandler = GetComponent<CharacterMovementHandler>();
+        hphandler = GetComponent<HPHandler>();
         chatSystem = GetComponent<ChatSystem>();
     }
 
@@ -45,7 +50,7 @@ public class NetworkPlayer : NetworkBehaviour,IPlayerLeft
             //Camera.main.gameObject.SetActive(false);
             if(PlayerPrefs.GetString("PlayerNickname") == "" || PlayerPrefs.GetString("PlayerNickname") == null)
             {
-                RPC_SetNickName(PlayerPrefs.GetString("닉네임"));
+                RPC_SetNickName(PlayerPrefs.GetString("닉네임 안정했음"));
 
             }
             else
@@ -80,7 +85,7 @@ public class NetworkPlayer : NetworkBehaviour,IPlayerLeft
 
         if (HasInputAuthority)
         {
-            playerNickNameTM.enabled = false;
+            playerNickNameTM.color = new Color(0,0,0,0);
         }
         
 
@@ -104,7 +109,9 @@ public class NetworkPlayer : NetworkBehaviour,IPlayerLeft
         Debug.Log($"Nickname chaged for player to {nickName} for player {gameObject.name}");
 
         playerNickNameTM.text = nickName.ToString();
-        chatSystem.myName = nickName.ToString();
+        characterMovementHandler._nickName = nickName.ToString();
+        hphandler._nickName = nickName.ToString();
+        chatSystem._nickName = nickName.ToString();
 
     }
 

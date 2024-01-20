@@ -13,6 +13,9 @@ public class LocalCameraHandler : NetworkBehaviour
     public float cameraRotationX { get; private set; } = 0;
     public float cameraRotationY { get; private set; } = 0;
 
+    public float sensitivity { get; set; } =  1f;
+
+
     CharacterMovementHandler characterMovementHandler;
 
     Camera localCamera;
@@ -62,7 +65,7 @@ public class LocalCameraHandler : NetworkBehaviour
 
 
         
-        localCamera.transform.rotation = Quaternion.Euler(cameraRotationX / 2, cameraRotationY / 2, 0);
+        localCamera.transform.rotation = Quaternion.Euler(cameraRotationX / 2 * sensitivity, cameraRotationY / 2 * sensitivity, 0);
 
     }
     public void SetViewInputVector(Vector2 viewInput)

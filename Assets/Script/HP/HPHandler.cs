@@ -3,39 +3,46 @@ using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
 using UnityEngine.UI;
+using TMPro;
 
 public class HPHandler : NetworkBehaviour
 {
-    
-    int MaxHp { get; set; }
 
+    int MaxHp { get; set; }
     [Networked(OnChanged = nameof(OnHPChanged))]
     public int HP { get; private set; }
-
     [Networked(OnChanged = nameof(OnStateChanged))]
     public bool isDead { get; set; }
-    [Header("KillLog UI")]
-    public GameObject _killLogPanel; // 킬로그 패널
-    public GameObject _killLogPrefab;// 킬로그 프리팹
 
     bool isInitialized = false;
-
     public Color uiOnHitColor;
-
     public Image uiONHitImage;
-
     public GameObject playerModel;
     public GameObject deathGameObjectPrefab;
-
-
-
     //Other components
     HitboxRoot hitboxRoot;
     CharacterMovementHandler characterMovementHandler;
-
     LocalUICanvas localUICanvas;
+    [Header("KillLog UI")]
+    public GameObject _killLogPanel; // 킬로그 패널
+    public GameObject _killLogPrefab;// 킬로그 프리팹
+    [Networked(OnChanged = nameof(ShowBoard))]
+    public NetworkBool _showBoard { get; set; } = true;
 
-
+    [Header("KDA Info UI")]
+    public GameObject _scoreBoard;
+    // KillLog
+    public Sprite[] _weaponSprite;
+    [Networked]
+    public int _weaponSpriteNum { get; set; }
+    [Networked(OnChanged = nameof(KillPlayer))]
+    public int _kill { get; set; }
+    [Networked(OnChanged = nameof(DeathPlayer))]
+    public int _death { get; set; }
+    [Networked]
+    public NetworkString<_16> _enemyNickName { get; set; }
+    public HPHandler enemyHPHandler;
+    public string _nickName;
     //public Slider hpBar;
 
     //[SerializeField] Image hpBarImage;
@@ -47,6 +54,7 @@ public class HPHandler : NetworkBehaviour
         characterMovementHandler = GetComponent<CharacterMovementHandler>();
         hitboxRoot = GetComponentInChildren<HitboxRoot>();
         localUICanvas = GetComponentInChildren<LocalUICanvas>(); ;
+        
         MaxHp = 5;
     }
     IEnumerator OnHitCo()
@@ -64,9 +72,9 @@ public class HPHandler : NetworkBehaviour
 
         if (Object.HasInputAuthority && !isDead)
         {
-            uiONHitImage.color = new Color(0, 0, 0,0);
+            uiONHitImage.color = new Color(0, 0, 0, 0);
         }
-        
+
 
     }
 
@@ -79,7 +87,6 @@ public class HPHandler : NetworkBehaviour
 
     void Start()
     {
-        Debug.Log("내 이름은 " + transform.name);
         //hpBar = transform.GetComponentInChildren<Slider>();
         HpReset();
 
@@ -88,38 +95,52 @@ public class HPHandler : NetworkBehaviour
 
         isInitialized = true;
     }
+
+    
+
     void Update()
     {
-        
+
     }
 
     public override void Spawned()
     {
-        _killLogPanel = GameObject.Find("KillLogPanel").gameObject;
-
+        _killLogPanel = GameObject.Find("KillLogPanelnel");
     }
 
+    
 
-
-    public void OnTakeDamage(int _attackDamage = 1)
+    public void OnTakeDamage(string _hitPlayer, int weaponNum, int _attackDamage = 1)
     {
+        if (HasStateAuthority)
+        {
+            _weaponSpriteNum = weaponNum;
+        }
         if (isDead && !Object.HasStateAuthority)
         {
             return;
         }
+        _enemyNickName = _hitPlayer;
         HP -= _attackDamage;
         if (HP <= 0)
         {
             Debug.Log($"{transform.name} isDead");
             StartCoroutine(ServerReviveCO());
             isDead = true;
-            
-
         }
 
     }
+
+    public void KillSelf()
+    {
+        HP = 0;
+        Debug.Log($"{transform.name} isDead");
+        StartCoroutine(ServerReviveCO());
+        isDead = true;
+    }
+
     //변하면 호출인데 아직 잘 모름 
-    
+
 
     public void HPUIUpdate()
     {
@@ -170,7 +191,9 @@ public class HPHandler : NetworkBehaviour
 
         //Handle on death for the player. Also check if the player was dead but is now alive in that case reive the player.
         if (isDeathCurrent)
+        {
             changed.Behaviour.OnDeath();
+        }
         else if (!isDeathCurrent && isDeadOld)
         {
             changed.Behaviour.OnReive();
@@ -180,7 +203,14 @@ public class HPHandler : NetworkBehaviour
     }
     void OnDeath()
     {
-        if(playerModel == null)
+        if(enemyHPHandler != null)
+        {
+            ++enemyHPHandler._kill;
+        }
+
+        KillLogUpdate();
+
+        if (playerModel == null)
         {
             Debug.Log("playerModel is Null");
             return;
@@ -188,18 +218,12 @@ public class HPHandler : NetworkBehaviour
         playerModel.gameObject.SetActive(false);
         hitboxRoot.HitboxRootActive = false;
         characterMovementHandler.SetCharacterControllerEnabled(false);
-        
 
-        Instantiate(deathGameObjectPrefab,transform.position,Quaternion.identity);
+
+        Instantiate(deathGameObjectPrefab, transform.position, Quaternion.identity);
 
     }
-    public void KillLogUpdate(string killPlayer, string deadPlayer, Sprite weapon)
-    {
-        Debug.Log("ㅇㅇㅇㅇㅇㅇㅇ");
-        var Q = Instantiate(_killLogPrefab);
-        Q.transform.parent = _killLogPanel.transform;
-        Q.GetComponent<KillLog>().SetLog(killPlayer, deadPlayer, weapon);
-    }
+
     void OnReive()
     {
         if (playerModel == null)
@@ -208,17 +232,22 @@ public class HPHandler : NetworkBehaviour
             return;
         }
         if (Object.HasInputAuthority)
-            uiONHitImage.color = new Color(0,0,0,0);
+            uiONHitImage.color = new Color(0, 0, 0, 0);
 
         playerModel.gameObject.SetActive(true);
         hitboxRoot.HitboxRootActive = true;
         characterMovementHandler.SetCharacterControllerEnabled(true);
-        
+
 
     }
 
     public void OnRespawned()
     {
+        if (HasStateAuthority)
+        {
+            ++_death;
+            _enemyNickName = "";
+        }
         isDead = false;
         HpReset();
     }
@@ -235,8 +264,53 @@ public class HPHandler : NetworkBehaviour
     {
         return MaxHp;
     }
+
+    public void KillLogUpdate()
+    {
+        var Q = Instantiate(_killLogPrefab);
+        Q.transform.parent = _killLogPanel.transform;
+
+        //풀피로 떨어짐
+        if (_enemyNickName.ToString() == "")
+        {
+            Q.GetComponent<KillLog>().SetLog(_nickName, " ", _weaponSprite[((int)EWeaponType.Gravity)]);
+        }
+        else
+            Q.GetComponent<KillLog>().SetLog(_enemyNickName.ToString(), _nickName, _weaponSprite[_weaponSpriteNum]);
+
+
+    }
+    static void KillPlayer(Changed<HPHandler> changed)
+    {
+        changed.Behaviour.KDAUpdate();
+
+    }
+    static void DeathPlayer(Changed<HPHandler> changed)
+    {
+        changed.Behaviour.KDAUpdate();
+    }
+
+    public void KDAUpdate()
+    {
+        if (HasInputAuthority)
+        {
+            UIManager.Instance.PlayerKDAScoreUI(_kill, _death);
+        }
+    }
+
+    static void ShowBoard(Changed<HPHandler> changed)
+    {
+        changed.Behaviour.QQQQ();
+    }
+    public void QQQQ()
+    {
+        if (HasInputAuthority)
+        {
+            _scoreBoard.SetActive(_showBoard);
+        }
+    }
 }
 
 
 
-    
+

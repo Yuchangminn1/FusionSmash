@@ -8,19 +8,26 @@ public class UISize : MonoBehaviour
     public float witdth = 4f;
     public float height = 3f;
 
-    Vector2 screenSize;
+    public Vector2 screenSize;
+    // UI 오브젝트의 RectTransform 참조
+
+    
+
     private void Awake()
     {
         UIManager.Instance.uISizeChange += SetScreenSize;
     }
 
+
     public void SetScreenSize(Vector2 _screenSize)
     {
+        //Vector3 currentPosition = rectTransform.position;
+
         screenSize = _screenSize;
         if (witdth != 0 && height != 0)
         {
             rectTransform.sizeDelta = new Vector2(screenSize.x / witdth, screenSize.y / height);
         }
-        Debug.Log("함수");
     }
+    
 }

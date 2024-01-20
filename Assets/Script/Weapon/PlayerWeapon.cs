@@ -11,6 +11,7 @@ public enum EWeaponType
     Pistol,
     Rifle,
     Shotgun,
+    Gravity
 }
 public class PlayerWeapon : NetworkBehaviour
 {
@@ -19,11 +20,11 @@ public class PlayerWeapon : NetworkBehaviour
 
     [Header("Weapon UI")]
     public GameObject _weaponUI;    //아  스프라이트 받고 교체하는 걸로 바꾸자 
-    public Sprite _weaponSprite;    //무기 이미지 스프라이트
+    //public Sprite _weaponSprite;    //무기 이미지 스프라이트
     public TMP_Text _weaponAmmoText;//총알 여부
     public Image _weaponAimImage;   //크로스헤어
     public Image _killIcon;         //킬 이미지
-    
+    public int _weaponNum = 0;
     
 
     [Header("Fire Setup")]
@@ -285,18 +286,24 @@ public class PlayerWeapon : NetworkBehaviour
 
             if (hit.Hitbox != null)
             {
-                HPHandler tmp = hit.Hitbox.transform.root.GetComponent<HPHandler>();
-                if (tmp.isDead)
+                HPHandler tmpHP = hit.Hitbox.transform.root.GetComponent<HPHandler>();
+
+                if (tmpHP.isDead)
                 {
                     return;
                 }
-                string KN = gameObject.GetComponentInParent<NetworkPlayer>().nickName.ToString();
-                string DN = hit.GameObject.GetComponentInParent<NetworkPlayer>().nickName.ToString();
-                
-                tmp.OnTakeDamage();
-                if (tmp.isDead)
+                HPHandler KN = gameObject.GetComponentInParent<HPHandler>();
+                tmpHP.enemyHPHandler = KN;
+                //string DN = hit.GameObject.GetComponentInParent<NetworkPlayer>().nickName.ToString();
+
+                tmpHP.OnTakeDamage(KN._nickName, ((int)Type));
+                if (tmpHP.isDead)
                 {
-                    tmp.KillLogUpdate(KN, DN, _weaponSprite);
+                    if (KN.HasStateAuthority)
+                    {
+                        //tmpHP.KillLogUpdate(KN, DN, _weaponSprite);
+                        //tmpMove.KilledPlayer(DN, _weaponNum);
+                    }
 
                     if (HasInputAuthority)
                         StartCoroutine(KillEffect());
@@ -371,6 +378,13 @@ public class PlayerWeapon : NetworkBehaviour
         _killIcon.color = mirror;
 
         yield return null;
+    }
+
+    public void OnRespawn()
+    {
+        RemainingAmmo = StartAmmo- MaxClipAmmo;
+        ClipAmmo = MaxClipAmmo;
+        AmmoInfoUpdate();
     }
 
     //private void PlayFireEffect()

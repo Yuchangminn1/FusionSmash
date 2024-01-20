@@ -12,14 +12,14 @@ public class KillLog : MonoBehaviour
     Image _weaponImage;
     string _killPlayerName = "KillPlayer";
     string _deadPlayerName = "DeadPlayer";
+    string _weaponImageName = "Weapon";
 
     // Start is called before the first frame update
     private void Awake()
     {
         _killPlayerText = gameObject.FindChildByName(_killPlayerName).GetComponent<TMP_Text>();
         _deadPlayerText = gameObject.FindChildByName(_deadPlayerName).GetComponent<TMP_Text>();
-
-        _weaponImage = GetComponentInChildren<Image>();
+        _weaponImage = gameObject.FindChildByName(_weaponImageName).GetComponent<Image>();
 
     }
     public void SetLog(string killPlayer, string deadPlayer, Sprite weapon)
@@ -44,16 +44,18 @@ public class KillLog : MonoBehaviour
         _deadPlayerText.color = Color.black;
         _weaponImage.color = Color.white;
 
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(5f);
         int i = 0;
         int goal = 100;
         Color mirror = new Color(0, 0, 0, 0);
+        Color mirror1 = new Color(0, 0, 0, 0);
+
         while (i < goal)
         {
             ++i;
             _killPlayerText.color = Color.Lerp(_killPlayerText.color, mirror, 0.25f);
             _deadPlayerText.color = Color.Lerp(_deadPlayerText.color, mirror, 0.25f);
-            _weaponImage.color = Color.Lerp(_weaponImage.color, mirror, 0.25f);
+            _weaponImage.color = Color.Lerp(_weaponImage.color, mirror1, 0.25f);
             yield return new WaitForSeconds(0.01f);
 
         }

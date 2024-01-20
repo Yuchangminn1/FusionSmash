@@ -11,6 +11,7 @@ public struct NetworkInputData : INetworkInput
     public NetworkBool isFireButtonPressed;
     public NetworkBool isChatButtonPressed;
     public NetworkBool isDodgeButtonPressed;
+    public NetworkBool isShowBoardButtonPressed;
 
     public int fireNum;
 

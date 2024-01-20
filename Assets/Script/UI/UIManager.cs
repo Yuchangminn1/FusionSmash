@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class UIManager : MonoBehaviour
@@ -10,7 +11,7 @@ public class UIManager : MonoBehaviour
     Vector2 screenSize;
     public delegate void UISizeChange(Vector2 _screenSize);
     public UISizeChange uISizeChange;
-
+    public TMP_Text textKDA;
     
 
     public static UIManager Instance
@@ -41,6 +42,12 @@ public class UIManager : MonoBehaviour
         uISizeChange = new UISizeChange(ScerrenSizeChange);
         
     }
+    
+    public void PlayerKDAScoreUI(int kill,int death)
+    {
+        textKDA.text = $"{kill}     /    {death}";
+    }
+
 
     private void FixedUpdate()
     {

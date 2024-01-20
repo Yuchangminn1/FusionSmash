@@ -89,6 +89,15 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ShowBoard"",
+                    ""type"": ""Button"",
+                    ""id"": ""c131365c-64e8-4b6c-857d-debfd3d6bd16"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -375,6 +384,17 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""Chat"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a472d899-9dc7-4a2e-b79e-df7d41437db7"",
+                    ""path"": ""<Keyboard>/tab"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""ShowBoard"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -969,6 +989,7 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
         m_Player_Sumit = m_Player.FindAction("Sumit", throwIfNotFound: true);
         m_Player_Dodge = m_Player.FindAction("Dodge", throwIfNotFound: true);
         m_Player_Chat = m_Player.FindAction("Chat", throwIfNotFound: true);
+        m_Player_ShowBoard = m_Player.FindAction("ShowBoard", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1049,6 +1070,7 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Sumit;
     private readonly InputAction m_Player_Dodge;
     private readonly InputAction m_Player_Chat;
+    private readonly InputAction m_Player_ShowBoard;
     public struct PlayerActions
     {
         private @PlayerInputAction m_Wrapper;
@@ -1060,6 +1082,7 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
         public InputAction @Sumit => m_Wrapper.m_Player_Sumit;
         public InputAction @Dodge => m_Wrapper.m_Player_Dodge;
         public InputAction @Chat => m_Wrapper.m_Player_Chat;
+        public InputAction @ShowBoard => m_Wrapper.m_Player_ShowBoard;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1090,6 +1113,9 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
             @Chat.started += instance.OnChat;
             @Chat.performed += instance.OnChat;
             @Chat.canceled += instance.OnChat;
+            @ShowBoard.started += instance.OnShowBoard;
+            @ShowBoard.performed += instance.OnShowBoard;
+            @ShowBoard.canceled += instance.OnShowBoard;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -1115,6 +1141,9 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
             @Chat.started -= instance.OnChat;
             @Chat.performed -= instance.OnChat;
             @Chat.canceled -= instance.OnChat;
+            @ShowBoard.started -= instance.OnShowBoard;
+            @ShowBoard.performed -= instance.OnShowBoard;
+            @ShowBoard.canceled -= instance.OnShowBoard;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -1304,6 +1333,7 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
         void OnSumit(InputAction.CallbackContext context);
         void OnDodge(InputAction.CallbackContext context);
         void OnChat(InputAction.CallbackContext context);
+        void OnShowBoard(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {
