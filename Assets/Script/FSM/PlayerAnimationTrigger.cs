@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerAnimationTrigger : NetworkBehaviour
 {
@@ -35,8 +36,8 @@ public class PlayerAnimationTrigger : NetworkBehaviour
         {
             //Debug.Log("AnimationTrigger OFF");
             player.SetAnimationTrigger(false);
+            player.AnimationTrigger = false;
         }
-            
 
     }
     void AnimationTriggerOn()
@@ -45,6 +46,8 @@ public class PlayerAnimationTrigger : NetworkBehaviour
         {
             //Debug.Log("AnimationTrigger On");
             player.SetAnimationTrigger(true);
+            player.AnimationTrigger = true;
+
         }
 
     }

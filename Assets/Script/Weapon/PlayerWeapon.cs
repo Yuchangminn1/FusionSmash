@@ -22,7 +22,7 @@ public class PlayerWeapon : NetworkBehaviour
     public GameObject _weaponUI;    //��  ��������Ʈ �ް� ��ü�ϴ� �ɷ� �ٲ��� 
     //public Sprite _weaponSprite;    //���� �̹��� ��������Ʈ
     public TMP_Text _weaponAmmoText;//�Ѿ� ����
-    public Image _weaponAimImage;   //ũ�ν����
+    public Image _weaponAimImage;   //ũ�ν����?
     public Image _killIcon;         //ų �̹���
     public int _weaponNum = 0;
 
@@ -34,7 +34,7 @@ public class PlayerWeapon : NetworkBehaviour
     public float Damage = 10f; // ������
     public int FireRate = 100; // �߻� �ӵ�
     [Range(1, 20)]
-    public int ProjectilesPerShot = 1; // �� �߿� �߻�Ǵ� ������Ÿ�� ��
+    public int ProjectilesPerShot = 1; // �� �߿� �߻�Ǵ�?������Ÿ�� ��
     public float Dispersion = 0f; // �л�
     public LayerMask HitMask; // ��Ʈ ����ũ
     public float MaxHitDistance = 100f; // �ִ� ��Ʈ �Ÿ�
@@ -50,7 +50,7 @@ public class PlayerWeapon : NetworkBehaviour
     //public Animator Animator; // �ִϸ�����
 
     [Header("Fire Effect")]
-    //public Transform MuzzleTransform; // 3��Ī �������� �߻�Ǵ� ��ġ
+    //public Transform MuzzleTransform; // 3��Ī �������� �߻�Ǵ�?��ġ
     //public GameObject MuzzleEffectPrefab; // �߻� ȿ�� ������
     public Projectile ProjectilePrefab; // ������Ÿ�� �ð�ȭ ������
 
@@ -73,7 +73,7 @@ public class PlayerWeapon : NetworkBehaviour
     [Networked]
     private int _fireCount { get; set; } // �߻� Ƚ��
     [Networked]
-    private TickTimer _fireCooldown { get; set; } // �߻� ��ٿ� Ÿ�̸�
+    private TickTimer _fireCooldown { get; set; } // �߻� ��ٿ�?Ÿ�̸�
     [Networked, Capacity(32)]
     private NetworkArray<ProjectileData> _projectileData { get; } // ������Ÿ�� ������ �迭
 
@@ -83,30 +83,25 @@ public class PlayerWeapon : NetworkBehaviour
     private GameObject _muzzleEffectInstance; // �߻� ȿ�� �ν��Ͻ�
 
     //private SceneObjects _sceneObjects; // SceneObjects Ŭ����
-
-    // ���� �߻��ϴ� �޼ҵ�
-    public void Fire(Vector3 firePosition, Vector3 fireDirection, bool justPressed)
+    public bool AbleFire(bool justPressed) 
     {
-
-        // ���� ȹ����� �ʾҰų� �ڵ� �߻簡 �ƴϰų� ������ ���̰ų� �߻� ��ٿ��� ���������� ����
         if (IsCollected == false || (justPressed == false && !IsAutomatic) || IsReloading || !_fireCooldown.ExpiredOrNotRunning(Runner))
-            return;
+            return false;
 
-        //źâ�� ź���� ���� ��� �� źâ ���� ��� �� ����
         if (ClipAmmo <= 0)
         {
-            //PlayEmptyClipSound(justPressed);
-            return;
+            return false;
         }
-
-        // ����ü �߻�
+        return true;
+    }
+    public void Fire(Vector3 firePosition, Vector3 fireDirection)
+    {
         for (int i = 0; i < ProjectilesPerShot; i++)
         {
             var projectileDirection = fireDirection;
 
             if (Dispersion > 0f)
             {
-                // �л��� ����� �߻� ���� ���
                 var dispersionRotation = Quaternion.Euler(Random.insideUnitSphere * Dispersion);
                 projectileDirection = dispersionRotation * fireDirection;
             }
@@ -116,7 +111,6 @@ public class PlayerWeapon : NetworkBehaviour
 
         }
 
-        // �߻� ��ٿ� ���� �� ź�� ����
         _fireCooldown = TickTimer.CreateFromTicks(Runner, _fireTicks);
         ClipAmmo--;
         AmmoInfoUpdate();
@@ -140,11 +134,9 @@ public class PlayerWeapon : NetworkBehaviour
     // ������ �޼ҵ�
     public void Reload()
     {
-        // ���� ȹ����� �ʾҰų� źâ�� ���� á�ų� ���� ź���� ���ų� ������ ���̰ų� �߻� ��ٿ��� ���������� ����
         if (IsCollected == false || ClipAmmo >= MaxClipAmmo || RemainingAmmo <= 0 || IsReloading || !_fireCooldown.ExpiredOrNotRunning(Runner))
             return;
 
-        // ������ ������ �����ϰ� ������ ��ٿ� ����
         IsReloading = true;
         _fireCooldown = TickTimer.CreateFromSeconds(Runner, ReloadTime);
     }
@@ -168,14 +160,14 @@ public class PlayerWeapon : NetworkBehaviour
         if (!IsReloading)
             return 1f;
 
-        // ������ ���� ��� ���� ������ �ð��� ���� ���� ��ȯ
+        // ������ ���� ���?���� ������ �ð��� ���� ���� ��ȯ
         return 1f - _fireCooldown.RemainingTime(Runner).GetValueOrDefault() / ReloadTime;
     }
 
-    // ������Ʈ�� ������ �� ȣ��Ǵ� �޼ҵ�
+    // ������Ʈ�� ������ �� ȣ��Ǵ�?�޼ҵ�
     public override void Spawned()
     {
-        // ���� ������ �ִ� ��쿡�� �ʱ�ȭ �ڵ� ����
+        // ���� ������ �ִ� ��쿡��?�ʱ�ȭ �ڵ� ����
 
         if (HasStateAuthority)
         {
@@ -193,41 +185,32 @@ public class PlayerWeapon : NetworkBehaviour
             IsCollected = true;
         }
 
-        // �߻� ȿ�� �ν��Ͻ� ���� �� ��Ȱ��ȭ
         // _muzzleEffectInstance = Instantiate(MuzzleEffectPrefab, MuzzleTransform);
         // _muzzleEffectInstance.SetActive(false);
 
-        // SceneObjects Ŭ���� ����
+        // SceneObjects 
         //_sceneObjects = Runner.GetSingleton<SceneObjects>();
     }
 
-    // ��Ʈ��ũ ������Ʈ �޼ҵ�
     public override void FixedUpdateNetwork()
     {
-        // ���� ȹ����� �ʾҴٸ� ����
         if (IsCollected == false)
             return;
 
-        // źâ�� ��������� �ڵ����� ������ �õ�
         if (ClipAmmo == 0)
             Reload();
 
-        // ������ ���̸� ������ ��ٿ��� ������ ��
         if (IsReloading && _fireCooldown.ExpiredOrNotRunning(Runner))
         {
-            // ������ �Ϸ�
             IsReloading = false;
 
-            // �������� �� �ִ� �ִ� ź�� �� ���
             int reloadAmmo = MaxClipAmmo - ClipAmmo;
             reloadAmmo = Mathf.Min(reloadAmmo, RemainingAmmo);
 
-            // ź�� �߰� �� ���� ź�� ����
             ClipAmmo += reloadAmmo;
             RemainingAmmo -= reloadAmmo;
             AmmoInfoUpdate();
 
-            // ������ �� �غ� �ð� �߰�
             _fireCooldown = TickTimer.CreateFromSeconds(Runner, 0.25f);
         }
     }
@@ -235,13 +218,11 @@ public class PlayerWeapon : NetworkBehaviour
     // ������ �޼ҵ�
     public override void Render()
     {
-        // �߻� Ƚ���� ����Ǿ����� �߻� ȿ�� ���
         //if (_visibleFireCount < _fireCount)
         //{
         //    PlayFireEffect();
         //}
 
-        // ���� ǥ�õ��� ���� ��� ������Ÿ�Ͽ� ���� �ð����� ó��
         //for (int i = _visibleFireCount; i < _fireCount; i++)
         //{
         //    var data = _projectileData[i % _projectileData.Length];
@@ -255,12 +236,10 @@ public class PlayerWeapon : NetworkBehaviour
 
         if (_reloadingVisible != IsReloading)
         {
-            // ���ο� ������ ���¿� ���� �ִϸ��̼� �� �Ҹ��� ó���մϴ�.
             //Animator.SetBool("IsReloading", IsReloading);
 
             if (IsReloading)
             {
-                // ������ �߿��� ���ε� ���带 ����մϴ�.
                 // ReloadingSound.Play();
             }
 
@@ -275,7 +254,6 @@ public class PlayerWeapon : NetworkBehaviour
 
         var hitOptions = HitOptions.IncludePhysX | HitOptions.IgnoreInputAuthority;
 
-        // ��ü �߻�ü ��� �� ȿ���� ��� ó���մϴ�(��Ʈ��ĵ �߻�ü).
         //Runner.LagCompensation.Raycast(aimPoint.position + aimForwardVector * 2.5f, aimForwardVector,
         //hitDistance, Object.InputAuthority, out var hitnfo, collisionLayer, HitOptions.IncludePhysX);
         Debug.DrawRay(firePosition + fireDirection * 2.5f, fireDirection * MaxHitDistance, Color.green, 1);
@@ -301,11 +279,6 @@ public class PlayerWeapon : NetworkBehaviour
                 tmpHP.OnTakeDamage(KN._nickName, ((int)Type));
                 if (tmpHP.isDead)
                 {
-                    if (KN.HasStateAuthority)
-                    {
-                        
-                    }
-
                     if (HasInputAuthority)
                         StartCoroutine(KillEffect());
                 }
@@ -314,15 +287,10 @@ public class PlayerWeapon : NetworkBehaviour
                     if (HasInputAuthority)
                         StartCoroutine(EnemyHitEffect());
                 }
-
-                // ��Ʈ�ڽ��� �ִ� ��� �������� �����մϴ�.
                 ApplyDamage(hit.Hitbox, hit.Point, fireDirection);
             }
             else
             {
-                Debug.Log("����");
-
-                // �÷��̾ �ܴ��� ��ü�� �浹���� ���� ��Ʈ ȿ���� ǥ���մϴ�.
                 projectileData.ShowHitEffect = true;
             }
         }
@@ -331,7 +299,6 @@ public class PlayerWeapon : NetworkBehaviour
 
         _projectileData.Set(_fireCount % _projectileData.Length, projectileData);
         _fireCount++;
-        Debug.Log($"�߻�Ƚ�� {_fireCount}");
     }
     
 
@@ -393,7 +360,7 @@ public class PlayerWeapon : NetworkBehaviour
     //{
     //    if (FireSound != null)
     //    {
-    //        // �߻� ���带 �� �� ����մϴ�.
+    //        // �߻� ���带 �� �� ����մϴ�?
     //        FireSound.PlayOneShot(FireSound.clip);
     //    }
 
@@ -401,10 +368,10 @@ public class PlayerWeapon : NetworkBehaviour
     //    _muzzleEffectInstance.SetActive(false);
     //    _muzzleEffectInstance.SetActive(true);
 
-    //    // �߻� �ִϸ��̼��� ����մϴ�.
+    //    // �߻� �ִϸ��̼��� ����մϴ�?
     //    Animator.SetTrigger("Fire");
 
-    //    // �θ� Player�� �߻� ����Ʈ�� ����մϴ�.
+    //    // �θ� Player�� �߻� ����Ʈ�� ����մϴ�?
     //    GetComponentInParent<CharacterMovementHandler>().PlayFireEffect();
     //}
 
@@ -420,7 +387,7 @@ public class PlayerWeapon : NetworkBehaviour
         //float damage = Damage * damageMultiplier;
         //if (_sceneObjects.Gameplay.DoubleDamageActive)
         //{
-        //    // ���� ������ Ȱ��ȭ ���̸� �������� �� ��� ������ŵ�ϴ�.
+        //    // ���� ������ Ȱ��ȭ ���̸� �������� �� ���?������ŵ�ϴ�.
         //    damage *= 2f;
         //}
 
@@ -436,7 +403,7 @@ public class PlayerWeapon : NetworkBehaviour
 
     //private void PlayEmptyClipSound(bool fireJustPressed)
     //{
-    //    // �ڵ� ������ ��� ������ �߻� �Ŀ� �� źâ ���带 �� �� ����Ϸ��� �մϴ�.
+    //    // �ڵ� ������ ���?������ �߻� �Ŀ� �� źâ ���带 �� �� ����Ϸ���?�մϴ�.
     //    bool firstEmptyShot = _fireCooldown.TargetTick.GetValueOrDefault() == Runner.Tick - 1;
 
     //    if (fireJustPressed == false && firstEmptyShot == false)
@@ -447,7 +414,7 @@ public class PlayerWeapon : NetworkBehaviour
 
     //    if (Runner.IsForward && HasInputAuthority)
     //    {
-    //        // �� źâ ���带 ����մϴ�.
+    //        // �� źâ ���带 ����մϴ�?
     //        EmptyClipSound.Play();
     //    }
     //}

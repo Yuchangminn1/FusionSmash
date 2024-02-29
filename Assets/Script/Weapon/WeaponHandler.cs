@@ -14,16 +14,15 @@ public class WeaponHandler : NetworkBehaviour
     public List<GameObject> playerWeaponPrefab;
     public PlayerWeapon _equipWeapon { get; private set; }
 
-    //public ParticleSystem fireParticleSystem;
     public LayerMask collisionLayer;
 
     float lastTimeFire = 0;
 
-    
+    Vector3 firePosition;
 
+    Vector3 fireDirection;
 
-    //HPHandler hpHandler;
-
+    bool justPressed;
     void Awake()
     {
         //hpHandler = GetComponent<HPHandler>();
@@ -41,12 +40,24 @@ public class WeaponHandler : NetworkBehaviour
         //}
 
     }
-    //�÷��̾ �߻��ư�� ����
-    public void Fire(Vector3 _firePosition, Vector3 _fireDirection, bool _isFireButtonPressed)
+    public void SetFire(Vector3 _firePosition, Vector3 _fireDirection,bool _justPressed)
+    {
+        firePosition = _firePosition;
+        fireDirection = _fireDirection;
+        justPressed = _justPressed;
+    }
+
+    public void Fire()
     {
         float hitDistance = 100;
-        _equipWeapon.Fire(_firePosition, _fireDirection, _isFireButtonPressed);
+        _equipWeapon.Fire(firePosition, fireDirection);
     }
+
+    public bool AbleFire()
+    {
+        return _equipWeapon.AbleFire(justPressed);
+    }
+
     public void ChangeWeapon(int num)
     {
         //�� ������Ʈ ü����
@@ -57,7 +68,6 @@ public class WeaponHandler : NetworkBehaviour
 
         }
         _equipWeapon = playerWeaponPrefab[num].GetComponent<PlayerWeapon>();
-
         _equipWeapon.gameObject.SetActive(true);
         _equipWeapon.Equip();
     }
@@ -65,7 +75,6 @@ public class WeaponHandler : NetworkBehaviour
 
     public void SetEq()
     {
-        //�Ⱦ��� ���� ���
         if (playerWeaponPrefab != null)
         {
             foreach (GameObject t in playerWeaponPrefab)
@@ -73,8 +82,6 @@ public class WeaponHandler : NetworkBehaviour
                 t.SetActive(false);
             }
         }
-        
-
     }
 
 }

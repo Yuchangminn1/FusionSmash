@@ -12,38 +12,28 @@ public class PlayerStateHandler : NetworkBehaviour
     public int state { get; set; }
     [Networked(OnChanged = nameof(ChangeState2))] //
     public int state2 { get; set; }
-    public bool animationTrigger { get; set; }
-    public NetworkString<_16> nickName { get; set; }
 
-
-    //public float dodgeCount = 0f;
-
-    //public int jumpCount { get; set; }
+    [Networked(OnChanged = nameof(ChangeAnimationTrigger))]
+    public NetworkBool AnimationTrigger { get; set; }
+    private bool animationTrigger { get; set; }
 
     public bool isdead = false;
-
     public bool isStop = false;
-    public bool isJumping = false;
-
-    //Ã¼ï¿½ï¿½È¸ï¿½ï¿½ 
     public bool isHeal = false;
+
     public int fHpHeal = 40;
     public int healNum;
     public int healNumMax = 3;
 
-    public int attackComboCount { get; set; }
-    // public int attackComboInput { get; set; }
-
     [SerializeField] protected float GroundCheckDis = 0.65f;
-    public LayerMask groundLayer; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½ï¿½Ï±ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ï¿½ï¿½Å©
+    public LayerMask groundLayer;
     float groundCheckRad = 0.2f;
 
-
-
     [SerializeField] Animator anima;
-
-    //public CharacterController cc;
-    //public Rigidbody rb;
+    //Jump
+    [Networked(OnChanged = nameof(ChangeJumpCount))] //
+    public int jumpCount { get; set; } = 0;
+    public int maxJumpCount { get; private set; } = 2;
 
     #region FSM
     protected StateMachine stateMachine;
@@ -89,13 +79,8 @@ public class PlayerStateHandler : NetworkBehaviour
         attackCoolDown = 1f;
         anima = GetComponent<Animator>();
         SetAnimationTrigger(false);
-        //cc = GetComponent<CharacterController>();
-        //networkCC = GetComponent<NetworkCharacterControllerPrototypeCustom>();
         characterMovementHandler = GetComponent<CharacterMovementHandler>();
-
-
     }
-
 
     // Start is called before the first frame update
     void Start()
@@ -119,18 +104,15 @@ public class PlayerStateHandler : NetworkBehaviour
             nextState = moveState;
             this.ChangeState();
         }
-            
-        //stateMachine.ChangeState(moveState);
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (HasStateAuthority)
         {
             stateMachine.Update();
         }
-        
+
     }
     private void OnDrawGizmos()
     {
@@ -150,22 +132,14 @@ public class PlayerStateHandler : NetworkBehaviour
         if (HasStateAuthority)
         {
             stateMachine.FixedUpdate();
-            //isJumpButtonPressed = false;
-            //isFireButtonPressed = false;
         }
     }
 
 
     private void LateUpdate()
     {
-
         SetFloat("InputX", inputVec3.x);
         SetFloat("InputZ", inputVec3.y);
-        //if (Object.HasInputAuthority)
-        //{
-        //    stateMachine.LateUpdate();
-        //}
-
     }
 
     public void StateChageUpdate()
@@ -196,25 +170,70 @@ public class PlayerStateHandler : NetworkBehaviour
         if (newS != oldS)
         {
             changed.Behaviour.SetInt("State", newS);
-            //changed.Behaviour.SetState(newS);
-
         }
     }
     static void ChangeState2(Changed<PlayerStateHandler> changed)
     {
-        Debug.Log("ChangeState2 @@");
         int newS = changed.Behaviour.state2;
         changed.LoadOld();
         int oldS = changed.Behaviour.state2;
         if (newS != oldS)
         {
             changed.Behaviour.SetInt("State2", newS);
+        }
+    }
+    static void ChangeAnimationTrigger(Changed<PlayerStateHandler> changed)
+    {
+        NetworkBool newS = changed.Behaviour.AnimationTrigger;
+        changed.LoadOld();
+        NetworkBool oldS = changed.Behaviour.AnimationTrigger;
+        Debug.Log(newS);
+        if (newS != oldS)
+        {
+            changed.Behaviour.SetAnimationTrigger(newS);
+            //changed.Behaviour.animationTrigger = newS;
+            //changed.Behaviour.SetBool("AnimationTrigger", newS);
+        }
+    }
+    
 
+    //Jump
+    public bool JumpAble()
+    {
+        if (jumpCount < maxJumpCount)
+        {
+            isJumpButtonPressed = true;
+            jumpCount++;
+
+            return true;
+        }
+        isJumpButtonPressed = false;
+        return false;
+    }
+    public void Fire() 
+    {
+        characterMovementHandler.Fire();
+    }
+    static void ChangeJumpCount(Changed<PlayerStateHandler> changed)
+    {
+        int newS = changed.Behaviour.jumpCount;
+        changed.LoadOld();
+        int oldS = changed.Behaviour.jumpCount;
+        if (newS != oldS)
+        {
+            changed.Behaviour.SetInt("State2", newS);
+        }
+    }
+    public void ResetJumpCount()
+    {
+        if (HasStateAuthority)
+        {
+            jumpCount = 0;
         }
     }
 
 
-
+    //Æ®¸®°Å¸¦ Áö±Ý ÄÑÁà¾ßÇÔ 
 
     public bool IsGround()
     {
@@ -243,21 +262,11 @@ public class PlayerStateHandler : NetworkBehaviour
             SetInt("State2", num);
         }
     }
-    
+
     public bool Isvisi()
     {
-        if (animationTrigger)
-        {
-            return true;
-        }
-        return false;
+        return animationTrigger;
     }
-
-    ////ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
-    //public void StateChange(EntityState _newState)
-    //{
-    //    stateMachine.ChangeState(_newState);
-    //}
 
     public void ChangeState()
     {
@@ -267,15 +276,26 @@ public class PlayerStateHandler : NetworkBehaviour
         }
     }
     #endregion
-   
-    public void SetCanMove(bool _tf) 
+
+    public void SetCanMove(bool _tf)
     {
         characterMovementHandler.SetCanMove(_tf);
+        Debug.Log("Canmove = " + characterMovementHandler.canMove);
     }
 
-    public void SetAnimationTrigger(bool _tf) 
+    public void SetAnimationTrigger(bool _tf)
     {
         animationTrigger = _tf;
         SetBool("AnimationTrigger", animationTrigger);
     }
+
+    public void AttackEnter() 
+    {
+        SetCanMove(false);
+        attackTime = Time.time;
+        isFireButtonPressed = false;
+        Fire();
+    }
+
+
 }

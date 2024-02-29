@@ -17,7 +17,7 @@ public class CharacterMovementHandler : NetworkBehaviour
     [Header("Move")]
     Vector3 moveDirection;
     [Networked]
-    NetworkBool canMove { get; set; } = true;
+    public NetworkBool canMove { get; set; } = true;
     float moveSpeed = 5f;
     float jumpTime = 0f;
     float jumpCooldown = 0f;
@@ -26,10 +26,6 @@ public class CharacterMovementHandler : NetworkBehaviour
     [Header("NickName")]
     public string _nickName;
 
-    [Networked]
-    NetworkBool _isJumping { get; set; } = false;
-    [Networked]
-    int _jumpCount { get; set; } = 0;
     [Networked]
     int _jumpGravityCount { get; set; } = 0;
     [Networked]
@@ -89,6 +85,7 @@ public class CharacterMovementHandler : NetworkBehaviour
         //Component
         rb = GetComponent<Rigidbody>();
         camera = localCamera.GetComponent<Camera>();
+
         //Script
         hpHandler = GetComponent<HPHandler>();
         playerStateHandler = GetComponent<PlayerStateHandler>();
@@ -182,7 +179,6 @@ public class CharacterMovementHandler : NetworkBehaviour
                 if (networkRigidbody.ReadVelocity().y < 0.05f && networkRigidbody.ReadVelocity().y > -0.05f)
                 {
                     _jumpGravityCount++;
-
                 }
             }
             else
@@ -220,50 +216,62 @@ public class CharacterMovementHandler : NetworkBehaviour
 
         if (playerStateHandler.IsGround() && (rb.velocity.y < 0.03 && rb.velocity.y > -0.03)&& !playerStateHandler.Isvisi())
         {
-            _jumpCount = 0;
+            //Reset Counter
+            playerStateHandler.ResetJumpCount();
             _dodgeCount = 0;
         }
         //Jump
-        if (networkInputData.isJumpButtonPressed && _jumpCount < 2)
+        if (networkInputData.isJumpButtonPressed)
         {
-
-            playerStateHandler.isJumpButtonPressed = true;
-            ++_jumpCount;
-            Debug.Log(_jumpCount);
-            playerStateHandler.SetState2(_jumpCount);
-            Vector3 tmp = Vector3.zero;
-            tmp.x = rb.velocity.x;
-            tmp.z = rb.velocity.z;
-            rb.velocity = tmp;
-            networkRigidbody.Rigidbody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-
-            return;
+            if (playerStateHandler.JumpAble())
+            {
+                Jump();
+                return;
+            }
         }
-        else
-            playerStateHandler.isJumpButtonPressed = false;
-
-        if (playerStateHandler.Isvisi()) { return; }
-
-        //Dodge
-        if (networkInputData.isDodgeButtonPressed && _dodgeCount < 1)
-        {
-            playerStateHandler.isDodgeButtonPressed = true;
-            ++_dodgeCount;
-            return;
-        }
-        else
-            playerStateHandler.isDodgeButtonPressed = false;
-
+        //if (playerStateHandler.Isvisi()) { return; }
         //Fire
         if (networkInputData.isFireButtonPressed)
         {
-            playerStateHandler.isFireButtonPressed = true;
-            weaponHandler.Fire(localCamera.transform.position, networkInputData.aimFowardVector, networkInputData.isFireButtonPressed);
-            return;
+            if (!weaponHandler.AbleFire()) 
+            {
+                return;
+            }
+            else 
+            {
+                //transform.rotation=localCameraHandler.CMLookRotation();
+
+                weaponHandler.SetFire(localCamera.transform.position, networkInputData.aimFowardVector, networkInputData.isFireButtonPressed);
+                playerStateHandler.isFireButtonPressed = true;
+                return;
+            }
         }
+        ////Dodge
+        //if (networkInputData.isDodgeButtonPressed && _dodgeCount < 1)
+        //{
+        //    playerStateHandler.isDodgeButtonPressed = true;
+        //    ++_dodgeCount;
+        //    return;
+        //}
+        //else
+        //    playerStateHandler.isDodgeButtonPressed = false;
+
     }
 
-    
+    public void Fire()
+    {
+        weaponHandler.Fire();
+    }
+
+    private void Jump()
+    {
+        Vector3 tmp = Vector3.zero;
+        tmp.x = rb.velocity.x;
+        tmp.z = rb.velocity.z;
+        rb.velocity = tmp;
+        networkRigidbody.Rigidbody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+    }
+
     void CheckFallRespawn()
     {
         if (transform.position.y < -12)
@@ -272,7 +280,6 @@ public class CharacterMovementHandler : NetworkBehaviour
             {
                 hpHandler.KillSelf();
             }
-
         }
     }
 
@@ -297,7 +304,7 @@ public class CharacterMovementHandler : NetworkBehaviour
         isRespawnRequsted = false;
     }
     /// <summary>
-    /// CharacterController bool������ Ű�� ��� 
+    /// CharacterController bool������ Ű�� ���?
     /// </summary>
     public void SetCharacterControllerEnabled(bool isEnabled)
     {

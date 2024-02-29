@@ -13,21 +13,15 @@ public class JumpState : PlayerState
         endMotionChange = true;
         isAbleAttack = true;
         isAbleDodge = true;
-        isAbleJump = false; // �÷��̾� ������Ʈ���� ����ޱ� �Ⱦ 
+        isAbleJump = false; 
         isState2 = true;
     }
 
     public override void Enter()
     {
-        player.isJumpButtonPressed = false;
-
-
-        //player.SetState2(1);
         base.Enter();
-        //player.SetState2(player.jumpCount);
-        //player.jumpCount += 1;
-        player.isJumping = true;
 
+        player.isJumpButtonPressed = false;
     }
     public override bool Update()
     {
@@ -38,13 +32,16 @@ public class JumpState : PlayerState
         }
         if (player.isJumpButtonPressed)
         {
-            player.nextState = player.jumpState;
+            player.isJumpButtonPressed = false;
+            player.SetAnimationTrigger(false);
+            player.ChangeState();
             return true;
         }
         if (player.isFireButtonPressed && !player.attackCoolDownOn)
         {
             if (!player.attackCoolDownOn)
             {
+                //player.SetAnimationTrigger(false);
                 player.nextState = player.attackState;
                 return true;
             }
@@ -80,7 +77,6 @@ public class JumpState : PlayerState
     }
     public override void LateUpdate()
     {
-        //Debug.Log($"�̰� ���� ������Ʈ ����Ʈ  {player.jumpCount}");
 
 
         base.LateUpdate();
@@ -88,7 +84,6 @@ public class JumpState : PlayerState
     public override void Exit()
     {
         base.Exit();
-        player.isJumping = false;
 
     }
 

@@ -68,6 +68,12 @@ public class LocalCameraHandler : NetworkBehaviour
         localCamera.transform.rotation = Quaternion.Euler(cameraRotationX / 2 * sensitivity, cameraRotationY / 2 * sensitivity, 0);
 
     }
+    public Rotation CMLookRotation() 
+    {
+        return gameObject.transform.rotation;
+    } 
+
+
     public void SetViewInputVector(Vector2 viewInput)
     {
         this.viewInput = viewInput;

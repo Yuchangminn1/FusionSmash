@@ -16,7 +16,7 @@ public class PlayerState : EntityState
     //protected int currentStateNum;        ���� ������Ʈ ��
     //protected float stateTimer;
     //protected float startTime;                
-    //protected bool endMotionChange = true; ������ �ִϸ��̼� �ٲ��Ʈ����
+    //protected bool endMotionChange = true; ������ �ִϸ��̼� �ٲ���?�����?
     //protected bool isAbleFly = false; �̰� ���� 
     //protected bool isAbleAttack = true;
     //protected bool isState2=false;
@@ -28,19 +28,16 @@ public class PlayerState : EntityState
     public override void Enter()
     {
         base.Enter();
-        player.SetState(currentStateNum);
         startTime = Time.time;
-
-        if (endMotionChange)
+        player.SetState(currentStateNum);
+        if (endMotionChange) 
         {
-            //player.SetAnimationTrigger(true);
-            ;
+            player.SetAnimationTrigger(true);
         }
         if (!isState2) 
         {
             player.SetState2(0);
-        } 
-        //Debug.Log($"Enter{currentStateNum}State");
+        }
     }
     public override bool Update()
     {
@@ -48,18 +45,12 @@ public class PlayerState : EntityState
 
         stateTimer = Time.time;
 
-        if (!isAbleAttack)
-        {
-            player.isFireButtonPressed = false;
-        }
-
         if (player.nextState != this)
         {
             return true;
         }
         if (!isAbleFly)
         {
-            //ü�� �Ұ��� �����϶�
             if (!player.IsGround())
             {
                 if (airTime == 0f)
@@ -80,7 +71,6 @@ public class PlayerState : EntityState
         }
         if (player.isJumpButtonPressed && isAbleJump)
         {
-            //����������
             player.nextState = player.jumpState;
             return true;
         }
@@ -88,9 +78,7 @@ public class PlayerState : EntityState
         {
             if (!player.attackCoolDownOn)
             {
-
                 player.nextState = player.attackState;
-
                 return true;
             }
         }
@@ -99,8 +87,6 @@ public class PlayerState : EntityState
             player.nextState = player.dodgeState;
             return true;
         }
-
-
         return BaseState();
     }
     public override void FixedUpdate()
@@ -109,18 +95,7 @@ public class PlayerState : EntityState
         if (player.attackCoolDownOn && player.attackCoolDown + player.attackTime < Time.time)
         {
             player.attackCoolDownOn = false;
-            Debug.Log("attackCoolDownOn �Ƚ�");
-            //player.attackComboCount = 0;
         }
-        //Ʋ���� �ִϸ��̼� �����ֱ� ? 
-        //if (player.state != currentStateNum)
-        //{
-        //    //Debug.Log($"player.state = {player.state} currentStateNum{currentStateNum}");
-        //    player.SetState(currentStateNum);
-        //}
-        //Debug.Log($"currentNum = {currentStateNum}");
-        //Debug.Log(currentStateNum);
-
     }
     public override void LateUpdate()
     {
