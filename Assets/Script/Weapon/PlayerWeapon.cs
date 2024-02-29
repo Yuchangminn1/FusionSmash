@@ -15,98 +15,98 @@ public enum EWeaponType
 }
 public class PlayerWeapon : NetworkBehaviour
 {
-    // ÃÑ±â À¯Çü
+    // ï¿½Ñ±ï¿½ ï¿½ï¿½ï¿½ï¿½
     public EWeaponType Type;
 
     [Header("Weapon UI")]
-    public GameObject _weaponUI;    //¾Æ  ½ºÇÁ¶óÀÌÆ® ¹Þ°í ±³Ã¼ÇÏ´Â °É·Î ¹Ù²ÙÀÚ 
-    //public Sprite _weaponSprite;    //¹«±â ÀÌ¹ÌÁö ½ºÇÁ¶óÀÌÆ®
-    public TMP_Text _weaponAmmoText;//ÃÑ¾Ë ¿©ºÎ
-    public Image _weaponAimImage;   //Å©·Î½ºÇì¾î
-    public Image _killIcon;         //Å³ ÀÌ¹ÌÁö
+    public GameObject _weaponUI;    //ï¿½ï¿½  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½Þ°ï¿½ ï¿½ï¿½Ã¼ï¿½Ï´ï¿½ ï¿½É·ï¿½ ï¿½Ù²ï¿½ï¿½ï¿½ 
+    //public Sprite _weaponSprite;    //ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¹ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
+    public TMP_Text _weaponAmmoText;//ï¿½Ñ¾ï¿½ ï¿½ï¿½ï¿½ï¿½
+    public Image _weaponAimImage;   //Å©ï¿½Î½ï¿½ï¿½ï¿½ï¿½
+    public Image _killIcon;         //Å³ ï¿½Ì¹ï¿½ï¿½ï¿½
     public int _weaponNum = 0;
 
 
     [Header("Fire Setup")]
     public GameObject _localCameraRotation;
 
-    public bool IsAutomatic = true; // ÀÚµ¿ ¹ß»ç ¿©ºÎ
-    public float Damage = 10f; // µ¥¹ÌÁö
-    public int FireRate = 100; // ¹ß»ç ¼Óµµ
+    public bool IsAutomatic = true; // ï¿½Úµï¿½ ï¿½ß»ï¿½ ï¿½ï¿½ï¿½ï¿½
+    public float Damage = 10f; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    public int FireRate = 100; // ï¿½ß»ï¿½ ï¿½Óµï¿½
     [Range(1, 20)]
-    public int ProjectilesPerShot = 1; // ÇÑ ¹ß¿¡ ¹ß»çµÇ´Â ÇÁ·ÎÁ§Å¸ÀÏ ¼ö
-    public float Dispersion = 0f; // ºÐ»ê
-    public LayerMask HitMask; // È÷Æ® ¸¶½ºÅ©
-    public float MaxHitDistance = 100f; // ÃÖ´ë È÷Æ® °Å¸®
+    public int ProjectilesPerShot = 1; // ï¿½ï¿½ ï¿½ß¿ï¿½ ï¿½ß»ï¿½Ç´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å¸ï¿½ï¿½ ï¿½ï¿½
+    public float Dispersion = 0f; // ï¿½Ð»ï¿½
+    public LayerMask HitMask; // ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½Å©
+    public float MaxHitDistance = 100f; // ï¿½Ö´ï¿½ ï¿½ï¿½Æ® ï¿½Å¸ï¿½
 
     [Header("Ammo")]
-    public int MaxClipAmmo = 12; // ÃÖ´ë Åº¾à ¼ö
-    public int StartAmmo = 25; // ½ÃÀÛ Åº¾à ¼ö
-    public float ReloadTime = 2f; // ÀçÀåÀü ½Ã°£
+    public int MaxClipAmmo = 12; // ï¿½Ö´ï¿½ Åºï¿½ï¿½ ï¿½ï¿½
+    public int StartAmmo = 25; // ï¿½ï¿½ï¿½ï¿½ Åºï¿½ï¿½ ï¿½ï¿½
+    public float ReloadTime = 2f; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½
 
     //[Header("Visuals")]
-    //public Sprite Icon; // ¾ÆÀÌÄÜ
-    //public string Name; // ÀÌ¸§
-    //public Animator Animator; // ¾Ö´Ï¸ÞÀÌÅÍ
+    //public Sprite Icon; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    //public string Name; // ï¿½Ì¸ï¿½
+    //public Animator Animator; // ï¿½Ö´Ï¸ï¿½ï¿½ï¿½ï¿½ï¿½
 
     [Header("Fire Effect")]
-    //public Transform MuzzleTransform; // 3ÀÎÄª ½ÃÁ¡¿¡¼­ ¹ß»çµÇ´Â À§Ä¡
-    //public GameObject MuzzleEffectPrefab; // ¹ß»ç È¿°ú ÇÁ¸®ÆÕ
-    public Projectile ProjectilePrefab; // ÇÁ·ÎÁ§Å¸ÀÏ ½Ã°¢È­ ÇÁ¸®ÆÕ
+    //public Transform MuzzleTransform; // 3ï¿½ï¿½Äª ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ß»ï¿½Ç´ï¿½ ï¿½ï¿½Ä¡
+    //public GameObject MuzzleEffectPrefab; // ï¿½ß»ï¿½ È¿ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    public Projectile ProjectilePrefab; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å¸ï¿½ï¿½ ï¿½Ã°ï¿½È­ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
     //[Header("Sounds")]
-    //public AudioSource FireSound; // ¹ß»ç »ç¿îµå
-    //public AudioSource ReloadingSound; // ÀçÀåÀü »ç¿îµå
-    //public AudioSource EmptyClipSound; // ºó ÅºÃ¢ »ç¿îµå
+    //public AudioSource FireSound; // ï¿½ß»ï¿½ ï¿½ï¿½ï¿½ï¿½
+    //public AudioSource ReloadingSound; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    //public AudioSource EmptyClipSound; // ï¿½ï¿½ ÅºÃ¢ ï¿½ï¿½ï¿½ï¿½
 
-    public bool HasAmmo => ClipAmmo > 0 || RemainingAmmo > 0; // Åº¾àÀÌ ÀÖ´ÂÁö ¿©ºÎ
-
-    [Networked]
-    public NetworkBool IsCollected { get; set; }  // È¹µæ ¿©ºÎ
-    [Networked]
-    public NetworkBool IsReloading { get; set; } // ÀçÀåÀü ¿©ºÎ
-    [Networked]
-    public int ClipAmmo { get; set; } // ÇöÀç ÅºÃ¢ÀÇ Åº¾à ¼ö
-    [Networked]
-    public int RemainingAmmo { get; set; } // ³²Àº Åº¾à ¼ö
+    public bool HasAmmo => ClipAmmo > 0 || RemainingAmmo > 0; // Åºï¿½ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
     [Networked]
-    private int _fireCount { get; set; } // ¹ß»ç È½¼ö
+    public NetworkBool IsCollected { get; set; }  // È¹ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     [Networked]
-    private TickTimer _fireCooldown { get; set; } // ¹ß»ç Äð´Ù¿î Å¸ÀÌ¸Ó
+    public NetworkBool IsReloading { get; set; } // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    [Networked]
+    public int ClipAmmo { get; set; } // ï¿½ï¿½ï¿½ï¿½ ÅºÃ¢ï¿½ï¿½ Åºï¿½ï¿½ ï¿½ï¿½
+    [Networked]
+    public int RemainingAmmo { get; set; } // ï¿½ï¿½ï¿½ï¿½ Åºï¿½ï¿½ ï¿½ï¿½
+
+    [Networked]
+    private int _fireCount { get; set; } // ï¿½ß»ï¿½ È½ï¿½ï¿½
+    [Networked]
+    private TickTimer _fireCooldown { get; set; } // ï¿½ß»ï¿½ ï¿½ï¿½Ù¿ï¿½ Å¸ï¿½Ì¸ï¿½
     [Networked, Capacity(32)]
-    private NetworkArray<ProjectileData> _projectileData { get; } // ÇÁ·ÎÁ§Å¸ÀÏ µ¥ÀÌÅÍ ¹è¿­
+    private NetworkArray<ProjectileData> _projectileData { get; } // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½è¿­
 
-    private int _fireTicks; // ¹ß»ç Æ½
-    private int _visibleFireCount; // ½Ã°¢È­µÈ ¹ß»ç È½¼ö
-    private bool _reloadingVisible; // ÀçÀåÀü ½Ã°¢È­ ¿©ºÎ
-    private GameObject _muzzleEffectInstance; // ¹ß»ç È¿°ú ÀÎ½ºÅÏ½º
+    private int _fireTicks; // ï¿½ß»ï¿½ Æ½
+    private int _visibleFireCount; // ï¿½Ã°ï¿½È­ï¿½ï¿½ ï¿½ß»ï¿½ È½ï¿½ï¿½
+    private bool _reloadingVisible; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½È­ ï¿½ï¿½ï¿½ï¿½
+    private GameObject _muzzleEffectInstance; // ï¿½ß»ï¿½ È¿ï¿½ï¿½ ï¿½Î½ï¿½ï¿½Ï½ï¿½
 
-    //private SceneObjects _sceneObjects; // SceneObjects Å¬·¡½º
+    //private SceneObjects _sceneObjects; // SceneObjects Å¬ï¿½ï¿½ï¿½ï¿½
 
-    // ÃÑÀ» ¹ß»çÇÏ´Â ¸Þ¼Òµå
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ß»ï¿½ï¿½Ï´ï¿½ ï¿½Þ¼Òµï¿½
     public void Fire(Vector3 firePosition, Vector3 fireDirection, bool justPressed)
     {
 
-        // ÃÑÀÌ È¹µæµÇÁö ¾Ê¾Ò°Å³ª ÀÚµ¿ ¹ß»ç°¡ ¾Æ´Ï°Å³ª ÀçÀåÀü ÁßÀÌ°Å³ª ¹ß»ç Äð´Ù¿îÀÌ ³²¾ÆÀÖÀ¸¸é ¹«½Ã
+        // ï¿½ï¿½ï¿½ï¿½ È¹ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¾Ò°Å³ï¿½ ï¿½Úµï¿½ ï¿½ß»ç°¡ ï¿½Æ´Ï°Å³ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ì°Å³ï¿½ ï¿½ß»ï¿½ ï¿½ï¿½Ù¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         if (IsCollected == false || (justPressed == false && !IsAutomatic) || IsReloading || !_fireCooldown.ExpiredOrNotRunning(Runner))
             return;
 
-        //ÅºÃ¢¿¡ Åº¾àÀÌ ¾øÀ» °æ¿ì ºó ÅºÃ¢ »ç¿îµå Àç»ý ÈÄ ¸®ÅÏ
+        //ÅºÃ¢ï¿½ï¿½ Åºï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ ÅºÃ¢ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         if (ClipAmmo <= 0)
         {
             //PlayEmptyClipSound(justPressed);
             return;
         }
 
-        // Åõ»çÃ¼ ¹ß»ç
+        // ï¿½ï¿½ï¿½ï¿½Ã¼ ï¿½ß»ï¿½
         for (int i = 0; i < ProjectilesPerShot; i++)
         {
             var projectileDirection = fireDirection;
 
             if (Dispersion > 0f)
             {
-                // ºÐ»êÀÌ Àû¿ëµÈ ¹ß»ç ¹æÇâ °è»ê
+                // ï¿½Ð»ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ß»ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
                 var dispersionRotation = Quaternion.Euler(Random.insideUnitSphere * Dispersion);
                 projectileDirection = dispersionRotation * fireDirection;
             }
@@ -116,7 +116,7 @@ public class PlayerWeapon : NetworkBehaviour
 
         }
 
-        // ¹ß»ç Äð´Ù¿î ¼³Á¤ ¹× Åº¾à °¨¼Ò
+        // ï¿½ß»ï¿½ ï¿½ï¿½Ù¿ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ Åºï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         _fireCooldown = TickTimer.CreateFromTicks(Runner, _fireTicks);
         ClipAmmo--;
         AmmoInfoUpdate();
@@ -137,14 +137,14 @@ public class PlayerWeapon : NetworkBehaviour
     {
         _weaponAmmoText.text = $"   {ClipAmmo}  /  {RemainingAmmo}";
     }
-    // ÀçÀåÀü ¸Þ¼Òµå
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Þ¼Òµï¿½
     public void Reload()
     {
-        // ÃÑÀÌ È¹µæµÇÁö ¾Ê¾Ò°Å³ª ÅºÃ¢ÀÌ °¡µæ Ã¡°Å³ª ³²Àº Åº¾àÀÌ ¾ø°Å³ª ÀçÀåÀü ÁßÀÌ°Å³ª ¹ß»ç Äð´Ù¿îÀÌ ³²¾ÆÀÖÀ¸¸é ¹«½Ã
+        // ï¿½ï¿½ï¿½ï¿½ È¹ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¾Ò°Å³ï¿½ ÅºÃ¢ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ã¡ï¿½Å³ï¿½ ï¿½ï¿½ï¿½ï¿½ Åºï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Å³ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ì°Å³ï¿½ ï¿½ß»ï¿½ ï¿½ï¿½Ù¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         if (IsCollected == false || ClipAmmo >= MaxClipAmmo || RemainingAmmo <= 0 || IsReloading || !_fireCooldown.ExpiredOrNotRunning(Runner))
             return;
 
-        // ÀçÀåÀü ÁßÀ¸·Î ¼³Á¤ÇÏ°í ÀçÀåÀü Äð´Ù¿î ½ÃÀÛ
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ù¿ï¿½ ï¿½ï¿½ï¿½ï¿½
         IsReloading = true;
         _fireCooldown = TickTimer.CreateFromSeconds(Runner, ReloadTime);
     }
@@ -154,28 +154,28 @@ public class PlayerWeapon : NetworkBehaviour
         _text.text = $"{ClipAmmo} / {MaxClipAmmo}";
     }
 
-    // Åº¾à Ãß°¡ ¸Þ¼Òµå
+    // Åºï¿½ï¿½ ï¿½ß°ï¿½ ï¿½Þ¼Òµï¿½
     public void AddAmmo(int amount)
     {
         RemainingAmmo += amount;
     }
 
 
-    // ÀçÀåÀü ÁøÇà »óÅÂ¸¦ °¡Á®¿À´Â ¸Þ¼Òµå
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Â¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Þ¼Òµï¿½
     public float GetReloadProgress()
     {
-        // ÀçÀåÀü ÁßÀÌ ¾Æ´Ï¸é 1À» ¹ÝÈ¯
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Æ´Ï¸ï¿½ 1ï¿½ï¿½ ï¿½ï¿½È¯
         if (!IsReloading)
             return 1f;
 
-        // ÀçÀåÀü ÁßÀÎ °æ¿ì ³²Àº ÀçÀåÀü ½Ã°£ÀÇ ÁøÇà »óÅÂ ¹ÝÈ¯
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯
         return 1f - _fireCooldown.RemainingTime(Runner).GetValueOrDefault() / ReloadTime;
     }
 
-    // ¿ÀºêÁ§Æ®°¡ ½ºÆùµÉ ¶§ È£ÃâµÇ´Â ¸Þ¼Òµå
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ È£ï¿½ï¿½Ç´ï¿½ ï¿½Þ¼Òµï¿½
     public override void Spawned()
     {
-        // »óÅÂ ±ÇÇÑÀÌ ÀÖ´Â °æ¿ì¿¡¸¸ ÃÊ±âÈ­ ÄÚµå ½ÇÇà
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ì¿¡ï¿½ï¿½ ï¿½Ê±ï¿½È­ ï¿½Úµï¿½ ï¿½ï¿½ï¿½ï¿½
 
         if (HasStateAuthority)
         {
@@ -193,55 +193,55 @@ public class PlayerWeapon : NetworkBehaviour
             IsCollected = true;
         }
 
-        // ¹ß»ç È¿°ú ÀÎ½ºÅÏ½º »ý¼º ¹× ºñÈ°¼ºÈ­
+        // ï¿½ß»ï¿½ È¿ï¿½ï¿½ ï¿½Î½ï¿½ï¿½Ï½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½È°ï¿½ï¿½È­
         // _muzzleEffectInstance = Instantiate(MuzzleEffectPrefab, MuzzleTransform);
         // _muzzleEffectInstance.SetActive(false);
 
-        // SceneObjects Å¬·¡½º ÂüÁ¶
+        // SceneObjects Å¬ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         //_sceneObjects = Runner.GetSingleton<SceneObjects>();
     }
 
-    // ³×Æ®¿öÅ© ¾÷µ¥ÀÌÆ® ¸Þ¼Òµå
+    // ï¿½ï¿½Æ®ï¿½ï¿½Å© ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½Þ¼Òµï¿½
     public override void FixedUpdateNetwork()
     {
-        // ÃÑÀÌ È¹µæµÇÁö ¾Ê¾Ò´Ù¸é ¹«½Ã
+        // ï¿½ï¿½ï¿½ï¿½ È¹ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¾Ò´Ù¸ï¿½ ï¿½ï¿½ï¿½ï¿½
         if (IsCollected == false)
             return;
 
-        // ÅºÃ¢ÀÌ ºñ¾îÀÖÀ¸¸é ÀÚµ¿À¸·Î ÀçÀåÀü ½Ãµµ
+        // ÅºÃ¢ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ãµï¿½
         if (ClipAmmo == 0)
             Reload();
 
-        // ÀçÀåÀü ÁßÀÌ¸ç ÀçÀåÀü Äð´Ù¿îÀÌ ³¡³µÀ» ¶§
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ì¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ù¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
         if (IsReloading && _fireCooldown.ExpiredOrNotRunning(Runner))
         {
-            // ÀçÀåÀü ¿Ï·á
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ï·ï¿½
             IsReloading = false;
 
-            // ÀçÀåÀüÇÒ ¼ö ÀÖ´Â ÃÖ´ë Åº¾à ¼ö °è»ê
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½Ö´ï¿½ Åºï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½
             int reloadAmmo = MaxClipAmmo - ClipAmmo;
             reloadAmmo = Mathf.Min(reloadAmmo, RemainingAmmo);
 
-            // Åº¾à Ãß°¡ ¹× ³²Àº Åº¾à °¨¼Ò
+            // Åºï¿½ï¿½ ï¿½ß°ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Åºï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             ClipAmmo += reloadAmmo;
             RemainingAmmo -= reloadAmmo;
             AmmoInfoUpdate();
 
-            // ÀçÀåÀü ÈÄ ÁØºñ ½Ã°£ Ãß°¡
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Øºï¿½ ï¿½Ã°ï¿½ ï¿½ß°ï¿½
             _fireCooldown = TickTimer.CreateFromSeconds(Runner, 0.25f);
         }
     }
 
-    // ·»´õ¸µ ¸Þ¼Òµå
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Þ¼Òµï¿½
     public override void Render()
     {
-        // ¹ß»ç È½¼ö°¡ º¯°æµÇ¾úÀ¸¸é ¹ß»ç È¿°ú Àç»ý
+        // ï¿½ß»ï¿½ È½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ç¾ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ß»ï¿½ È¿ï¿½ï¿½ ï¿½ï¿½ï¿½
         //if (_visibleFireCount < _fireCount)
         //{
         //    PlayFireEffect();
         //}
 
-        // ¾ÆÁ÷ Ç¥½ÃµÇÁö ¾ÊÀº ¸ðµç ÇÁ·ÎÁ§Å¸ÀÏ¿¡ ´ëÇÑ ½Ã°¢ÀûÀÎ Ã³¸®
+        // ï¿½ï¿½ï¿½ï¿½ Ç¥ï¿½Ãµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å¸ï¿½Ï¿ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½
         //for (int i = _visibleFireCount; i < _fireCount; i++)
         //{
         //    var data = _projectileData[i % _projectileData.Length];
@@ -255,12 +255,12 @@ public class PlayerWeapon : NetworkBehaviour
 
         if (_reloadingVisible != IsReloading)
         {
-            // »õ·Î¿î ÀçÀåÀü »óÅÂ¿¡ µû¶ó ¾Ö´Ï¸ÞÀÌ¼Ç ¹× ¼Ò¸®¸¦ Ã³¸®ÇÕ´Ï´Ù.
+            // ï¿½ï¿½ï¿½Î¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Â¿ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ ï¿½ï¿½ ï¿½Ò¸ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
             //Animator.SetBool("IsReloading", IsReloading);
 
             if (IsReloading)
             {
-                // ÀçÀåÀü Áß¿¡´Â ¸®·Îµù »ç¿îµå¸¦ Àç»ýÇÕ´Ï´Ù.
+                // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ß¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Îµï¿½ ï¿½ï¿½ï¿½å¸¦ ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
                 // ReloadingSound.Play();
             }
 
@@ -275,7 +275,7 @@ public class PlayerWeapon : NetworkBehaviour
 
         var hitOptions = HitOptions.IncludePhysX | HitOptions.IgnoreInputAuthority;
 
-        // ÀüÃ¼ ¹ß»çÃ¼ °æ·Î ¹× È¿°ú¸¦ Áï½Ã Ã³¸®ÇÕ´Ï´Ù(È÷Æ®½ºÄµ ¹ß»çÃ¼).
+        // ï¿½ï¿½Ã¼ ï¿½ß»ï¿½Ã¼ ï¿½ï¿½ï¿½ ï¿½ï¿½ È¿ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½Õ´Ï´ï¿½(ï¿½ï¿½Æ®ï¿½ï¿½Äµ ï¿½ß»ï¿½Ã¼).
         //Runner.LagCompensation.Raycast(aimPoint.position + aimForwardVector * 2.5f, aimForwardVector,
         //hitDistance, Object.InputAuthority, out var hitnfo, collisionLayer, HitOptions.IncludePhysX);
         Debug.DrawRay(firePosition + fireDirection * 2.5f, fireDirection * MaxHitDistance, Color.green, 1);
@@ -315,14 +315,14 @@ public class PlayerWeapon : NetworkBehaviour
                         StartCoroutine(EnemyHitEffect());
                 }
 
-                // È÷Æ®¹Ú½º°¡ ÀÖ´Â °æ¿ì µ¥¹ÌÁö¸¦ Àû¿ëÇÕ´Ï´Ù.
+                // ï¿½ï¿½Æ®ï¿½Ú½ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
                 ApplyDamage(hit.Hitbox, hit.Point, fireDirection);
             }
             else
             {
-                Debug.Log("¾øÀ½");
+                Debug.Log("ï¿½ï¿½ï¿½ï¿½");
 
-                // ÇÃ·¹ÀÌ¾î°¡ ´Ü´ÜÇÑ ¹°Ã¼¿¡ Ãæµ¹ÇßÀ» ¶§¸¸ È÷Æ® È¿°ú¸¦ Ç¥½ÃÇÕ´Ï´Ù.
+                // ï¿½Ã·ï¿½ï¿½Ì¾î°¡ ï¿½Ü´ï¿½ï¿½ï¿½ ï¿½ï¿½Ã¼ï¿½ï¿½ ï¿½æµ¹ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ® È¿ï¿½ï¿½ï¿½ï¿½ Ç¥ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
                 projectileData.ShowHitEffect = true;
             }
         }
@@ -331,7 +331,7 @@ public class PlayerWeapon : NetworkBehaviour
 
         _projectileData.Set(_fireCount % _projectileData.Length, projectileData);
         _fireCount++;
-        Debug.Log($"¹ß»çÈ½¼ö {_fireCount}");
+        Debug.Log($"ï¿½ß»ï¿½È½ï¿½ï¿½ {_fireCount}");
     }
     
 
@@ -393,18 +393,18 @@ public class PlayerWeapon : NetworkBehaviour
     //{
     //    if (FireSound != null)
     //    {
-    //        // ¹ß»ç »ç¿îµå¸¦ ÇÑ ¹ø Àç»ýÇÕ´Ï´Ù.
+    //        // ï¿½ß»ï¿½ ï¿½ï¿½ï¿½å¸¦ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
     //        FireSound.PlayOneShot(FireSound.clip);
     //    }
 
-    //    // ÃÑ±¸ ÀÌÆåÆ® °¡½Ã¼ºÀ» Àç¼³Á¤ÇÕ´Ï´Ù.
+    //    // ï¿½Ñ±ï¿½ ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½Ã¼ï¿½ï¿½ï¿½ ï¿½ç¼³ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
     //    _muzzleEffectInstance.SetActive(false);
     //    _muzzleEffectInstance.SetActive(true);
 
-    //    // ¹ß»ç ¾Ö´Ï¸ÞÀÌ¼ÇÀ» Àç»ýÇÕ´Ï´Ù.
+    //    // ï¿½ß»ï¿½ ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
     //    Animator.SetTrigger("Fire");
 
-    //    // ºÎ¸ð PlayerÀÇ ¹ß»ç ÀÌÆåÆ®¸¦ Àç»ýÇÕ´Ï´Ù.
+    //    // ï¿½Î¸ï¿½ Playerï¿½ï¿½ ï¿½ß»ï¿½ ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
     //    GetComponentInParent<CharacterMovementHandler>().PlayFireEffect();
     //}
 
@@ -420,7 +420,7 @@ public class PlayerWeapon : NetworkBehaviour
         //float damage = Damage * damageMultiplier;
         //if (_sceneObjects.Gameplay.DoubleDamageActive)
         //{
-        //    // ´õºí µ¥¹ÌÁö È°¼ºÈ­ ÁßÀÌ¸é µ¥¹ÌÁö¸¦ µÎ ¹è·Î Áõ°¡½ÃÅµ´Ï´Ù.
+        //    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ È°ï¿½ï¿½È­ ï¿½ï¿½ï¿½Ì¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Åµï¿½Ï´ï¿½.
         //    damage *= 2f;
         //}
 
@@ -429,14 +429,14 @@ public class PlayerWeapon : NetworkBehaviour
 
         //if (HasInputAuthority && Runner.IsForward)
         //{
-        //    // ·ÎÄÃ ÇÃ·¹ÀÌ¾î¿¡°Ô UI È÷Æ® ÀÌÆåÆ®¸¦ Ç¥½ÃÇÕ´Ï´Ù.
+        //    // ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾î¿¡ï¿½ï¿½ UI ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ Ç¥ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
         //   // _sceneObjects.GameUI.PlayerView.Crosshair.ShowHit(enemyHealth.IsAlive == false, isCriticalHit);
         //}
     }
 
     //private void PlayEmptyClipSound(bool fireJustPressed)
     //{
-    //    // ÀÚµ¿ ¹«±âÀÇ °æ¿ì ¸¶Áö¸· ¹ß»ç ÈÄ¿¡ ºó ÅºÃ¢ »ç¿îµå¸¦ ÇÑ ¹ø Àç»ýÇÏ·Á°í ÇÕ´Ï´Ù.
+    //    // ï¿½Úµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ß»ï¿½ ï¿½Ä¿ï¿½ ï¿½ï¿½ ÅºÃ¢ ï¿½ï¿½ï¿½å¸¦ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ ï¿½Õ´Ï´ï¿½.
     //    bool firstEmptyShot = _fireCooldown.TargetTick.GetValueOrDefault() == Runner.Tick - 1;
 
     //    if (fireJustPressed == false && firstEmptyShot == false)
@@ -447,13 +447,13 @@ public class PlayerWeapon : NetworkBehaviour
 
     //    if (Runner.IsForward && HasInputAuthority)
     //    {
-    //        // ºó ÅºÃ¢ »ç¿îµå¸¦ Àç»ýÇÕ´Ï´Ù.
+    //        // ï¿½ï¿½ ÅºÃ¢ ï¿½ï¿½ï¿½å¸¦ ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
     //        EmptyClipSound.Play();
     //    }
     //}
 
     /// <summary>
-    /// ´ÜÀÏ ¹ß»çÃ¼ ¹ß»ç¸¦ ³ªÅ¸³»´Â ±¸Á¶Ã¼ÀÔ´Ï´Ù.
+    /// ï¿½ï¿½ï¿½ï¿½ ï¿½ß»ï¿½Ã¼ ï¿½ß»ç¸¦ ï¿½ï¿½Å¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ã¼ï¿½Ô´Ï´ï¿½.
     /// </summary>
     private struct ProjectileData : INetworkStruct
     {

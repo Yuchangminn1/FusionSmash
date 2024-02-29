@@ -7,12 +7,12 @@ public class EntityState
     protected int currentStateNum;
     protected float stateTimer;
     protected float startTime;
-    protected bool endMotionChange = false;    //¾Ö´Ï¸ÞÀÌ¼Ç Æ®¸®°Å ÀÖ´ÂÁö
+    protected bool endMotionChange = false;    //ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ Æ®ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ï¿½ï¿½
     protected bool isAbleFly = false;         
     protected bool isAbleAttack = true;
     protected bool isAbleDodge = true;
     protected bool isAbleJump = true;
-
+    protected bool isState2=false;
 
     public virtual void Enter()
     {

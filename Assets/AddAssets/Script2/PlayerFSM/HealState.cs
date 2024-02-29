@@ -18,7 +18,7 @@ public class HealState : PlayerState
         base.Enter();
         //if(player.Hp >= player.HpMax || player.healNum == 0)
         //{
-        //    Debug.Log("Ã¼·ÂÀÌ ÀÌ¹Ì °¡µæ Ã¡½À´Ï´Ù");
+        //    Debug.Log("Ã¼ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¹ï¿½ ï¿½ï¿½ï¿½ï¿½ Ã¡ï¿½ï¿½ï¿½Ï´ï¿½");
         //    player.StateChange(player.moveState);
         //    return;
         //}
@@ -32,7 +32,7 @@ public class HealState : PlayerState
         {
             return true;
         }
-        if (!player.animationTrigger)
+        if (!player.Isvisi())
         {
             ReCoverHP();
             player.nextState = player.moveState;

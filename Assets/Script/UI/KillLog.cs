@@ -26,11 +26,11 @@ public class KillLog : MonoBehaviour
     {
         if(killPlayer == "")
         {
-            killPlayer = "´Ð³×ÀÓ";
+            killPlayer = "ï¿½Ð³ï¿½ï¿½ï¿½";
         }
         if (deadPlayer == "")
         {
-            deadPlayer = "´Ð³×ÀÓ";
+            deadPlayer = "ï¿½Ð³ï¿½ï¿½ï¿½";
         }
         _killPlayerText.text = killPlayer;
         _deadPlayerText.text = deadPlayer;

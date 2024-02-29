@@ -18,7 +18,7 @@ public class MoveState : PlayerState
     {
         base.Enter();
         
-       // Debug.Log("Á¡ÇÁÄ«¿îÆ® ¸®¼Â Çß¾î¿ë");
+       // Debug.Log("ï¿½ï¿½ï¿½ï¿½Ä«ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ ï¿½ß¾ï¿½ï¿½");
     }
 
     public override bool Update()

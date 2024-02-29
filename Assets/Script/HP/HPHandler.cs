@@ -24,8 +24,8 @@ public class HPHandler : NetworkBehaviour
     CharacterMovementHandler characterMovementHandler;
     LocalUICanvas localUICanvas;
     [Header("KillLog UI")]
-    public GameObject _killLogPanel; // Å³·Î±× ÆÐ³Î
-    public GameObject _killLogPrefab;// Å³·Î±× ÇÁ¸®ÆÕ
+    public GameObject _killLogPanel; // Å³ï¿½Î±ï¿½ ï¿½Ð³ï¿½
+    public GameObject _killLogPrefab;// Å³ï¿½Î±ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     [Networked(OnChanged = nameof(ShowBoard))]
     public NetworkBool _showBoard { get; set; } = true;
 
@@ -64,7 +64,7 @@ public class HPHandler : NetworkBehaviour
         if (Object.HasInputAuthority)
         {
             uiONHitImage.color = uiOnHitColor;
-            Debug.Log($"OnHitCo ÀÇ HP = {HP}");
+            //Debug.Log($"OnHitCo ï¿½ï¿½ HP = {HP}");
             localUICanvas.ChangeHPBar(HP, MaxHp, transform);
 
         }
@@ -139,7 +139,7 @@ public class HPHandler : NetworkBehaviour
         isDead = true;
     }
 
-    //º¯ÇÏ¸é È£ÃâÀÎµ¥ ¾ÆÁ÷ Àß ¸ð¸§ 
+    //ï¿½ï¿½ï¿½Ï¸ï¿½ È£ï¿½ï¿½ï¿½Îµï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ 
 
 
     public void HPUIUpdate()
@@ -149,7 +149,7 @@ public class HPHandler : NetworkBehaviour
 
     void OnHPReduced()
     {
-        Debug.Log($"OnHPReduced ÀÇ HP = {HP}");
+        //Debug.Log($"OnHPReduced ï¿½ï¿½ HP = {HP}");
         if (!isInitialized)
         {
             return;
@@ -158,7 +158,7 @@ public class HPHandler : NetworkBehaviour
     }
     static void OnHPChanged(Changed<HPHandler> changed)
     {
-        Debug.Log($" OnHPChanged()");
+       // Debug.Log($" OnHPChanged()");
 
 
         int newHP = changed.Behaviour.HP;
@@ -172,9 +172,9 @@ public class HPHandler : NetworkBehaviour
         if (newHP != oldHP)
         {
             changed.Behaviour.HPUIUpdate();
-            //changed.Behaviour.HPBarValue(); ÀÌ·± È£½ºÆ® Ã¼·ÂÀ» ´Ù¸¥ ÇÃ·¹ÀÌ¾îµé UI·Î °øÀ¯ÇØÁÖ³× 
-            //changed¿¡¼­ º¯°æµÈ Áö¿ªÇÔ¼ö? ´Â ÀÌ ÇÔ¼ö·Î È£Ãâ µÇ´Â ¸ðµç ÇÔ¼ö¿¡¼­ ±× °ªÀ¸·Î ÀÛ¿ë ???
-            //¿©±â¼­ ¾²´Â ÇÔ¼ö´Â static ÀÌ±â ‹š¹®¿¡ ? changed.Behaviour¸¦ ½á¾ßÇÏ³× °øºÎ ÇØºÁ¾ßÇÒµí
+            //changed.Behaviour.HPBarValue(); ï¿½Ì·ï¿½ È£ï¿½ï¿½Æ® Ã¼ï¿½ï¿½ï¿½ï¿½ ï¿½Ù¸ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ UIï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö³ï¿½ 
+            //changedï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½? ï¿½ï¿½ ï¿½ï¿½ ï¿½Ô¼ï¿½ï¿½ï¿½ È£ï¿½ï¿½ ï¿½Ç´ï¿½ ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Û¿ï¿½ ???
+            //ï¿½ï¿½ï¿½â¼­ ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½ï¿½ï¿½ static ï¿½Ì±ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ? changed.Behaviourï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ï³ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Øºï¿½ï¿½ï¿½ï¿½Òµï¿½
             changed.Behaviour.OnHPReduced();
             //changed.Behaviour.HP = newHP;
         }
@@ -197,7 +197,7 @@ public class HPHandler : NetworkBehaviour
         else if (!isDeathCurrent && isDeadOld)
         {
             changed.Behaviour.OnReive();
-            //ÀÌ·¯´Ï±î ÇÑ¹æÀÌ³× ?
+            //ï¿½Ì·ï¿½ï¿½Ï±ï¿½ ï¿½Ñ¹ï¿½ï¿½Ì³ï¿½ ?
             //changed.Behaviour.HpReset();
         }
     }
@@ -254,7 +254,7 @@ public class HPHandler : NetworkBehaviour
 
     void HpReset()
     {
-        Debug.Log("ResetHP");
+        //Debug.Log("ResetHP");
         HP = 0;
         HP = MaxHp;
         HPUIUpdate();
@@ -270,7 +270,7 @@ public class HPHandler : NetworkBehaviour
         var Q = Instantiate(_killLogPrefab);
         Q.transform.parent = _killLogPanel.transform;
 
-        //Ç®ÇÇ·Î ¶³¾îÁü
+        //Ç®ï¿½Ç·ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         if (_enemyNickName.ToString() == "")
         {
             Q.GetComponent<KillLog>().SetLog(_nickName, " ", _weaponSprite[((int)EWeaponType.Gravity)]);

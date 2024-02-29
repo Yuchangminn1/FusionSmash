@@ -15,7 +15,7 @@ public static class Utils
         {
             if (trans.CompareTag("IgnoreLayerChange"))
             {
-                //IgnoreLayerChange°¡ Å×±×ÀÌ¸é ·¹ÀÌ¾î º¯°æ ÇÏÁö¸¶¶ó ±Ùµ¥ ³ª´Â ·¹ÀÌ¾îº¯°æÀ» ¾Æ¸¶ ?¾È¾¸
+                //IgnoreLayerChangeï¿½ï¿½ ï¿½×±ï¿½ï¿½Ì¸ï¿½ ï¿½ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ùµï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ì¾îº¯ï¿½ï¿½ï¿½ï¿½ ï¿½Æ¸ï¿½ ?ï¿½È¾ï¿½
                 continue;
             }
             trans.gameObject.layer = layerNumber;

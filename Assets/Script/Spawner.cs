@@ -10,7 +10,7 @@ using TMPro;
 public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
 {
 
-    //ÀÌ°Ô »ç½Ç»ó °³Á¶ÇÒ¼ö ÀÖ´Â ½ÉÀåÀÌ¶ó°í »ý°¢ÇØ¾ßÇÒµí
+    //ï¿½Ì°ï¿½ ï¿½ï¿½Ç»ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ò¼ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ì¶ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ø¾ï¿½ï¿½Òµï¿½
 
     public NetworkPlayer playerPrefab;
 
@@ -25,29 +25,28 @@ public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
     }
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
-        if (runner.IsServer) //¿¬°áµÇ¾îÀÖÀ¸¸é
+        if (runner.IsServer) //ï¿½ï¿½ï¿½ï¿½Ç¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         {
             runner.Spawn(playerPrefab, Utils.GetRandomSpawnPoint(), Quaternion.identity, player);
 
-            //»ý¼ºÇØ
         }
         
     }
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
-        //ÀÔ·ÂÀº ÀÌ ÇÔ¼ö¿¡¼­¸¸ ÇÏ´Â°É·Î º¸ÀÓ 
+        //ï¿½Ô·ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ï´Â°É·ï¿½ ï¿½ï¿½ï¿½ï¿½ 
 
-        //Local != null  >> °ÔÀÓ ¿ÀºêÁ§Æ®¿Í »óÈ£ÀÛ¿ëÇÒ ¼ö ÀÖ´Â ÇÃ·¹ÀÌ¾î   
+        //Local != null  >> ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½È£ï¿½Û¿ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½   
         if (characterInputhandler == null && NetworkPlayer.Local != null )
             characterInputhandler = NetworkPlayer.Local.GetComponent<CharacterInputhandler>();
-        // >> NetworkPlayer ´Â »ý¼ºµÈ °ÔÀÓ ¿ÀºêÁ§Æ® Ä³¸¯ÅÍ¿¡ ºÙ¾îÀÖÀ½   
-        // runner °¡ »ý¼ºµÈ ÇÃ·¹ÀÌ¾î
+        // >> NetworkPlayer ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® Ä³ï¿½ï¿½ï¿½Í¿ï¿½ ï¿½Ù¾ï¿½ï¿½ï¿½ï¿½ï¿½   
+        // runner ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½
 
         if (characterInputhandler != null)
         {
-            // NetworkInput.Set(NetworkInputData) ²Ã·Î º¸ÀÓ 
+            // NetworkInput.Set(NetworkInputData) ï¿½Ã·ï¿½ ï¿½ï¿½ï¿½ï¿½ 
             input.Set(characterInputhandler.GetNetworkInput());
-            //³×Æ®¿öÅ© ÀÎÇ² Àü¼ÛÇÏ´Â ¹æ½ÄÀ¸·Î º¸ÀÓ 
+            //ï¿½ï¿½Æ®ï¿½ï¿½Å© ï¿½ï¿½Ç² ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ 
         }
     }
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
@@ -67,7 +66,7 @@ public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token)
     {
-        //¿¬°á¿äÃ»
+        //ï¿½ï¿½ï¿½ï¿½ï¿½Ã»
        // throw new NotImplementedException();
     }
 

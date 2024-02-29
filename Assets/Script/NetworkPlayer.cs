@@ -6,7 +6,7 @@ using TMPro;
 using Unity.VisualScripting;
 
 /// <summary>
-/// ÇÃ·¹ÀÌ¾î ¼ÒÈ¯ÇÒ ¶§ ¹º°¡ Ãß°¡ÇÏ°í½ÍÀ¸¸é ¿©±â´Ù°¡ Ãß°¡ÇÏ¼¼¿ë
+/// ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½È¯ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½ï¿½Ï°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ù°ï¿½ ï¿½ß°ï¿½ï¿½Ï¼ï¿½ï¿½ï¿½
 /// </summary>
 public class NetworkPlayer : NetworkBehaviour,IPlayerLeft
 {
@@ -22,7 +22,7 @@ public class NetworkPlayer : NetworkBehaviour,IPlayerLeft
     HPHandler hphandler;
     ChatSystem chatSystem;
 
-    //Æ¯Á¤ ºÎºÐ ¾Èº¸ÀÌ°Ô
+    //Æ¯ï¿½ï¿½ ï¿½Îºï¿½ ï¿½Èºï¿½ï¿½Ì°ï¿½
     //public Transform playerModel;
 
     // Start is called before the first frame update
@@ -42,22 +42,22 @@ public class NetworkPlayer : NetworkBehaviour,IPlayerLeft
 
     public override void Spawned()
     {
-        if (Object.HasInputAuthority) // °ÔÀÓ¿¡¼­ ¿òÁ÷ÀÏ ±Ç¸® ? °°Àº°Å   > ¿ÀºêÁ§Æ®¸¦ ÀÌµ¿½ÃÅ³ ±Ç¸®?  NetworkObject½ºÅ©¸³Æ®¸¦ ºÙ¿©ÁÖ¸é Æ®·ç
+        if (Object.HasInputAuthority) // ï¿½ï¿½ï¿½Ó¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ç¸ï¿½ ? ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½   > ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½Ìµï¿½ï¿½ï¿½Å³ ï¿½Ç¸ï¿½?  NetworkObjectï¿½ï¿½Å©ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½Ù¿ï¿½ï¿½Ö¸ï¿½ Æ®ï¿½ï¿½
         {
             Local = this;
 
-            //Disable main camera ¸ÞÀÎ Ä«¸Þ¶ó Á¦°Å
+            //Disable main camera ï¿½ï¿½ï¿½ï¿½ Ä«ï¿½Þ¶ï¿½ ï¿½ï¿½ï¿½ï¿½
             //Camera.main.gameObject.SetActive(false);
             if(PlayerPrefs.GetString("PlayerNickname") == "" || PlayerPrefs.GetString("PlayerNickname") == null)
             {
-                RPC_SetNickName(PlayerPrefs.GetString("´Ð³×ÀÓ ¾ÈÁ¤ÇßÀ½"));
+                RPC_SetNickName(PlayerPrefs.GetString("ï¿½Ð³ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"));
 
             }
             else
             {
                 RPC_SetNickName(PlayerPrefs.GetString("PlayerNickname"));
             }
-            Debug.Log("Spawned local player");
+            //Debug.Log("Spawned local player");
 
 }
         else
@@ -89,7 +89,7 @@ public class NetworkPlayer : NetworkBehaviour,IPlayerLeft
         }
         
 
-        //Ã¼·Â¹Ù ÆÄÆ¼·Î º¸ÀÌ°Ô ÇÒ·Á°í ¹øÈ£ ÇÑ°Çµð Èì º°·ÎÀÎµí ¸ð¸£°Ú´Ù ¸ð¸£°Ú ¾î
+        //Ã¼ï¿½Â¹ï¿½ ï¿½ï¿½Æ¼ï¿½ï¿½ ï¿½ï¿½ï¿½Ì°ï¿½ ï¿½Ò·ï¿½ï¿½ï¿½ ï¿½ï¿½È£ ï¿½Ñ°Çµï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Îµï¿½ ï¿½ð¸£°Ú´ï¿½ ï¿½ð¸£°ï¿½ ï¿½ï¿½
     }
     public void PlayerLeft(PlayerRef player)
     {
@@ -101,12 +101,12 @@ public class NetworkPlayer : NetworkBehaviour,IPlayerLeft
 
     static void OnNickNameChanged(Changed<NetworkPlayer> changed)
     {
-        Debug.Log($"{Time.time} OnHPChanged value {changed.Behaviour.nickName}");
+        //Debug.Log($"{Time.time} OnHPChanged value {changed.Behaviour.nickName}");
         changed.Behaviour.OnNickNameChanged();
     }
     private void OnNickNameChanged()
     {
-        Debug.Log($"Nickname chaged for player to {nickName} for player {gameObject.name}");
+        //Debug.Log($"Nickname chaged for player to {nickName} for player {gameObject.name}");
 
         playerNickNameTM.text = nickName.ToString();
         characterMovementHandler._nickName = nickName.ToString();
@@ -118,7 +118,7 @@ public class NetworkPlayer : NetworkBehaviour,IPlayerLeft
     [Rpc(RpcSources.InputAuthority,RpcTargets.StateAuthority)]
     public void RPC_SetNickName(string nickName, RpcInfo info = default)
     {
-        Debug.Log($"[RPC] SetNickname : {nickName}");
+        //Debug.Log($"[RPC] SetNickname : {nickName}");
         this.nickName = nickName;
     }
     

@@ -15,12 +15,14 @@ public class LandState : PlayerState
         isAbleAttack = false;
         isAbleDodge = false;
         isAbleJump = false;
+        isState2 = true;
+
     }
 
     public override void Enter()
     {
         base.Enter();
-        Debug.Log("·£µå ÁøÀÔ");
+        Debug.Log("ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½");
         player.isStop = true;
 
     }
@@ -29,7 +31,7 @@ public class LandState : PlayerState
 
         player.nextState = player.moveState;
         return true;
-        if (!player.animationTrigger)
+        if (!player.Isvisi())
         {
             if (base.Update())
                 return true;

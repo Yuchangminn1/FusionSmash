@@ -1,4 +1,5 @@
 
+using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -21,7 +22,9 @@ public class AttackState : PlayerState
     public override void Enter()
     {
         base.Enter();
-        //Debug.Log("¾îÅÃ¿£ÅÍ");
+
+        player.SetCanMove(false);
+        //Debug.Log("ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½ï¿½");
         player.attackTime = Time.time;
         //Combo = new Queue<bool>();
         //counter = 0;
@@ -35,7 +38,7 @@ public class AttackState : PlayerState
         //if (player.attackComboTime != 0 && player.attackTime + player.attackComboTime < Time.time)
         //{
         //    player.attackComboCount = 0;
-        //    Debug.Log("¾îÅÃÄ«¿îÆ® ÃÊ±âÈ­ ¹«ºê ½ºÅ×ÀÌÆ®");
+        //    Debug.Log("ï¿½ï¿½ï¿½ï¿½Ä«ï¿½ï¿½Æ® ï¿½Ê±ï¿½È­ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®");
         //}
 
        // Debug.Log($"player.attackComboCount = {player.attackComboCount}");
@@ -49,41 +52,13 @@ public class AttackState : PlayerState
     public override bool Update()
     {
 
-        //if (player.isFireButtonPressed && counter < 2)
-        //{
-        //    //++counter;
-        //    //Combo.Enqueue(true);
-        //    Debug.Log("ÄÞº¸ Ãß°¡");
-        //    player.isFireButtonPressed = false;
-
-        //}
-
-        //player.ZeroVelocity();
-
-
-        //if (startTime + 2f < Time.time)
-        //{
-        //    Debug.Log("¾Ö´Ï¸ÞÀÌ¼ÇÆ®¸®°Å ¹ö±×");
-        //    player.animationTrigger = false;
-        //}
         if (startTime + 0.1f > Time.time)
         {
             player.isFireButtonPressed = false;
         }
-        if (!player.animationTrigger)
+        if (!player.Isvisi())
         {
-            //if (player.isFireButtonPressed && player.attackComboCount < 3 && !player.attackCoolDownOn)
-            //{
-            //    if (!player.attackCoolDownOn)
-            //    {
-            //        player.nextState = player.attackState;
-            //        player.ChangeState();
-            //        startTime = Time.time;
-            //        return true;
-            //    }
-                
-            //}
-
+            
             if (base.Update())
             {
                 return true;
@@ -115,16 +90,9 @@ public class AttackState : PlayerState
     public override void Exit()
     {
         base.Exit();
-        //if (player.attackComboCount > 2)
-        //{
-        //    player.attackCoolDownOn = true;
-        //    Debug.Log("¾îÅÃ ¿¢½ÃÆ®¿¡¼­ ¾îÅÃ Ä«¿îÆ® ÃÊ±âÈ­");
+        player.SetCanMove(true);
 
-        //    player.attackComboCount = 0;
-        //    player.isFireButtonPressed = false;
-        //}
         player.attackTime = Time.time;
-        //Debug.Log("Attack Exit");
 
     }
 }

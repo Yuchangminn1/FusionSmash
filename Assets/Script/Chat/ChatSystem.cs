@@ -35,12 +35,12 @@ public class ChatSystem : NetworkBehaviour
     [Networked(OnChanged = nameof(OnChangeSumit))]
     public NetworkBool ischating { get; set; }
 
-    //Å¬¶óÀÌ¾ðÆ®¿¡¼­ ÃÂÀÌ onoffonoff¹Ýº¹ÇÏ´Â°Å ¹æÁö
+    //Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ onoffonoffï¿½Ýºï¿½ï¿½Ï´Â°ï¿½ ï¿½ï¿½ï¿½ï¿½
     float inputTime = 0f;
     // Checks if there is anything entered into the input field.
     public void Awake()
     {
-        //ÀÌ°É ¾î¿þÀÌÅ©¿¡¼­ ¾ÈÇÏ¸é nullÀÌ¶ó ¿À·ù³² 
+        //ï¿½Ì°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Å©ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ï¸ï¿½ nullï¿½Ì¶ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 
         playerControls = new PlayerInputAction();
         chatLog = GameObject.FindWithTag("ChatDisplay").GetComponentInChildren<TMP_Text>();
         scrollV = GameObject.FindWithTag("ScrollV").GetComponent<Scrollbar>();
@@ -53,7 +53,7 @@ public class ChatSystem : NetworkBehaviour
         {
             mainInputField.enabled = true;
         }
-        Debug.Log("chatLog = " + chatLog);
+        //Debug.Log("chatLog = " + chatLog);
 
     }
 
@@ -72,7 +72,7 @@ public class ChatSystem : NetworkBehaviour
         {
             if (mainInputField.text != "" && mainInputField.text != " ")
             {
-                // °ø¹é ½Ã Ãë¼Ò 
+                // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ 
                 Debug.Log(mainInputField.text.Length);
                 StartCoroutine(SumitE());
             }
@@ -107,7 +107,7 @@ public class ChatSystem : NetworkBehaviour
 
     static void OnChangeChatLog(Changed<ChatSystem> changed)
     {
-        Debug.Log("mychat = " + changed.Behaviour.myChat);
+        //Debug.Log("mychat = " + changed.Behaviour.myChat);
         if (changed.Behaviour.myChat == "")
         {
             return;
@@ -129,7 +129,7 @@ public class ChatSystem : NetworkBehaviour
         {
             nullcheck += chatSystem;
 
-            //Debug.Log($"ÀÌ°Å{chatSystem}ÀÌ°Å");
+            //Debug.Log($"ï¿½Ì°ï¿½{chatSystem}ï¿½Ì°ï¿½");
         }
         if (Object.HasInputAuthority)
         {
@@ -151,13 +151,13 @@ public class ChatSystem : NetworkBehaviour
     {
 
         sendName = _sendName;
-        Debug.Log($"[RPC] SetNickname : {mychat}");
+        //Debug.Log($"[RPC] SetNickname : {mychat}");
         this.myChat = mychat;
     }
 
     private void OnEnable()
     {
-        Debug.Log("chatDown change true ");
+        //Debug.Log("chatDown change true ");
         sumit = playerControls.Player.Sumit;
         sumit.Enable();
 

@@ -14,8 +14,10 @@ public class FallState : PlayerState
         endMotionChange = false;
         isAbleFly = true;
         isAbleDodge = true;
-        isAbleJump = false;
+        isAbleJump = true;
         isAbleAttack = true;
+        isState2 = true;
+
     }
 
     public override void Enter()
@@ -36,43 +38,10 @@ public class FallState : PlayerState
             player.nextState = player.moveState;
             return true;
 
-            //// Debug.Log("Time = " + (Time.time - startTime));
-            //if (Time.time - startTime > 2f)
-            //{
-            //    player.nextState = player.landState;
-
-            //    //player.StateChange(player.landState);
-            //    return true;
-            //}
-            //else
-            //{
-            //    //Debug.Log("Fall to MoveState IS Ground On");
-            //    player.nextState = player.moveState;
-
-            //    //player.StateChange(player.moveState);
-            //    return true;
-
-
-            //}
+            
         }
         
-        //if (player.isDodgeButtonPressed)
-        //{
-        //    player.nextState = player.dodgeState;
-
-        //    //player.StateChange(player.dodgeState);
-        //    return true;
-
-        //}
-
-        //if (player.isJumpButtonPressed)
-        //{
-        //    player.nextState = player.jumpState;
-
-        //    //player.StateChange(player.jumpState);
-        //    return true;
-
-        //}
+        
         return false;
 
     }

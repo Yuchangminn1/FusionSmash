@@ -24,11 +24,11 @@ public class Projectile : MonoBehaviour
     private float _duration;
 
     /// <summary>
-    /// Set where the projectile visual should land.                                Åº¾Ë ºñÁÖ¾óÀÌ ÂøÅºÇÒ À§Ä¡¸¦ ¼³Á¤ÇÕ´Ï´Ù.
+    /// Set where the projectile visual should land.                                Åºï¿½ï¿½ ï¿½ï¿½ï¿½Ö¾ï¿½ï¿½ï¿½ ï¿½ï¿½Åºï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
     /// </summary>
-    /// <param name="hitPosition">Position where projectile hit geometry</param>    Åº¾ËÀÌ ±âÇÏÃ¼¿¡ ¸ÂÀº À§Ä¡
-    /// <param name="hitNormal">Normal of the hit surface</param>                   ¸ÂÀº Ç¥¸éÀÇ ¹ý¼± º¤ÅÍ
-    /// <param name="showHitEffect">Whether projectile impact should be displayed   Åº¾Ë Ãæµ¹ È¿°ú¸¦ Ç¥½ÃÇÒÁö ¿©ºÎ
+    /// <param name="hitPosition">Position where projectile hit geometry</param>    Åºï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ã¼ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡
+    /// <param name="hitNormal">Normal of the hit surface</param>                   ï¿½ï¿½ï¿½ï¿½ Ç¥ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    /// <param name="showHitEffect">Whether projectile impact should be displayed   Åºï¿½ï¿½ ï¿½æµ¹ È¿ï¿½ï¿½ï¿½ï¿½ Ç¥ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     /// (e.g. we don't want static impact effect displayed on other player's body)</param>
     public void SetHit(Vector3 hitPosition, Vector3 hitNormal, bool showHitEffect)
     {

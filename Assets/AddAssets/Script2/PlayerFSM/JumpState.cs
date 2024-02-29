@@ -5,7 +5,6 @@ using static UnityEngine.CullingGroup;
 
 public class JumpState : PlayerState
 {
-    int chageCount = 0;
     public JumpState(PlayerStateHandler _player, int _currentStateNum) : base(_player, _currentStateNum)
     {
         player = _player;
@@ -14,16 +13,16 @@ public class JumpState : PlayerState
         endMotionChange = true;
         isAbleAttack = true;
         isAbleDodge = true;
-        isAbleJump = false; // ÇÃ·¹ÀÌ¾î ½ºÅ×ÀÌÆ®¿¡¼­ ¿µÇâ¹Þ±â ½È¾î¼­ 
+        isAbleJump = false; // ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Þ±ï¿½ ï¿½È¾î¼­ 
+        isState2 = true;
     }
 
     public override void Enter()
     {
         player.isJumpButtonPressed = false;
-        Debug.Log("Á¡ÇÁ½ºÅ×ÀÌÆ® µé¾î¿ÔÀ½");
 
-        player.SetState2(1);
 
+        //player.SetState2(1);
         base.Enter();
         //player.SetState2(player.jumpCount);
         //player.jumpCount += 1;
@@ -37,11 +36,11 @@ public class JumpState : PlayerState
             player.nextState = player.dodgeState;
             return true;
         }
-        //if (player.isJumpButtonPressed)
-        //{
-        //    player.nextState = player.jumpState;
-        //    return true;
-        //}
+        if (player.isJumpButtonPressed)
+        {
+            player.nextState = player.jumpState;
+            return true;
+        }
         if (player.isFireButtonPressed && !player.attackCoolDownOn)
         {
             if (!player.attackCoolDownOn)
@@ -51,7 +50,7 @@ public class JumpState : PlayerState
             }
 
         }
-        if (!player.animationTrigger)
+        if (!player.Isvisi())
         {
             if (player.nextState != this)
             {
@@ -81,7 +80,7 @@ public class JumpState : PlayerState
     }
     public override void LateUpdate()
     {
-        //Debug.Log($"ÀÌ°Ç Á¡ÇÁ ½ºÅ×ÀÌÆ® ·¹ÀÌÆ®  {player.jumpCount}");
+        //Debug.Log($"ï¿½Ì°ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½Æ®  {player.jumpCount}");
 
 
         base.LateUpdate();
@@ -91,7 +90,6 @@ public class JumpState : PlayerState
         base.Exit();
         player.isJumping = false;
 
-        chageCount = 0;
     }
 
 

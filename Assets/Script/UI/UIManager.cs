@@ -23,7 +23,7 @@ public class UIManager : MonoBehaviour
                 _instance = FindObjectOfType<UIManager>();
                 if (_instance == null)
                 {
-                    Debug.Log("UIManager ¾øÀ½");
+                    Debug.Log("UIManager ï¿½ï¿½ï¿½ï¿½");
                 }
             }
             return _instance;
@@ -52,7 +52,7 @@ public class UIManager : MonoBehaviour
     private void FixedUpdate()
     {
         
-        //È­¸é ºñÀ² Ã¼Å© 
+        //È­ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ã¼Å© 
         if (screenSize.x != Screen.width*1f || screenSize.y != Screen.height * 1f)
         {
             uISizeChange(new Vector2(Screen.width * 1f, Screen.height * 1f));

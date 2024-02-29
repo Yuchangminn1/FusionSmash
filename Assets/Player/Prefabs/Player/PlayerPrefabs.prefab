@@ -5559,7 +5559,7 @@ MonoBehaviour:
   camera: {fileID: 0}
   rotationSpeed: 15
   viewUpDownRotationSpeed: 50
-  GroundCheckDis: 0.65
+  GroundCheckDis: 0.3
   groundLayer:
     serializedVersion: 2
     m_Bits: 64

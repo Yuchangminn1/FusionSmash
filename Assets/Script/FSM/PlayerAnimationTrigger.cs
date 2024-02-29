@@ -18,7 +18,7 @@ public class PlayerAnimationTrigger : NetworkBehaviour
     void Start()
     {
         testweapon = GetComponentInChildren<TestWeapon>();
-        if(testweapon != null)
+        if (testweapon != null)
         {
             testweapon.meshcol.enabled = false;
         }
@@ -29,22 +29,32 @@ public class PlayerAnimationTrigger : NetworkBehaviour
 
     }
 
-    void AnimationTrigger()
+    void AnimationTriggerOFF()
     {
-        if (Object.HasInputAuthority)
+        if (HasStateAuthority)
         {
-            Debug.Log("Æ®¸®°Å¿¡¼­ OFF");
-            player.animationTrigger = false;
+            //Debug.Log("AnimationTrigger OFF");
+            player.SetAnimationTrigger(false);
         }
-    }
+            
 
+    }
+    void AnimationTriggerOn()
+    {
+        if (HasStateAuthority)
+        {
+            //Debug.Log("AnimationTrigger On");
+            player.SetAnimationTrigger(true);
+        }
+
+    }
     void AttackColOn()
     {
         if (Object.HasInputAuthority)
         {
-            //ÀÓ½Ã·Î º¸°ü ³ªÁß¿¡ ¿þÆù ÇÚµé·¯µç ´Ù¸¥ °÷¿¡ ¹èÄ¡
+            //ï¿½Ó½Ã·ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ß¿ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Úµé·¯ï¿½ï¿½ ï¿½Ù¸ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡
             testweapon.SetDirect(true);
-            //Debug.Log("°ø°Ý½Ãµµ");
+            //Debug.Log("ï¿½ï¿½ï¿½Ý½Ãµï¿½");
             if (testweapon != null)
                 testweapon.WeaponColOn();
             else
@@ -57,9 +67,9 @@ public class PlayerAnimationTrigger : NetworkBehaviour
     {
         if (Object.HasInputAuthority)
         {
-            //ÀÓ½Ã·Î º¸°ü ³ªÁß¿¡ ¿þÆù ÇÚµé·¯µç ´Ù¸¥ °÷¿¡ ¹èÄ¡
+            //ï¿½Ó½Ã·ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ß¿ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Úµé·¯ï¿½ï¿½ ï¿½Ù¸ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡
             testweapon.SetDirect(true);
-            //Debug.Log("°ø°Ý½Ãµµ");
+            //Debug.Log("ï¿½ï¿½ï¿½Ý½Ãµï¿½");
             if (testweapon != null)
                 testweapon.WeaponColOff();
             else

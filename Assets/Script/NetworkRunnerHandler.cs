@@ -16,11 +16,11 @@ public class NetworkRunnerHandler : MonoBehaviour
     NetworkRunner networkRunner;
     void Start()
     {
-        //·¯³Ê ¼ÒÈ¯
+        //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯
         networkRunner = Instantiate(networkRunnerPrefab, Vector3.up*10f,Quaternion.identity);
-        //ÀÌ¸§ ¹Ù²Þ
+        //ï¿½Ì¸ï¿½ ï¿½Ù²ï¿½
         networkRunner.name = "Network Runner";
-        //³×Æ®¿öÅ© ·¯³Ê Á¤ÀÇ 
+        //ï¿½ï¿½Æ®ï¿½ï¿½Å© ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ 
         var clienTask = InitializeNetworkRunner(networkRunner, GameMode.AutoHostOrClient, NetAddress.Any(), SceneManager.GetActiveScene().buildIndex, null);
         Debug.Log("sever networkRunner started.");
         // 
@@ -30,7 +30,7 @@ public class NetworkRunnerHandler : MonoBehaviour
 
     protected virtual Task InitializeNetworkRunner(NetworkRunner runner, GameMode gameMode, NetAddress address ,SceneRef scene,Action<NetworkRunner> initialized)
     {
-        //Á¤ÀÇ ÇÔ¼ö¶ó°í »ý°¢ÇÏ°í ³Ñ¾î°¡ 
+        //ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ ï¿½Ñ¾î°¡ 
         var sceneManager = runner.GetComponents(typeof(MonoBehaviour)).OfType<INetworkSceneManager>().FirstOrDefault();
         if(sceneManager == null)
         {

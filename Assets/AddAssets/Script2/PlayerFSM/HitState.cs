@@ -29,7 +29,7 @@ public class HitState : PlayerState
         }
         if (base.Update())
             return true;
-        if(!player.animationTrigger)
+        if(!player.Isvisi())
         {
             if (player.isdead)
             {

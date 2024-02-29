@@ -4,14 +4,15 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerStateHandler : NetworkBehaviour
 {
     [Networked(OnChanged = nameof(ChangeState))]
     public int state { get; set; }
-    [Networked(OnChanged = nameof(ChangeState2))]
+    [Networked(OnChanged = nameof(ChangeState2))] //
     public int state2 { get; set; }
-
+    public bool animationTrigger { get; set; }
     public NetworkString<_16> nickName { get; set; }
 
 
@@ -24,21 +25,21 @@ public class PlayerStateHandler : NetworkBehaviour
     public bool isStop = false;
     public bool isJumping = false;
 
-    //Ã¼·ÂÈ¸º¹ 
+    //Ã¼ï¿½ï¿½È¸ï¿½ï¿½ 
     public bool isHeal = false;
     public int fHpHeal = 40;
     public int healNum;
     public int healNumMax = 3;
 
     public int attackComboCount { get; set; }
-   // public int attackComboInput { get; set; }
+    // public int attackComboInput { get; set; }
 
     [SerializeField] protected float GroundCheckDis = 0.65f;
-    public LayerMask groundLayer; // ¶¥ÀÎÁö È®ÀÎÇÏ±â À§ÇÑ ·¹ÀÌ¾î ¸¶½ºÅ©
+    public LayerMask groundLayer; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½ï¿½Ï±ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ï¿½ï¿½Å©
     float groundCheckRad = 0.2f;
 
 
-    public bool animationTrigger { get; set; }
+
     [SerializeField] Animator anima;
 
     //public CharacterController cc;
@@ -78,7 +79,7 @@ public class PlayerStateHandler : NetworkBehaviour
 
     public float attackCoolDown { get; set; }
 
-    public bool attackCoolDownOn {  get; set; }
+    public bool attackCoolDownOn { get; set; }
 
 
     void Awake()
@@ -87,15 +88,15 @@ public class PlayerStateHandler : NetworkBehaviour
         attackComboTime = 1f;
         attackCoolDown = 1f;
         anima = GetComponent<Animator>();
-        animationTrigger = false;
+        SetAnimationTrigger(false);
         //cc = GetComponent<CharacterController>();
         //networkCC = GetComponent<NetworkCharacterControllerPrototypeCustom>();
         characterMovementHandler = GetComponent<CharacterMovementHandler>();
 
 
     }
-    
-    
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -113,25 +114,23 @@ public class PlayerStateHandler : NetworkBehaviour
         deathState = new DeathState(this, 7);
         healState = new HealState(this, 8);
         #endregion
-        if (Object.HasInputAuthority)
+        if (HasStateAuthority)
         {
             nextState = moveState;
             this.ChangeState();
-            //stateMachine.ChangeState(moveState);
         }
+            
+        //stateMachine.ChangeState(moveState);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Object.HasInputAuthority)
+        if (HasStateAuthority)
         {
             stateMachine.Update();
         }
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            animationTrigger = false;
-        }
+        
     }
     private void OnDrawGizmos()
     {
@@ -148,7 +147,7 @@ public class PlayerStateHandler : NetworkBehaviour
     }
     void FixedUpdate()
     {
-        if (Object.HasInputAuthority)
+        if (HasStateAuthority)
         {
             stateMachine.FixedUpdate();
             //isJumpButtonPressed = false;
@@ -177,7 +176,7 @@ public class PlayerStateHandler : NetworkBehaviour
             return;
         }
 
-        if (Object.HasInputAuthority)
+        if (HasStateAuthority)
         {
             stateMachine.Update();
             stateMachine.LateUpdate();
@@ -203,6 +202,7 @@ public class PlayerStateHandler : NetworkBehaviour
     }
     static void ChangeState2(Changed<PlayerStateHandler> changed)
     {
+        Debug.Log("ChangeState2 @@");
         int newS = changed.Behaviour.state2;
         changed.LoadOld();
         int oldS = changed.Behaviour.state2;
@@ -212,80 +212,70 @@ public class PlayerStateHandler : NetworkBehaviour
 
         }
     }
+
+
+
+
     public bool IsGround()
     {
         return characterMovementHandler.IsGround();
     }
     #region Animator
+    public void SetBool(string _parameters, bool _tf) => anima.SetBool(_parameters, _tf);
     public void SetInt(string _parameters, int _num) => anima.SetInteger(_parameters, _num);
     public void SetFloat(string _parameters, float value) => anima.SetFloat(_parameters, value);
     public void ZeroHorizontal() => anima.SetFloat("Horizontal", 0f);
     public void AnimaPlay(string _name) => anima.Play(_name);
     public void SetState(int num)
     {
-        state = num;
-        //Debug.Log($"½ºÅ×ÀÌÆ®  = {state}");
-        SetInt("State", num);
-        if (Object.HasInputAuthority)
+        if (HasStateAuthority)
         {
-            //state = num;
-            RPC_SetState(state);
+            state = num;
+            SetInt("State", num);
         }
     }
     public void SetState2(int num)
     {
-        state2 = num;
         //Debug.Log($"State2 = {state2}");
-        SetInt("State2", num);
-        if (Object.HasInputAuthority)
+        if (HasStateAuthority)
         {
-            RPC_SetState2(state2);
-
+            state2 = num;
+            SetInt("State2", num);
         }
     }
-    //½ºÅ×ÀÌÆ® º¯°æ ´õºí Á¡ÇÁ¿¡¼­ »ç¿ëÇÔ
-    public void StateChange(EntityState _newState)
+    
+    public bool Isvisi()
     {
-        stateMachine.ChangeState(_newState);
+        if (animationTrigger)
+        {
+            return true;
+        }
+        return false;
     }
+
+    ////ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
+    //public void StateChange(EntityState _newState)
+    //{
+    //    stateMachine.ChangeState(_newState);
+    //}
 
     public void ChangeState()
     {
-        if (Object.HasInputAuthority)
+        if (HasStateAuthority)
         {
             stateMachine.ChangeState(nextState);
         }
     }
     #endregion
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    public void RPC_SetState(int _state, RpcInfo info = default)
+   
+    public void SetCanMove(bool _tf) 
     {
-        // Debug.Log($"[RPC] State{state}");
-
-        state = _state;
-        //characterMovementHandler.playerstate = _state;
-
-        //SetInt("State", state);
-
-    }
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    public void RPC_SetState2(int _state2, RpcInfo info = default)
-    {
-        //Debug.Log($"[RPC] State2 {state2} ");
-        state2 = _state2;
-
-        
-        //state2 = _state2;
-        //if (state == 1 || state == 2)
-        //{
-        //    Debug.Log($"_state2 = {state2}");
-
-        //    characterMovementHandler.playerjumpcount = state2;
-        //}
-
-        //SetInt("State2", state2);
-
+        characterMovementHandler.SetCanMove(_tf);
     }
 
-
+    public void SetAnimationTrigger(bool _tf) 
+    {
+        animationTrigger = _tf;
+        SetBool("AnimationTrigger", animationTrigger);
+    }
 }

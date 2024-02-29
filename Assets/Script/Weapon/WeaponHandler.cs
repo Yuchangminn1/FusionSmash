@@ -41,7 +41,7 @@ public class WeaponHandler : NetworkBehaviour
         //}
 
     }
-    //ÇÃ·¹ÀÌ¾î°¡ ¹ß»ç¹öÆ°À» ´©¸§
+    //ï¿½Ã·ï¿½ï¿½Ì¾î°¡ ï¿½ß»ï¿½ï¿½Æ°ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     public void Fire(Vector3 _firePosition, Vector3 _fireDirection, bool _isFireButtonPressed)
     {
         float hitDistance = 100;
@@ -49,7 +49,7 @@ public class WeaponHandler : NetworkBehaviour
     }
     public void ChangeWeapon(int num)
     {
-        //ÃÑ ¿ÀºêÁ§Æ® Ã¼ÀÎÁö
+        //ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® Ã¼ï¿½ï¿½ï¿½ï¿½
         if (_equipWeapon != null)
         {
             _equipWeapon.gameObject.SetActive(false);
@@ -65,7 +65,7 @@ public class WeaponHandler : NetworkBehaviour
 
     public void SetEq()
     {
-        //¾È¾²´Â ¹«±â ²ô±â
+        //ï¿½È¾ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
         if (playerWeaponPrefab != null)
         {
             foreach (GameObject t in playerWeaponPrefab)

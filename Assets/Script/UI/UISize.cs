@@ -9,7 +9,7 @@ public class UISize : MonoBehaviour
     public float height = 3f;
 
     public Vector2 screenSize;
-    // UI ¿ÀºêÁ§Æ®ÀÇ RectTransform ÂüÁ¶
+    // UI ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ RectTransform ï¿½ï¿½ï¿½ï¿½
 
     
 

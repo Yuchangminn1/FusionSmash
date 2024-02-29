@@ -5,11 +5,11 @@ using Unity.VisualScripting;
 using UnityEngine;
 public class TestWeapon : MonoBehaviour
 {
-    string localPlayerName; // ÀÚ½ÅÀÇ ÀÌ¸§ °ãÄ¡Áö ¾Ê°Ô
+    string localPlayerName; // ï¿½Ú½ï¿½ï¿½ï¿½ ï¿½Ì¸ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½Ê°ï¿½
 
-    bool directeAttack; //ÃÑ¾Ë °°Àº ¹«±â¸¦ »ý°¢ÇØ¼­ Á÷Á¢ °ø°ÝÇÏ´Â ¹«±â¸¸ Àû¿ëµÇµµ·Ï
+    bool directeAttack; //ï¿½Ñ¾ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½â¸¦ ï¿½ï¿½ï¿½ï¿½ï¿½Ø¼ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½â¸¸ ï¿½ï¿½ï¿½ï¿½Çµï¿½ï¿½ï¿½
 
-    bool isHit = false;                // µ¥¹ÌÁö ÁÙ Å¸ÀÌ¹Ö ³×Æ®¿öÅ© ¾÷µ¥ÀÌÆ®¿¡ Àü´Þ 
+    bool isHit = false;                // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ Å¸ï¿½Ì¹ï¿½ ï¿½ï¿½Æ®ï¿½ï¿½Å© ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ 
 
     public MeshCollider meshcol;
     List<GameObject> hitPlayer;
@@ -24,7 +24,7 @@ public class TestWeapon : MonoBehaviour
 
         if (localPlayerName == null)
         {
-            Debug.Log("ÀÌ¸§ÀÌ ¾ø½À´Ï´Ù");
+            Debug.Log("ï¿½Ì¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½");
             return;
         }
         Debug.Log(localPlayerName);
@@ -42,14 +42,14 @@ public class TestWeapon : MonoBehaviour
         //if (!directeAttack)
         //    return;
         meshcol.enabled = true;
-        Debug.Log($"¹«±â ÄÝ¶óÀÌ´õ {true}");
+        Debug.Log($"ï¿½ï¿½ï¿½ï¿½ ï¿½Ý¶ï¿½ï¿½Ì´ï¿½ {true}");
     }
     public void WeaponColOff()
     {
         //if (!directeAttack)
         //    return;
         meshcol.enabled = false;
-        Debug.Log($"¹«±â ÄÝ¶óÀÌ´õ {false}");
+        Debug.Log($"ï¿½ï¿½ï¿½ï¿½ ï¿½Ý¶ï¿½ï¿½Ì´ï¿½ {false}");
     }
     public bool IsHit()
     {
@@ -59,7 +59,7 @@ public class TestWeapon : MonoBehaviour
     //{
     //    if (hitPlayer.Count == 0)
     //    {
-    //        Debug.Log("Ãæµ¹ÇÑ ÇÃ·¹ÀÌ¾î°¡ ¾øÀ½ ");
+    //        Debug.Log("ï¿½æµ¹ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾î°¡ ï¿½ï¿½ï¿½ï¿½ ");
     //        return;
     //    }
     //    int i = 0;
@@ -72,7 +72,7 @@ public class TestWeapon : MonoBehaviour
     //    }
     //    hitPlayer.Clear();
     //    isHit = false;
-    //    Debug.Log("Ãæµ¹ ÇÃ·¹ÀÌ¾î ¸®½ºÆ® Å¬¸®¾î");
+    //    Debug.Log("ï¿½æµ¹ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ï¿½ï¿½Æ® Å¬ï¿½ï¿½ï¿½ï¿½");
     //}
     private void OnTriggerEnter(Collider other)
     {
@@ -84,14 +84,14 @@ public class TestWeapon : MonoBehaviour
             {
                 if(localPlayerName!= other.transform.name)
                 {
-                    if (hitPlayer.Contains(other.gameObject)) //Áßº¹ ¹æÁö
+                    if (hitPlayer.Contains(other.gameObject)) //ï¿½ßºï¿½ ï¿½ï¿½ï¿½ï¿½
                         return;
                     hitPlayer.Add(other.gameObject);
                     isHit = true;
 
                     if (hitPlayer.Contains(other.gameObject))
                     {
-                        Debug.Log($"{hitPlayer.IndexOf(other.gameObject)}¹øÂ° ¸®½ºÆ® Ãæµ¹ÇÑ ÇÃ·¹ÀÌ¾î ÀÌ¸§ = {other.gameObject.name}");
+                        Debug.Log($"{hitPlayer.IndexOf(other.gameObject)}ï¿½ï¿½Â° ï¿½ï¿½ï¿½ï¿½Æ® ï¿½æµ¹ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½Ì¸ï¿½ = {other.gameObject.name}");
                     }
 
                 }
@@ -111,16 +111,16 @@ public class TestWeapon : MonoBehaviour
 
     //                if (hitPlayer.Contains(other.gameObject))
     //                {
-    //                    Debug.Log($"{hitPlayer.IndexOf(other.gameObject)}¹øÂ° ¸®½ºÆ® »èÁ¦ÇÑ ÇÃ·¹ÀÌ¾î ÀÌ¸§ = {other.gameObject.name}");
+    //                    Debug.Log($"{hitPlayer.IndexOf(other.gameObject)}ï¿½ï¿½Â° ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½Ì¸ï¿½ = {other.gameObject.name}");
 
     //                    hitPlayer.Remove(other.gameObject);
     //                }
 
     //            }
     //        }
-    //        //Debug.Log("Å»Ãâ");
+    //        //Debug.Log("Å»ï¿½ï¿½");
     //    }
-    //    Debug.Log("Å»Ãâ");
+    //    Debug.Log("Å»ï¿½ï¿½");
 
     //}
 

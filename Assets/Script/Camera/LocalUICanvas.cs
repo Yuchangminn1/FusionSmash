@@ -15,7 +15,7 @@ public class LocalUICanvas : MonoBehaviour
     public void ChangeHPBar(int _hp, int _maxHP, Transform transform )
     {
         hpSlider.value = (float)_hp / (float)_maxHP;
-        Debug.Log($"{transform.name} : MaxHp{_maxHP} , _currentHp{_hp}  hpBar.value = {hpSlider.value}");
+        //Debug.Log($"{transform.name} : MaxHp{_maxHP} , _currentHp{_hp}  hpBar.value = {hpSlider.value}");
 
     }
 } 

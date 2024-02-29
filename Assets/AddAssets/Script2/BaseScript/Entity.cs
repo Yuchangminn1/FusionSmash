@@ -20,7 +20,7 @@ public class Entity : MonoBehaviour
     public bool isStop = false;
     public int stateNum2 = 0;
 
-    public LayerMask groundLayer; // ¶¥ÀÎÁö È®ÀÎÇÏ±â À§ÇÑ ·¹ÀÌ¾î ¸¶½ºÅ©
+    public LayerMask groundLayer; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½ï¿½Ï±ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ï¿½ï¿½Å©
 
     public int attackDagame;
     public int iGroggyMax = 100;
@@ -53,7 +53,7 @@ public class Entity : MonoBehaviour
     {
         Gizmos.color = Color.green;
         Gizmos.DrawRay(transform.position, Vector3.down * GroundCheckDis);
-        //ÁøÇà¹æÇâÀÇ ¹Ù´ÚÀ» Ã¼Å© ¾Õ ¹æÇâ µð·º¼ÇÀ¸·Î ¹Þ¾Æ¼­ ÇÃ·¯½ºÇØ¾ßÁö
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ù´ï¿½ï¿½ï¿½ Ã¼Å© ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ð·º¼ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Þ¾Æ¼ï¿½ ï¿½Ã·ï¿½ï¿½ï¿½ï¿½Ø¾ï¿½ï¿½ï¿½
         //Gizmos.DrawRay(transform.position, Vector3.down * GroundCheckDis);
     }
     public virtual void Hit(int _atk)
@@ -74,12 +74,12 @@ public class Entity : MonoBehaviour
     #region RayCastCheck
     public bool IsGround(Transform transform)
     {
-        //¹ß¹ØÃ¼Å©
+        //ï¿½ß¹ï¿½Ã¼Å©
         return Physics.Raycast(transform.position, Vector3.down, GroundCheckDis, groundLayer);
     }
     public bool DirIsGround(Transform transform)
     {
-        //ÁøÇà¹æÇâÀÇ ¹Ù´ÚÀ» Ã¼Å© ¾Õ ¹æÇâ µð·º¼ÇÀ¸·Î ¹Þ¾Æ¼­ ÇÃ·¯½ºÇØ¾ßÁö
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ù´ï¿½ï¿½ï¿½ Ã¼Å© ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ð·º¼ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Þ¾Æ¼ï¿½ ï¿½Ã·ï¿½ï¿½ï¿½ï¿½Ø¾ï¿½ï¿½ï¿½
         //return Physics.Raycast(transform.position + player.dir , Vector3.down, GroundCheckDis, groundLayer);
         return Physics.Raycast(transform.position , Vector3.down, GroundCheckDis, groundLayer);
     }

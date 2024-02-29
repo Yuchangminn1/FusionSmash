@@ -82,9 +82,9 @@ public class CharacterInputhandler : MonoBehaviour
     }
     public NetworkInputData GetNetworkInput()
     {
-        //ÇÃ·¹ÀÌ¾îÀÇ Àü¹ÝÀûÀÎ ÀÎÇ² Àü¼Û
+        //ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ç² ï¿½ï¿½ï¿½ï¿½
 
-        //³×Æ®¿öÅ© µ¥ÀÌÅÍ·Î Àü¼Û 
+        //ï¿½ï¿½Æ®ï¿½ï¿½Å© ï¿½ï¿½ï¿½ï¿½ï¿½Í·ï¿½ ï¿½ï¿½ï¿½ï¿½ 
         NetworkInputData networkInputData = new NetworkInputData();
 
         //View data
@@ -185,7 +185,7 @@ public class CharacterInputhandler : MonoBehaviour
     }
     private float MYCut(float _float)
     {
-        //input xy °ªÀ» getaxisÈ­ ½ÃÄÑÁÙ·Á°í ÇØº»°Å ³Ê¹« ÀûÀº º¯È­´Â ±×³É »¡¸® ÁøÇà½ÃÄÑ 
+        //input xy ï¿½ï¿½ï¿½ï¿½ getaxisÈ­ ï¿½ï¿½ï¿½ï¿½ï¿½Ù·ï¿½ï¿½ï¿½ ï¿½Øºï¿½ï¿½ï¿½ ï¿½Ê¹ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È­ï¿½ï¿½ ï¿½×³ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 
         if (Mathf.Abs(_float) > 0.9f)
             _float = 1 * _float / Mathf.Abs(_float);
         else if (Mathf.Abs(_float) < 0.1f&& move.ReadValue<Vector2>() == Vector2.zero) 

@@ -13,13 +13,13 @@ public class PlayerState : EntityState
     protected float airTime;
 
 
-    //protected int currentStateNum;        ÇöÀç ½ºÅ×ÀÌÆ® ³Ñ
+    //protected int currentStateNum;        ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½
     //protected float stateTimer;
     //protected float startTime;                
-    //protected bool endMotionChange = true; ³¡³ª¸é ¾Ö´Ï¸ÞÀÌ¼Ç ¹Ù²ã¶óÆ®¸®°Å
-    //protected bool isAbleFly = false; ÀÌ°Å Á¦°Å 
+    //protected bool endMotionChange = true; ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ ï¿½Ù²ï¿½ï¿½Æ®ï¿½ï¿½ï¿½ï¿½
+    //protected bool isAbleFly = false; ï¿½Ì°ï¿½ ï¿½ï¿½ï¿½ï¿½ 
     //protected bool isAbleAttack = true;
-
+    //protected bool isState2=false;
     public PlayerState(PlayerStateHandler _player, int _currentStateNum)
     {
         player = _player;
@@ -28,15 +28,19 @@ public class PlayerState : EntityState
     public override void Enter()
     {
         base.Enter();
-        player.state = currentStateNum;
-        player.SetState(player.state);
+        player.SetState(currentStateNum);
         startTime = Time.time;
 
         if (endMotionChange)
         {
-            player.animationTrigger = true;
-
+            //player.SetAnimationTrigger(true);
+            ;
         }
+        if (!isState2) 
+        {
+            player.SetState2(0);
+        } 
+        //Debug.Log($"Enter{currentStateNum}State");
     }
     public override bool Update()
     {
@@ -55,7 +59,7 @@ public class PlayerState : EntityState
         }
         if (!isAbleFly)
         {
-            //Ã¼°ø ºÒ°¡´É »óÅÂÀÏ¶§
+            //Ã¼ï¿½ï¿½ ï¿½Ò°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¶ï¿½
             if (!player.IsGround())
             {
                 if (airTime == 0f)
@@ -76,7 +80,7 @@ public class PlayerState : EntityState
         }
         if (player.isJumpButtonPressed && isAbleJump)
         {
-            //´õºíÁ¡ÇÁ¿ë
+            //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
             player.nextState = player.jumpState;
             return true;
         }
@@ -105,22 +109,21 @@ public class PlayerState : EntityState
         if (player.attackCoolDownOn && player.attackCoolDown + player.attackTime < Time.time)
         {
             player.attackCoolDownOn = false;
-            Debug.Log("attackCoolDownOn ÆÈ½º");
+            Debug.Log("attackCoolDownOn ï¿½È½ï¿½");
             //player.attackComboCount = 0;
         }
-        //Æ²¾îÁø ¾Ö´Ï¸ÞÀÌ¼Ç ¸ÂÃçÁÖ±â ? 
-        if (player.state != currentStateNum)
-        {
-            //Debug.Log($"player.state = {player.state} currentStateNum{currentStateNum}");
-            player.SetState(currentStateNum);
-        }
+        //Æ²ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ö±ï¿½ ? 
+        //if (player.state != currentStateNum)
+        //{
+        //    //Debug.Log($"player.state = {player.state} currentStateNum{currentStateNum}");
+        //    player.SetState(currentStateNum);
+        //}
         //Debug.Log($"currentNum = {currentStateNum}");
         //Debug.Log(currentStateNum);
 
     }
     public override void LateUpdate()
     {
-
         if (player.nextState != this)
         {
             player.ChangeState();
@@ -129,24 +132,13 @@ public class PlayerState : EntityState
     public override void Exit()
     {
         base.Exit();
-
-        if (endMotionChange)
-        {
-            if (player.animationTrigger)
-            {
-                Debug.Log($"{currentStateNum}¿¡¼­ ¹ö±×·Î ¿¡´Ï¸ÅÀÌ¼Ç Æ®¸®°Å ÆÞ½º·Î ¹Ù²åÀ½");
-                player.animationTrigger = false;
-
-            }
-        }
-        
     }
 
 
 
     protected bool BaseState()
     {
-        if (!player.animationTrigger && endMotionChange)
+        if (!player.Isvisi() && endMotionChange)
         {
             if (player.IsGround())
             {

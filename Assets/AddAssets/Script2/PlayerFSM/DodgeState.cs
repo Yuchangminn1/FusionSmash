@@ -25,7 +25,7 @@ public class DodgeState : PlayerState
     }
     public override bool Update()
     {
-        if (!player.animationTrigger)
+        if (!player.Isvisi())
         {
             if (base.Update())
                 return true;
