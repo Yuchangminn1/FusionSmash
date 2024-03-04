@@ -10,7 +10,7 @@ using TMPro;
 public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
 {
 
-    //�̰� ��ǻ�?�����Ҽ� �ִ� �����̶��?�����ؾ��ҵ�
+    //�̰� ��ǻ�?�����Ҽ� �ִ� �����̶��?�����ؾ��ҵ�
 
     public NetworkPlayer playerPrefab;
 
@@ -25,7 +25,7 @@ public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
     }
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
-        if (runner.IsServer) //����Ǿ�������?
+        if (runner.IsServer) //����Ǿ�������?
         {
             runner.Spawn(playerPrefab, Utils.GetRandomSpawnPoint(), Quaternion.identity, player);
 
@@ -46,7 +46,7 @@ public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
         {
             // NetworkInput.Set(NetworkInputData) �÷� ���� 
             input.Set(characterInputhandler.GetNetworkInput());
-            //��Ʈ��ũ ��ǲ �����ϴ� �������?���� 
+            //��Ʈ��ũ ��ǲ �����ϴ� �������?���� 
         }
     }
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
@@ -66,7 +66,7 @@ public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token)
     {
-        //������?
+        //������?
        // throw new NotImplementedException();
     }
 

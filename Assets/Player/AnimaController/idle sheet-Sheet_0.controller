@@ -373,9 +373,9 @@ AnimatorStateTransition:
   - m_ConditionMode: 6
     m_ConditionEvent: State
     m_EventTreshold: 2
-  - m_ConditionMode: 6
+  - m_ConditionMode: 4
     m_ConditionEvent: State2
-    m_EventTreshold: 1
+    m_EventTreshold: 2
   - m_ConditionMode: 2
     m_ConditionEvent: AnimationTrigger
     m_EventTreshold: 0

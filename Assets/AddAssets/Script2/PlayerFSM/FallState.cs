@@ -9,13 +9,8 @@ public class FallState : PlayerState
 
     public FallState(PlayerStateHandler _player, int _currentStateNum) : base(_player, _currentStateNum)
     {
-        player = _player;
-        currentStateNum = _currentStateNum;
         endMotionChange = false;
         isAbleFly = true;
-        isAbleDodge = true;
-        isAbleJump = true;
-        isAbleAttack = true;
         isState2 = true;
 
     }
@@ -23,10 +18,8 @@ public class FallState : PlayerState
     public override void Enter()
     {
         base.Enter();
-
         startTime = Time.time;
-        //Debug.Log("endMotionChange " + endMotionChange);
-       // player.gravity = gravityOrigin;
+        
     }
     public override bool Update()
     {

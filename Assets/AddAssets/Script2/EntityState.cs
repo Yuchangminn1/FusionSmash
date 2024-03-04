@@ -5,14 +5,15 @@ using UnityEngine;
 public class EntityState 
 {
     protected int currentStateNum;
+    public EntityState currentState { get;protected set; }
     protected float stateTimer;
     protected float startTime;
-    protected bool endMotionChange = false;    //�ִϸ��̼� Ʈ���� �ִ���
-    protected bool isAbleFly = false;         
-    protected bool isAbleAttack = true;
+    protected bool endMotionChange = false;    
+    protected bool isAbleFly = false;
+    protected bool isState2 = false;
+    public bool isAbleAttack { get; protected set; } = true;
     protected bool isAbleDodge = true;
-    protected bool isAbleJump = true;
-    protected bool isState2=false;
+    public bool isAbleJump { get; protected set; } = true;
 
     public virtual void Enter()
     {
@@ -22,7 +23,6 @@ public class EntityState
     {
         stateTimer = Time.time;
         return false;
-
     }
     public virtual void FixedUpdate()
     {

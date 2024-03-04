@@ -1,18 +1,14 @@
 using Fusion;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO.Pipes;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Animations;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-public enum EWeaponType
-{
-    Pistol,
-    Rifle,
-    Shotgun,
-    Gravity
-}
+
 public class PlayerWeapon : NetworkBehaviour
 {
     // �ѱ� ����
@@ -22,10 +18,10 @@ public class PlayerWeapon : NetworkBehaviour
     public GameObject _weaponUI;    //��  ��������Ʈ �ް� ��ü�ϴ� �ɷ� �ٲ��� 
     //public Sprite _weaponSprite;    //���� �̹��� ��������Ʈ
     public TMP_Text _weaponAmmoText;//�Ѿ� ����
-    public Image _weaponAimImage;   //ũ�ν����?
+    public Image _weaponAimImage;   //ũ�ν����?
     public Image _killIcon;         //ų �̹���
     public int _weaponNum = 0;
-
+    private HPHandler _hPHandler;
 
     [Header("Fire Setup")]
     public GameObject _localCameraRotation;
@@ -34,7 +30,7 @@ public class PlayerWeapon : NetworkBehaviour
     public float Damage = 10f; // ������
     public int FireRate = 100; // �߻� �ӵ�
     [Range(1, 20)]
-    public int ProjectilesPerShot = 1; // �� �߿� �߻�Ǵ�?������Ÿ�� ��
+    public int ProjectilesPerShot = 1; // �� �߿� �߻�Ǵ�?������Ÿ�� ��
     public float Dispersion = 0f; // �л�
     public LayerMask HitMask; // ��Ʈ ����ũ
     public float MaxHitDistance = 100f; // �ִ� ��Ʈ �Ÿ�
@@ -44,20 +40,10 @@ public class PlayerWeapon : NetworkBehaviour
     public int StartAmmo = 25; // ���� ź�� ��
     public float ReloadTime = 2f; // ������ �ð�
 
-    //[Header("Visuals")]
-    //public Sprite Icon; // ������
-    //public string Name; // �̸�
-    //public Animator Animator; // �ִϸ�����
 
     [Header("Fire Effect")]
-    //public Transform MuzzleTransform; // 3��Ī �������� �߻�Ǵ�?��ġ
-    //public GameObject MuzzleEffectPrefab; // �߻� ȿ�� ������
+    
     public Projectile ProjectilePrefab; // ������Ÿ�� �ð�ȭ ������
-
-    //[Header("Sounds")]
-    //public AudioSource FireSound; // �߻� ����
-    //public AudioSource ReloadingSound; // ������ ����
-    //public AudioSource EmptyClipSound; // �� źâ ����
 
     public bool HasAmmo => ClipAmmo > 0 || RemainingAmmo > 0; // ź���� �ִ��� ����
 
@@ -73,7 +59,7 @@ public class PlayerWeapon : NetworkBehaviour
     [Networked]
     private int _fireCount { get; set; } // �߻� Ƚ��
     [Networked]
-    private TickTimer _fireCooldown { get; set; } // �߻� ��ٿ�?Ÿ�̸�
+    private TickTimer _fireCooldown { get; set; } // �߻� ��ٿ�?Ÿ�̸�
     [Networked, Capacity(32)]
     private NetworkArray<ProjectileData> _projectileData { get; } // ������Ÿ�� ������ �迭
 
@@ -85,7 +71,8 @@ public class PlayerWeapon : NetworkBehaviour
     //private SceneObjects _sceneObjects; // SceneObjects Ŭ����
     public bool AbleFire(bool justPressed) 
     {
-        if (IsCollected == false || (justPressed == false && !IsAutomatic) || IsReloading || !_fireCooldown.ExpiredOrNotRunning(Runner))
+        //IsCollected == false ||
+        if ( (justPressed == false && !IsAutomatic) || IsReloading || !_fireCooldown.ExpiredOrNotRunning(Runner))
             return false;
 
         if (ClipAmmo <= 0)
@@ -134,7 +121,8 @@ public class PlayerWeapon : NetworkBehaviour
     // ������ �޼ҵ�
     public void Reload()
     {
-        if (IsCollected == false || ClipAmmo >= MaxClipAmmo || RemainingAmmo <= 0 || IsReloading || !_fireCooldown.ExpiredOrNotRunning(Runner))
+        //IsCollected == false ||
+        if ( ClipAmmo >= MaxClipAmmo || RemainingAmmo <= 0 || IsReloading || !_fireCooldown.ExpiredOrNotRunning(Runner))
             return;
 
         IsReloading = true;
@@ -160,14 +148,15 @@ public class PlayerWeapon : NetworkBehaviour
         if (!IsReloading)
             return 1f;
 
-        // ������ ���� ���?���� ������ �ð��� ���� ���� ��ȯ
+        // ������ ���� ���?���� ������ �ð��� ���� ���� ��ȯ
         return 1f - _fireCooldown.RemainingTime(Runner).GetValueOrDefault() / ReloadTime;
     }
 
-    // ������Ʈ�� ������ �� ȣ��Ǵ�?�޼ҵ�
+    // ������Ʈ�� ������ �� ȣ��Ǵ�?�޼ҵ�
     public override void Spawned()
     {
-        // ���� ������ �ִ� ��쿡��?�ʱ�ȭ �ڵ� ����
+        base.Spawned();
+        // ���� ������ �ִ� ��쿡��?�ʱ�ȭ �ڵ� ����
 
         if (HasStateAuthority)
         {
@@ -184,18 +173,19 @@ public class PlayerWeapon : NetworkBehaviour
         {
             IsCollected = true;
         }
-
-        // _muzzleEffectInstance = Instantiate(MuzzleEffectPrefab, MuzzleTransform);
-        // _muzzleEffectInstance.SetActive(false);
-
-        // SceneObjects 
-        //_sceneObjects = Runner.GetSingleton<SceneObjects>();
+        _hPHandler = GetComponentInParent<HPHandler>();
+        
     }
-
+    public void OnRespawn()
+    {
+        RemainingAmmo = StartAmmo - MaxClipAmmo;
+        ClipAmmo = MaxClipAmmo;
+        AmmoInfoUpdate();
+    }
     public override void FixedUpdateNetwork()
     {
-        if (IsCollected == false)
-            return;
+        //if (IsCollected == false)
+        //    return;
 
         if (ClipAmmo == 0)
             Reload();
@@ -218,20 +208,7 @@ public class PlayerWeapon : NetworkBehaviour
     // ������ �޼ҵ�
     public override void Render()
     {
-        //if (_visibleFireCount < _fireCount)
-        //{
-        //    PlayFireEffect();
-        //}
-
-        //for (int i = _visibleFireCount; i < _fireCount; i++)
-        //{
-        //    var data = _projectileData[i % _projectileData.Length];
-        //    var muzzleTransform = MuzzleTransform;
-
-        //    var projectileVisual = Instantiate(ProjectilePrefab, muzzleTransform.position, muzzleTransform.rotation);
-        //    projectileVisual.SetHit(data.HitPosition, data.HitNormal, data.ShowHitEffect);
-        //}
-
+        
         _visibleFireCount = _fireCount;
 
         if (_reloadingVisible != IsReloading)
@@ -254,113 +231,85 @@ public class PlayerWeapon : NetworkBehaviour
 
         var hitOptions = HitOptions.IncludePhysX | HitOptions.IgnoreInputAuthority;
 
-        //Runner.LagCompensation.Raycast(aimPoint.position + aimForwardVector * 2.5f, aimForwardVector,
-        //hitDistance, Object.InputAuthority, out var hitnfo, collisionLayer, HitOptions.IncludePhysX);
         Debug.DrawRay(firePosition + fireDirection * 2.5f, fireDirection * MaxHitDistance, Color.green, 1);
-        
-        
-        if (Runner.LagCompensation.Raycast(firePosition, fireDirection, MaxHitDistance,
-                Object.InputAuthority, out var hit, HitMask, hitOptions))
+
+        if (HasStateAuthority) 
         {
-            projectileData.HitPosition = hit.Point;
-            projectileData.HitNormal = hit.Normal;
-
-            if (hit.Hitbox != null)
-            {
-                HPHandler tmpHP = hit.Hitbox.transform.root.GetComponent<HPHandler>();
-
-                if (tmpHP.isDead)
-                {
-                    return;
-                }
-                HPHandler KN = gameObject.GetComponentInParent<HPHandler>();
-                tmpHP.enemyHPHandler = KN;
-
-                tmpHP.OnTakeDamage(KN._nickName, ((int)Type));
-                if (tmpHP.isDead)
-                {
-                    if (HasInputAuthority)
-                        StartCoroutine(KillEffect());
-                }
-                else
-                {
-                    if (HasInputAuthority)
-                        StartCoroutine(EnemyHitEffect());
-                }
-                ApplyDamage(hit.Hitbox, hit.Point, fireDirection);
-            }
-            else
-            {
-                projectileData.ShowHitEffect = true;
-            }
+            Quaternion cmRotation = Quaternion.FromToRotation(firePosition, fireDirection);
+            var QQ = Runner.Spawn(ProjectilePrefab, firePosition + fireDirection * 2.5f, Quaternion.identity);
+            QQ.SetTarget(fireDirection * MaxHitDistance, this, _hPHandler);
         }
         
-        Instantiate(ProjectilePrefab, firePosition + fireDirection * 2.5f, _localCameraRotation.transform.rotation);
-
+        
         _projectileData.Set(_fireCount % _projectileData.Length, projectileData);
         _fireCount++;
     }
-    
+
+    //public void HitEffect()
+    //{
+    //    if (HasInputAuthority)
+    //        StartCoroutine(EnemyHitEffect());
+    //}
+
+    //public void KillEffect()
+    //{
+    //    if (HasInputAuthority)
+    //        StartCoroutine(EnemyKillEffect());
+    //}
+
+    //IEnumerator EnemyHitEffect()
+    //{
+    //    int i = 0;
+    //    int goal = 20;
+    //    while (i < goal)
+    //    {
+    //        _weaponAimImage.color = Color.Lerp(_weaponAimImage.color, Color.red, 0.3f);
+    //        ++i;
+    //        yield return null;
+    //    }
+    //    i = 0;
+    //    while (i < goal)
+    //    {
+    //        _weaponAimImage.color = Color.Lerp(_weaponAimImage.color, Color.white, 0.3f);
+    //        ++i;
+    //        yield return null;
+    //    }
+    //    _weaponAimImage.color = Color.white;
+
+    //    yield return null;
+    //}
+    //IEnumerator EnemyKillEffect()
+    //{
+    //    Color mirror = new Color(1, 1, 1, 0);
+    //    int i = 0;
+    //    int goal = 100;
+    //    _weaponAimImage.color = mirror;
+    //    while (i < goal)
+    //    {
+    //        _killIcon.color = Color.Lerp(_killIcon.color, Color.white, 0.25f);
+    //        ++i;
+    //        yield return null;
+    //    }
+    //    i = 0;
+    //    while (i < goal / 4)
+    //    {
+    //        _killIcon.color = Color.Lerp(_killIcon.color, mirror, 0.5f);
+    //        ++i;
+    //        yield return null;
+    //    }
+    //    _weaponAimImage.color = Color.white;
+    //    _killIcon.color = mirror;
+
+    //    yield return null;
+    //}
 
     
-    IEnumerator EnemyHitEffect()
-    {
-        int i = 0;
-        int goal = 20;
-        while (i < goal)
-        {
-            _weaponAimImage.color = Color.Lerp(_weaponAimImage.color, Color.red, 0.3f);
-            ++i;
-            yield return null;
-        }
-        i = 0;
-        while (i < goal)
-        {
-            _weaponAimImage.color = Color.Lerp(_weaponAimImage.color, Color.white, 0.3f);
-            ++i;
-            yield return null;
-        }
-        _weaponAimImage.color = Color.white;
-
-        yield return null;
-    }
-    IEnumerator KillEffect()
-    {
-        Color mirror = new Color(1, 1, 1, 0);
-        int i = 0;
-        int goal = 100;
-        _weaponAimImage.color = mirror;
-        while (i < goal)
-        {
-            _killIcon.color = Color.Lerp(_killIcon.color, Color.white, 0.25f);
-            ++i;
-            yield return null;
-        }
-        i = 0;
-        while (i < goal / 4)
-        {
-            _killIcon.color = Color.Lerp(_killIcon.color, mirror, 0.5f);
-            ++i;
-            yield return null;
-        }
-        _weaponAimImage.color = Color.white;
-        _killIcon.color = mirror;
-
-        yield return null;
-    }
-
-    public void OnRespawn()
-    {
-        RemainingAmmo = StartAmmo- MaxClipAmmo;
-        ClipAmmo = MaxClipAmmo;
-        AmmoInfoUpdate();
-    }
 
     //private void PlayFireEffect()
     //{
     //    if (FireSound != null)
     //    {
-    //        // �߻� ���带 �� �� ����մϴ�?
+    //        // �߻� ���带 �� �� ����մϴ�?
     //        FireSound.PlayOneShot(FireSound.clip);
     //    }
 
@@ -368,65 +317,20 @@ public class PlayerWeapon : NetworkBehaviour
     //    _muzzleEffectInstance.SetActive(false);
     //    _muzzleEffectInstance.SetActive(true);
 
-    //    // �߻� �ִϸ��̼��� ����մϴ�?
+    //    // �߻� �ִϸ��̼��� ����մϴ�?
     //    Animator.SetTrigger("Fire");
 
-    //    // �θ� Player�� �߻� ����Ʈ�� ����մϴ�?
+    //    // �θ� Player�� �߻� ����Ʈ�� ����մϴ�?
     //    GetComponentInParent<CharacterMovementHandler>().PlayFireEffect();
     //}
 
-    private void ApplyDamage(Hitbox enemyHitbox, Vector3 position, Vector3 direction)
-    {
-        //var enemyHealth = enemyHitbox.Root.GetComponent<Health>();
-        //if (enemyHealth == null || enemyHealth.IsAlive == false)
-        //    return;
-
-        //float damageMultiplier = enemyHitbox is BodyHitbox bodyHitbox ? bodyHitbox.DamageMultiplier : 1f;
-        //bool isCriticalHit = damageMultiplier > 1f;
-
-        //float damage = Damage * damageMultiplier;
-        //if (_sceneObjects.Gameplay.DoubleDamageActive)
-        //{
-        //    // ���� ������ Ȱ��ȭ ���̸� �������� �� ���?������ŵ�ϴ�.
-        //    damage *= 2f;
-        //}
-
-        //if (enemyHealth.ApplyDamage(Object.InputAuthority, damage, position, direction, Type, isCriticalHit) == false)
-        //    return;
-
-        //if (HasInputAuthority && Runner.IsForward)
-        //{
-        //    // ���� �÷��̾�� UI ��Ʈ ����Ʈ�� ǥ���մϴ�.
-        //   // _sceneObjects.GameUI.PlayerView.Crosshair.ShowHit(enemyHealth.IsAlive == false, isCriticalHit);
-        //}
-    }
-
-    //private void PlayEmptyClipSound(bool fireJustPressed)
-    //{
-    //    // �ڵ� ������ ���?������ �߻� �Ŀ� �� źâ ���带 �� �� ����Ϸ���?�մϴ�.
-    //    bool firstEmptyShot = _fireCooldown.TargetTick.GetValueOrDefault() == Runner.Tick - 1;
-
-    //    if (fireJustPressed == false && firstEmptyShot == false)
-    //        return;
-
-    //    if (EmptyClipSound == null || EmptyClipSound.isPlaying)
-    //        return;
-
-    //    if (Runner.IsForward && HasInputAuthority)
-    //    {
-    //        // �� źâ ���带 ����մϴ�?
-    //        EmptyClipSound.Play();
-    //    }
-    //}
-
-    /// <summary>
-    /// ���� �߻�ü �߻縦 ��Ÿ���� ����ü�Դϴ�.
-    /// </summary>
     private struct ProjectileData : INetworkStruct
     {
         public Vector3 HitPosition;
         public Vector3 HitNormal;
         public NetworkBool ShowHitEffect;
     }
+    
+    
 }
 

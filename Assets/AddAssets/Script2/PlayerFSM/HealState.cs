@@ -7,8 +7,6 @@ public class HealState : PlayerState
     
     public HealState(PlayerStateHandler _player, int _currentStateNum) : base(_player, _currentStateNum)
     {
-        player = _player;
-        currentStateNum = _currentStateNum;
         endMotionChange = false;
         isAbleAttack = false;
     }

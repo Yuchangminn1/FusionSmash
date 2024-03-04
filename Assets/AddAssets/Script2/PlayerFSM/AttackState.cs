@@ -8,14 +8,11 @@ public class AttackState : PlayerState
 {
     int counter;
     Queue<bool> Combo;
-    public AttackState(PlayerStateHandler _player, int _currentStateNum) : base(_player, _currentStateNum)
+    public AttackState(PlayerStateHandler _player,  int _currentStateNum) : base(_player,  _currentStateNum)
     {
-        player = _player;
-        currentStateNum = _currentStateNum;
         endMotionChange = true;
         isAbleFly = true;
         isAbleAttack = false;
-        isAbleDodge = false;
         isAbleJump = false;
     }
 
@@ -52,7 +49,8 @@ public class AttackState : PlayerState
         if (startTime + 5f < Time.time)
         {
             player.SetAnimationTrigger(false);
-            Debug.Log("AnimationTrigger Error ");
+            
+            Debug.Log("AnimationTrigger Error State =  " + player.GetCurrentState().currentState);
         }
     }
 }

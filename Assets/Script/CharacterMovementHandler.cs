@@ -139,10 +139,11 @@ public class CharacterMovementHandler : NetworkBehaviour
             if (hpHandler.isDead)
                 return;
         }
-        if (HasInputAuthority)
-        {
-            cameraAimAngle.SetAngle();
-        }
+        cameraAimAngle.SetAngle();
+        //if (HasInputAuthority)
+        //{
+        //    cameraAimAngle.SetAngle();
+        //}
         if (GetInput(out NetworkInputData networkInputData))
         {
             ShowBoard(networkInputData);
@@ -212,7 +213,7 @@ public class CharacterMovementHandler : NetworkBehaviour
     }
     private void Action(NetworkInputData networkInputData)
     {
-        if (!HasStateAuthority) return;
+        //if (!HasStateAuthority) return;
 
         if (playerStateHandler.IsGround() && (rb.velocity.y < 0.03 && rb.velocity.y > -0.03)&& !playerStateHandler.Isvisi())
         {
@@ -229,33 +230,24 @@ public class CharacterMovementHandler : NetworkBehaviour
                 return;
             }
         }
-        //if (playerStateHandler.Isvisi()) { return; }
         //Fire
         if (networkInputData.isFireButtonPressed)
         {
-            if (!weaponHandler.AbleFire()) 
+
+            if (!weaponHandler.AbleFire() || !playerStateHandler.AbleFire()) 
             {
+
+                playerStateHandler.isFireButtonPressed = false;
                 return;
             }
             else 
             {
-                //transform.rotation=localCameraHandler.CMLookRotation();
-
                 weaponHandler.SetFire(localCamera.transform.position, networkInputData.aimFowardVector, networkInputData.isFireButtonPressed);
+                //Debug.Log(localCamera.transform.position + networkInputData.aimFowardVector);
                 playerStateHandler.isFireButtonPressed = true;
                 return;
             }
         }
-        ////Dodge
-        //if (networkInputData.isDodgeButtonPressed && _dodgeCount < 1)
-        //{
-        //    playerStateHandler.isDodgeButtonPressed = true;
-        //    ++_dodgeCount;
-        //    return;
-        //}
-        //else
-        //    playerStateHandler.isDodgeButtonPressed = false;
-
     }
 
     public void Fire()
@@ -304,7 +296,7 @@ public class CharacterMovementHandler : NetworkBehaviour
         isRespawnRequsted = false;
     }
     /// <summary>
-    /// CharacterController bool������ Ű�� ���?
+    /// CharacterController bool������ Ű�� ���?
     /// </summary>
     public void SetCharacterControllerEnabled(bool isEnabled)
     {

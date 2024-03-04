@@ -7,13 +7,8 @@ public class JumpState : PlayerState
 {
     public JumpState(PlayerStateHandler _player, int _currentStateNum) : base(_player, _currentStateNum)
     {
-        player = _player;
-        currentStateNum = _currentStateNum;
         isAbleFly = true;
         endMotionChange = true;
-        isAbleAttack = true;
-        isAbleDodge = true;
-        isAbleJump = false; 
         isState2 = true;
     }
 
@@ -34,6 +29,7 @@ public class JumpState : PlayerState
         {
             player.isJumpButtonPressed = false;
             player.SetAnimationTrigger(false);
+            player.nextState = player.jumpState;
             player.ChangeState();
             return true;
         }

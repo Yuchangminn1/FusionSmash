@@ -200,6 +200,11 @@ public class PlayerStateHandler : NetworkBehaviour
     //Jump
     public bool JumpAble()
     {
+        if (stateMachine.GetState() == null) return false;
+        if (!stateMachine.GetState().isAbleJump) 
+        {
+            return false;
+        }
         if (jumpCount < maxJumpCount)
         {
             isJumpButtonPressed = true;
@@ -233,7 +238,7 @@ public class PlayerStateHandler : NetworkBehaviour
     }
 
 
-    //Æ®¸®°Å¸¦ Áö±Ý ÄÑÁà¾ßÇÔ 
+    //Æ®ï¿½ï¿½ï¿½Å¸ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 
 
     public bool IsGround()
     {
@@ -296,6 +301,24 @@ public class PlayerStateHandler : NetworkBehaviour
         isFireButtonPressed = false;
         Fire();
     }
+    public EntityState GetCurrentState() 
+    {
+        if (stateMachine.GetState() == null) 
+            return null;
 
+        return stateMachine.GetState();
+    }
+    public bool AbleFire()
+    {
+        if(GetCurrentState() == null)
+        {
+            return false;
+        }
+        if (GetCurrentState().isAbleAttack && !Isvisi()) 
+        {
+            return true;
+        }
+        return false;
+    }
 
 }

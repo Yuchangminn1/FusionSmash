@@ -8,8 +8,6 @@ public class HitState : PlayerState
     public int damage = 0;
     public HitState(PlayerStateHandler _player, int _currentStateNum) : base(_player, _currentStateNum)
     {
-        player = _player;
-        currentStateNum = _currentStateNum;
         isAbleAttack = false;  
         isAbleDodge = false;
     }

@@ -11,7 +11,7 @@ using UnityEngine.UI;
 
 public class WeaponHandler : NetworkBehaviour
 {
-    public List<GameObject> playerWeaponPrefab;
+    public List<NetworkObject> playerWeaponPrefab;
     public PlayerWeapon _equipWeapon { get; private set; }
 
     public LayerMask collisionLayer;
@@ -25,11 +25,19 @@ public class WeaponHandler : NetworkBehaviour
     bool justPressed;
     void Awake()
     {
-        //hpHandler = GetComponent<HPHandler>();
-
     }
 
+    private void Start()
+    {
 
+        //_equipWeapon = Runner.Spawn(playerWeaponPrefab[0], transform.position, Quaternion.identity).GetComponent<PlayerWeapon>();
+        //playerWeaponPrefab[0] = Runner.Spawn(playerWeaponPrefab[0], transform.position, Quaternion.identity);
+        //playerWeaponPrefab[1] = Runner.Spawn(playerWeaponPrefab[1], transform.position, Quaternion.identity);
+        //playerWeaponPrefab[2] = Runner.Spawn(playerWeaponPrefab[2], transform.position, Quaternion.identity);
+
+        //_equipWeapon = playerWeaponPrefab[0].GetComponent<PlayerWeapon>();
+
+    }
 
     public override void FixedUpdateNetwork()
     {
@@ -49,13 +57,19 @@ public class WeaponHandler : NetworkBehaviour
 
     public void Fire()
     {
-        float hitDistance = 100;
-        _equipWeapon.Fire(firePosition, fireDirection);
+        if(_equipWeapon != null)
+        {
+            _equipWeapon.Fire(firePosition, fireDirection);
+        }
     }
 
     public bool AbleFire()
     {
-        return _equipWeapon.AbleFire(justPressed);
+        if (_equipWeapon != null)
+        {
+            return _equipWeapon.AbleFire(justPressed);
+        }
+        else return false;
     }
 
     public void ChangeWeapon(int num)
@@ -63,6 +77,7 @@ public class WeaponHandler : NetworkBehaviour
         //�� ������Ʈ ü����
         if (_equipWeapon != null)
         {
+
             _equipWeapon.gameObject.SetActive(false);
             _equipWeapon.DisEquip();
 
@@ -77,9 +92,9 @@ public class WeaponHandler : NetworkBehaviour
     {
         if (playerWeaponPrefab != null)
         {
-            foreach (GameObject t in playerWeaponPrefab)
+            foreach (NetworkObject t in playerWeaponPrefab)
             {
-                t.SetActive(false);
+                t.gameObject.SetActive(false);
             }
         }
     }

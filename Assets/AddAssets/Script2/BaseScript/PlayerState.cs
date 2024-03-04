@@ -16,13 +16,14 @@ public class PlayerState : EntityState
     //protected int currentStateNum;        ���� ������Ʈ ��
     //protected float stateTimer;
     //protected float startTime;                
-    //protected bool endMotionChange = true; ������ �ִϸ��̼� �ٲ���?�����?
+    //protected bool endMotionChange = true; ������ �ִϸ��̼� �ٲ���?�����?
     //protected bool isAbleFly = false; �̰� ���� 
     //protected bool isAbleAttack = true;
     //protected bool isState2=false;
     public PlayerState(PlayerStateHandler _player, int _currentStateNum)
     {
         player = _player;
+        currentState = this;
         currentStateNum = _currentStateNum;
     }
     public override void Enter()

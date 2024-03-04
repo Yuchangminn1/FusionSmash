@@ -40,4 +40,8 @@ public class StateMachine
             currentState.LateUpdate();
         }
     }
+    public EntityState GetState() 
+    {
+        return currentState;
+    }
 }

@@ -112,6 +112,7 @@ public class HPHandler : NetworkBehaviour
 
     public void OnTakeDamage(string _hitPlayer, int weaponNum, int _attackDamage = 1)
     {
+        Debug.Log("OnTakeDamage");
         if (HasStateAuthority)
         {
             _weaponSpriteNum = weaponNum;
