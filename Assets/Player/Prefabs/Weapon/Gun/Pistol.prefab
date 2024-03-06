@@ -64,9 +64,11 @@ MonoBehaviour:
     m_Bits: 192
   MaxHitDistance: 100
   MaxClipAmmo: 12
-  StartAmmo: 25
+  StartAmmo: 250
   ReloadTime: 2
   ProjectilePrefab: {fileID: 4833850663028179173, guid: 38ee3e1b7b4c62349b0db316fb30b3f7, type: 3}
+  _IsCollected:
+    _value: 0
   _IsReloading:
     _value: 0
   _ClipAmmo: 0

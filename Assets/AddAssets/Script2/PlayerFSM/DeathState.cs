@@ -19,12 +19,9 @@ public class DeathState : PlayerState
     }
     public override bool Update()
     {
-
-        if (!player.Isvisi())
+        if (!player.isdead) 
         {
-
-            ;
-
+            return base.Update();
         }
         return false;
     }

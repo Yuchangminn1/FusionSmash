@@ -174,6 +174,10 @@ public class PlayerWeapon : NetworkBehaviour
             IsCollected = true;
         }
         _hPHandler = GetComponentInParent<HPHandler>();
+        if(_hPHandler == null)
+        {
+            Debug.Log("_hPHandler Is Null");
+        }
         
     }
     public void OnRespawn()
@@ -236,8 +240,9 @@ public class PlayerWeapon : NetworkBehaviour
         if (HasStateAuthority) 
         {
             Quaternion cmRotation = Quaternion.FromToRotation(firePosition, fireDirection);
-            var QQ = Runner.Spawn(ProjectilePrefab, firePosition + fireDirection * 2.5f, Quaternion.identity);
-            QQ.SetTarget(fireDirection * MaxHitDistance, this, _hPHandler);
+            Projectile QQ = Runner.Spawn(ProjectilePrefab, firePosition , Quaternion.identity);//+ fireDirection * 2.5f
+            QQ.SetTarget(firePosition + fireDirection * MaxHitDistance, this, _hPHandler);
+
         }
         
         

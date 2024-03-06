@@ -8,6 +8,7 @@ public class PlayerHpHandler : NetworkBehaviour
 {
     [Networked(OnChanged = nameof(PlayerHit))]
     int Hp { get; set; }
+    
     int MaxHp { get; set; }
 
     [SerializeField] Slider hpBar;

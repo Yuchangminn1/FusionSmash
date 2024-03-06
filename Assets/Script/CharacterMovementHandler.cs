@@ -333,4 +333,25 @@ public class CharacterMovementHandler : NetworkBehaviour
 
         canMove = _tf;
     }
+
+    public void HitAddForce(Vector3 _attackVec,int _force)
+    {
+        Vector3 tmp = (_attackVec - transform.position);
+        tmp.y = 0;
+        tmp = tmp.normalized * _force;
+        StartCoroutine(HitAddForce(tmp));
+    }
+
+    IEnumerator HitAddForce(Vector3 _attackVec)
+    {
+        _attackVec = _attackVec / 5;
+        for (int i = 1; i < 10; i++)
+        {
+            float Dis = Vector3.Distance(Vector3.zero, i * _attackVec)/20;
+            rb.AddForce(i*_attackVec+Vector3.up* Dis,ForceMode.Impulse);
+            yield return new WaitForFixedUpdate();
+        }
+        
+    }
+
 }

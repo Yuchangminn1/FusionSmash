@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO.Pipes;
 using UnityEngine;
 using UnityEngine.UIElements;
-using static Fusion.NetworkCharacterController;
+//using static Fusion.NetworkCharacterController;
 
 public enum EWeaponType
 {
@@ -38,6 +38,10 @@ public class Projectile : NetworkBehaviour
     private float _startTime;
     private float _lifetime = 3f;
     private HPHandler attackHP;
+
+    float raycastDistance = 1f;
+    public LayerMask layerMask;
+    float radius = 0.25f;
     /// <summary>
     /// Set where the projectile visual should land.                                ź�� ���־��� ��ź�� ��ġ�� �����մϴ�.
     /// </summary>
@@ -54,15 +58,34 @@ public class Projectile : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
-        _transform.transform.position += _targetPosition.normalized * Speed;
-        LifeTime();
+        if (HasStateAuthority)
+        {
+            if (attackHP != null)
+            {
+                _transform.transform.position += _targetPosition.normalized * Speed;
+                LifeTime();
+
+            }
+        }
+
+
+
     }
+    private void Update()
+    {
+        if (HasStateAuthority && attackHP !=null)
+        {
+            CheckRay();
+        }
+    }
+    
     public void SetTarget(Vector3 _vector3, PlayerWeapon _parentWeapon, HPHandler _attackHP)
     {
         parentWeapon = _parentWeapon;
         attackHP = _attackHP;
         _targetPosition = _vector3;
         _targetPosition -= _startPosition;
+        //CheckRay();
     }
     public override void Spawned()
     {
@@ -78,38 +101,97 @@ public class Projectile : NetworkBehaviour
             Runner.Despawn(Object);
         }
     }
-    private void OnTriggerEnter(Collider other)
+    private void CheckRay()
     {
-        Debug.Log("OnTriggerEnter");
-        HPHandler hitHP = other.GetComponent<HPHandler>();
-        
-        if (hitHP != null && hitHP != attackHP)
+        Debug.Log("CheckRay()");
+        if (attackHP == null)
         {
-            hitHP.enemyHPHandler = attackHP;
-            if (attackHP._nickName == null)
-            {
-                Debug.Log("attackHP._nickName Is Null");
-                return;
-            }
-            if((int)Type<0|| (int)Type > 3)
-            {
-                Debug.Log("Type Error");
+            Debug.Log("noHit");
+            return;
 
-                return;
-            }
-            hitHP.OnTakeDamage(attackHP._nickName, (int)Type);
-            if (hitHP.isDead)
-            {
-                //parentWeapon.KillEffect();
-            }
-            else
-            {
-                //parentWeapon.HitEffect();
-            }
-            Runner.Despawn(Object);
         }
+        RaycastHit hit;
+        //if (Physics.Raycast(transform.position, transform.forward, out hit, raycastDistance, layerMask))
+        Vector3 Dir = transform.position - _startPosition;
+        Dir.Normalize();
 
+        if (Physics.SphereCast(transform.position, radius, Dir, out hit, raycastDistance, layerMask))
+        {
+
+            HPHandler hitHP = hit.transform.GetComponent<HPHandler>();
+            if (hitHP != null && hitHP != attackHP)
+            {
+                hitHP.enemyHPHandler = attackHP;
+                Vector3 tmp = hit.transform.position - _startPosition;
+                //tmp.y = 0;
+                //other.GetComponent<Rigidbody>().AddForce(tmp.normalized * hitHP.AddForce, ForceMode.VelocityChange);
+                if (attackHP._nickName == null)
+                {
+                    attackHP._nickName = "tmp";
+                    return;
+                }
+                if ((int)Type < 0 || (int)Type > 3)
+                {
+
+                    return;
+                }
+                hitHP.OnTakeDamage(attackHP._nickName, (int)Type);
+                hit.transform.GetComponent<CharacterMovementHandler>().HitAddForce(tmp, hitHP.AddForce);
+
+                if (hitHP.isDead)
+                {
+                    //parentWeapon.KillEffect();
+                }
+                else
+                {
+                    //parentWeapon.HitEffect();
+                }
+                Runner.Despawn(Object);
+            }
+        }
     }
+    //private void OnTriggerEnter(Collider other)
+    //{
+    //    if (attackHP==null)
+    //    {
+    //        Debug.Log("attackHP Is NUll");
+    //        return;
+    //    }
+    //    Debug.Log("OnTriggerEnter");
+    //    HPHandler hitHP = other.GetComponent<HPHandler>();
+    //    if (hitHP != null && hitHP != attackHP)
+    //    {
+    //        hitHP.enemyHPHandler = attackHP;
+    //        Vector3 tmp = other.transform.position- _startPosition ;
+    //        //tmp.y = 0;
+    //        //other.GetComponent<Rigidbody>().AddForce(tmp.normalized * hitHP.AddForce, ForceMode.VelocityChange);
+    //        if (attackHP._nickName == null)
+    //        {
+    //            Debug.Log("attackHP._nickName Is Null");
+    //            attackHP._nickName = "tmp";
+    //            return;
+    //        }
+    //        if((int)Type<0|| (int)Type > 3)
+    //        {
+    //            Debug.Log("Type Error");
+
+    //            return;
+    //        }
+    //        hitHP.OnTakeDamage(attackHP._nickName, (int)Type);
+    //        other.GetComponent<CharacterMovementHandler>().HitAddForce(tmp, hitHP.AddForce);
+
+    //        if (hitHP.isDead)
+    //        {
+    //            //parentWeapon.KillEffect();
+    //        }
+    //        else
+    //        {
+    //            //parentWeapon.HitEffect();
+    //        }
+    //        Runner.Despawn(Object);
+    //    }
+
+    //}
 
 
     //private void Start()

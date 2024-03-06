@@ -20,6 +20,7 @@ public class PlayerStateHandler : NetworkBehaviour
     public bool isdead = false;
     public bool isStop = false;
     public bool isHeal = false;
+    public bool isHit = false;
 
     public int fHpHeal = 40;
     public int healNum;
@@ -134,7 +135,10 @@ public class PlayerStateHandler : NetworkBehaviour
             stateMachine.FixedUpdate();
         }
     }
-
+    public override void FixedUpdateNetwork()
+    {
+        AnimationTrigger = animationTrigger;
+    }
 
     private void LateUpdate()
     {
@@ -191,11 +195,10 @@ public class PlayerStateHandler : NetworkBehaviour
         if (newS != oldS)
         {
             changed.Behaviour.SetAnimationTrigger(newS);
-            //changed.Behaviour.animationTrigger = newS;
-            //changed.Behaviour.SetBool("AnimationTrigger", newS);
+            
         }
     }
-    
+
 
     //Jump
     public bool JumpAble()
@@ -293,7 +296,7 @@ public class PlayerStateHandler : NetworkBehaviour
         animationTrigger = _tf;
         SetBool("AnimationTrigger", animationTrigger);
     }
-
+    
     public void AttackEnter() 
     {
         SetCanMove(false);

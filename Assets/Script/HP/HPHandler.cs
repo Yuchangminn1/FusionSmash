@@ -11,6 +11,8 @@ public class HPHandler : NetworkBehaviour
     int MaxHp { get; set; }
     [Networked(OnChanged = nameof(OnHPChanged))]
     public int HP { get; private set; }
+    [Networked]
+    public int AddForce { get;private set; }
     [Networked(OnChanged = nameof(OnStateChanged))]
     public bool isDead { get; set; }
 
@@ -22,6 +24,7 @@ public class HPHandler : NetworkBehaviour
     //Other components
     HitboxRoot hitboxRoot;
     CharacterMovementHandler characterMovementHandler;
+    PlayerStateHandler playerStateHandler;
     LocalUICanvas localUICanvas;
     [Header("KillLog UI")]
     public GameObject _killLogPanel; // ų�α� �г�
@@ -54,8 +57,10 @@ public class HPHandler : NetworkBehaviour
         characterMovementHandler = GetComponent<CharacterMovementHandler>();
         hitboxRoot = GetComponentInChildren<HitboxRoot>();
         localUICanvas = GetComponentInChildren<LocalUICanvas>(); ;
-        
-        MaxHp = 5;
+        playerStateHandler = GetComponent<PlayerStateHandler>();
+        MaxHp = 500;
+
+
     }
     IEnumerator OnHitCo()
     {
@@ -108,9 +113,8 @@ public class HPHandler : NetworkBehaviour
         _killLogPanel = GameObject.Find("KillLogPanelnel");
     }
 
-    
 
-    public void OnTakeDamage(string _hitPlayer, int weaponNum, int _attackDamage = 1)
+    public void OnTakeDamage(string _hitPlayer, int weaponNum, int _addForce = 10, int _attackDamage = 1)
     {
         Debug.Log("OnTakeDamage");
         if (HasStateAuthority)
@@ -122,13 +126,18 @@ public class HPHandler : NetworkBehaviour
             return;
         }
         _enemyNickName = _hitPlayer;
+        AddForce += _addForce;
         HP -= _attackDamage;
         if (HP <= 0)
         {
             Debug.Log($"{transform.name} isDead");
             StartCoroutine(ServerReviveCO());
             isDead = true;
+            return;
         }
+        playerStateHandler.isHit = true;
+
+        
 
     }
 
@@ -251,6 +260,8 @@ public class HPHandler : NetworkBehaviour
         }
         isDead = false;
         HpReset();
+        AddForce =1;
+
     }
 
     void HpReset()

@@ -127,6 +127,10 @@ MonoBehaviour:
   LifeTimeAfterHit: 2
   ProjectileObject: {fileID: 7822029173100858382}
   HitEffectPrefab: {fileID: 422195123365560357, guid: a28e7471dd5ee3449a5ca05b15203a03, type: 3}
+  raycastDistance: 100
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 128
 --- !u!114 &1488264826938376011
 MonoBehaviour:
   m_ObjectHideFlags: 0

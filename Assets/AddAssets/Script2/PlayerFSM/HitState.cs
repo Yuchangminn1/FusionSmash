@@ -8,38 +8,24 @@ public class HitState : PlayerState
     public int damage = 0;
     public HitState(PlayerStateHandler _player, int _currentStateNum) : base(_player, _currentStateNum)
     {
-        isAbleAttack = false;  
+        endMotionChange = true;
+        isAbleAttack = false;
         isAbleDodge = false;
+        isAbleJump = false;
     }
 
     public override void Enter()
     {
         base.Enter();
+        player.isHit = false;
 
     }
 
 
     public override bool Update()
     {
-        if (player.nextState != this)
-        {
-            return true;
-        }
-        if (base.Update())
-            return true;
-        if(!player.Isvisi())
-        {
-            if (player.isdead)
-            {
+        return base.Update();
 
-                player.nextState = player.deathState;
-
-                return true;
-            }
-            player.nextState = player.moveState;
-
-        }
-        return false;
     }
     public override void FixedUpdate()
     {

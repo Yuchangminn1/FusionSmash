@@ -34,9 +34,8 @@ public class PlayerAnimationTrigger : NetworkBehaviour
     {
         if (HasStateAuthority)
         {
-            //Debug.Log("AnimationTrigger OFF");
             player.SetAnimationTrigger(false);
-            player.AnimationTrigger = false;
+
         }
 
     }
@@ -44,10 +43,7 @@ public class PlayerAnimationTrigger : NetworkBehaviour
     {
         if (HasStateAuthority)
         {
-            //Debug.Log("AnimationTrigger On");
             player.SetAnimationTrigger(true);
-            player.AnimationTrigger = true;
-
         }
 
     }

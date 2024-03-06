@@ -12,7 +12,7 @@ public class PlayerState : EntityState
 
     protected float airTime;
 
-
+    //protected int currentStateNum;
     //protected int currentStateNum;        ���� ������Ʈ ��
     //protected float stateTimer;
     //protected float startTime;                
@@ -20,6 +20,9 @@ public class PlayerState : EntityState
     //protected bool isAbleFly = false; �̰� ���� 
     //protected bool isAbleAttack = true;
     //protected bool isState2=false;
+    //protected bool isAbleDodge = true;
+    //public bool isAbleJump { get; protected set; } = true;
+
     public PlayerState(PlayerStateHandler _player, int _currentStateNum)
     {
         player = _player;
@@ -48,7 +51,28 @@ public class PlayerState : EntityState
 
         if (player.nextState != this)
         {
+
             return true;
+        }
+        if (player.isdead)
+        {
+            player.nextState = player.deathState;
+
+            return true;
+        }
+        if (player.isHit)
+        {
+            player.nextState = player.hitState;
+
+            return true;
+        }
+        if (endMotionChange)
+        {
+            if (player.Isvisi())
+            {
+
+                return false;
+            }
         }
         if (!isAbleFly)
         {
@@ -73,6 +97,7 @@ public class PlayerState : EntityState
         if (player.isJumpButtonPressed && isAbleJump)
         {
             player.nextState = player.jumpState;
+
             return true;
         }
         if (player.isFireButtonPressed && isAbleAttack)
@@ -80,14 +105,23 @@ public class PlayerState : EntityState
             if (!player.attackCoolDownOn)
             {
                 player.nextState = player.attackState;
+
                 return true;
             }
         }
         if (player.isDodgeButtonPressed && isAbleDodge)
         {
             player.nextState = player.dodgeState;
+
             return true;
         }
+        if (player.IsGround())
+        {
+            player.nextState = player.moveState;
+
+            return true;
+        }
+
         return BaseState();
     }
     public override void FixedUpdate()
@@ -129,4 +163,5 @@ public class PlayerState : EntityState
         }
         return false;
     }
+
 }
