@@ -58,14 +58,14 @@ public class LocalCameraHandler : NetworkBehaviour
         localCamera.transform.position = cameraAnchorPoint.position;
 
         //Calculate rotation
-        cameraRotationX += viewInput.y * Time.deltaTime * characterMovementHandler.viewUpDownRotationSpeed;
-        cameraRotationX = Mathf.Clamp(cameraRotationX, -90, 90);
+        //cameraRotationX += viewInput.y * Time.deltaTime * characterMovementHandler.viewUpDownRotationSpeed;
+        //cameraRotationX = Mathf.Clamp(cameraRotationX, -90, 90);
 
-        cameraRotationY += viewInput.x * Time.deltaTime * characterMovementHandler.rotationSpeed;
+        //cameraRotationY += viewInput.x * Time.deltaTime * characterMovementHandler.cameraRotationSpeed;
 
 
         
-        localCamera.transform.rotation = Quaternion.Euler(cameraRotationX / 2 * sensitivity, cameraRotationY / 2 * sensitivity, 0);
+       // localCamera.transform.rotation = Quaternion.Euler(cameraRotationX / 2 * sensitivity, cameraRotationY / 2 * sensitivity, 0);
 
     }
     public Rotation CMLookRotation() 

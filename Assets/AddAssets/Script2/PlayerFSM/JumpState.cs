@@ -33,15 +33,11 @@ public class JumpState : PlayerState
             player.ChangeState();
             return true;
         }
-        if (player.isFireButtonPressed && !player.attackCoolDownOn)
+        if (player.isFireButtonPressed)
         {
-            if (!player.attackCoolDownOn)
-            {
-                //player.SetAnimationTrigger(false);
-                player.nextState = player.attackState;
-                return true;
-            }
-
+            //player.SetAnimationTrigger(false);
+            player.nextState = player.attackState;
+            return true;
         }
         if (!player.Isvisi())
         {

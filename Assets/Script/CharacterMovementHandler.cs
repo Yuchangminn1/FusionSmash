@@ -16,8 +16,12 @@ public class CharacterMovementHandler : NetworkBehaviour
 {
     [Header("Move")]
     Vector3 moveDirection;
+
+    public Transform characterRoot;
     [Networked]
     public NetworkBool canMove { get; set; } = true;
+    [Networked]
+    public NetworkBool StopMove { get; set; } = false;
     float moveSpeed = 5f;
     float jumpTime = 0f;
     float jumpCooldown = 0f;
@@ -31,12 +35,8 @@ public class CharacterMovementHandler : NetworkBehaviour
     [Networked]
     int _dodgeCount { get; set; }
     public int playerAttackCount { get; set; }
-
-
     [Header("Weapon ")]
     WeaponHandler weaponHandler;
-
-
 
     [Header("Script")]
     public CharacterInputhandler characterInputhandler;
@@ -58,10 +58,10 @@ public class CharacterMovementHandler : NetworkBehaviour
     public GameObject localCamera;
     public Camera camera;
     private NetworkObject networkObject;
-
+    public float rotationSpeed = 5f;
 
     [Header("Camera")]
-    public float rotationSpeed = 15.0f;
+    public float cameraRotationSpeed = 15.0f;
     public float viewUpDownRotationSpeed = 50.0f;
 
     [Header("GroundCheck")]
@@ -70,6 +70,9 @@ public class CharacterMovementHandler : NetworkBehaviour
     float groundCheckRad = 0.2f;
 
     public bool isRespawnRequsted = false;
+
+    //임시
+    public int WeaponCNum = 0;
     //public GameObject _nickName;
 
     //public int jumpcount2 = 0;
@@ -98,7 +101,9 @@ public class CharacterMovementHandler : NetworkBehaviour
     {
         weaponHandler.SetEq();
         cameraAimAngle.camera = camera;
-        ChangeWeapon(0);
+        ChangeWeapon(WeaponCNum);
+        playerStateHandler.weapon = WeaponCNum;
+        RotateTowards(1f);
     }
     public void PlayFireEffect()
     {
@@ -191,11 +196,23 @@ public class CharacterMovementHandler : NetworkBehaviour
         Vector3 tmp = new Vector3(networkInputData.aimFowardVector.x, 0, networkInputData.aimFowardVector.z);
         transform.forward = tmp;
 
-        Vector3 moveDirection = transform.forward * networkInputData.movementInput.y + transform.right * networkInputData.movementInput.x;
+        Vector3 moveDirection = transform.right * networkInputData.movementInput.x;
         moveDirection.Normalize();
+        
+        if (StopMove)
+        {
+            Vector3 tmp22 = networkRigidbody.Rigidbody.velocity;
+            float div = 1.3f;
+            networkRigidbody.Rigidbody.velocity = (new Vector3(tmp22.x / div, tmp22.y, tmp22.z / div));
+
+        }
         if (!canMove)
         {
-            moveDirection = Vector3.zero;
+            return;
+        }
+        if (networkInputData.movementInput != Vector2.zero)
+        {
+            RotateTowards(networkInputData.movementInput.x);
         }
         playerStateHandler.SetInputVec(networkInputData.movementInput);
         if (_jumpGravityCount > 10)
@@ -254,7 +271,23 @@ public class CharacterMovementHandler : NetworkBehaviour
     {
         weaponHandler.Fire();
     }
-
+    void RotateTowards(float dir)
+    {
+        Vector3 direction;
+        if (dir > 0)
+        {
+            direction = Vector3.right;
+            Quaternion targetRotation = Quaternion.LookRotation(direction, Vector3.up);
+            characterRoot.transform.rotation = Quaternion.Lerp(characterRoot.transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+        }
+        else if(dir < 0)
+        {
+            direction = Vector3.left;
+            Quaternion targetRotation = Quaternion.LookRotation(direction, Vector3.up);
+            characterRoot.transform.rotation = Quaternion.Lerp(characterRoot.transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+        }
+        
+    }
     private void Jump()
     {
         Vector3 tmp = Vector3.zero;
@@ -286,13 +319,13 @@ public class CharacterMovementHandler : NetworkBehaviour
     /// hpHandler.OnRespawned();
     /// isRespawnRequsted = false;
     /// </summary>
-    void Respawn()
+    protected virtual void Respawn()
     {
         SetCharacterControllerEnabled(true);
         networkRigidbody.TeleportToPosition(Utils.GetRandomSpawnPoint());
+        weaponHandler._equipWeapon.OnRespawn();
 
         hpHandler.OnRespawned();
-        weaponHandler._equipWeapon.OnRespawn();
         isRespawnRequsted = false;
     }
     /// <summary>
@@ -330,10 +363,12 @@ public class CharacterMovementHandler : NetworkBehaviour
 
     public void SetCanMove(bool _tf)
     {
-
         canMove = _tf;
     }
-
+    public void SetStopMove(bool _tf)
+    {
+        StopMove = _tf;
+    }
     public void HitAddForce(Vector3 _attackVec,int _force)
     {
         Vector3 tmp = (_attackVec - transform.position);

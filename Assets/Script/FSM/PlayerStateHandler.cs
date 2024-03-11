@@ -12,7 +12,8 @@ public class PlayerStateHandler : NetworkBehaviour
     public int state { get; set; }
     [Networked(OnChanged = nameof(ChangeState2))] //
     public int state2 { get; set; }
-
+    [Networked(OnChanged = nameof(ChangeWeapon))] //
+    public int weapon { get; set; }
     [Networked(OnChanged = nameof(ChangeAnimationTrigger))]
     public NetworkBool AnimationTrigger { get; set; }
     private bool animationTrigger { get; set; }
@@ -35,6 +36,11 @@ public class PlayerStateHandler : NetworkBehaviour
     [Networked(OnChanged = nameof(ChangeJumpCount))] //
     public int jumpCount { get; set; } = 0;
     public int maxJumpCount { get; private set; } = 2;
+
+    [Networked(OnChanged = nameof(ChangeAttackCount))] //
+    public int attackCount { get; set; } = 0;
+    public int maxAttackCount { get; private set; } = 3;
+    
 
     #region FSM
     protected StateMachine stateMachine;
@@ -64,20 +70,17 @@ public class PlayerStateHandler : NetworkBehaviour
 
     #endregion
 
-    public float attackTime { get; set; }
+    public float lastAttackTime { get; set; } = 0f;
 
-    public float attackComboTime { get; set; }
+    float attackComboTime = 1.5f;
 
-    public float attackCoolDown { get; set; }
+    //public float attackCoolDown { get; set; }
 
-    public bool attackCoolDownOn { get; set; }
+    //public bool attackCoolDownOn { get; set; }
 
 
     void Awake()
     {
-        attackTime = 0f;
-        attackComboTime = 1f;
-        attackCoolDown = 1f;
         anima = GetComponent<Animator>();
         SetAnimationTrigger(false);
         characterMovementHandler = GetComponent<CharacterMovementHandler>();
@@ -186,6 +189,16 @@ public class PlayerStateHandler : NetworkBehaviour
             changed.Behaviour.SetInt("State2", newS);
         }
     }
+    static void ChangeWeapon(Changed<PlayerStateHandler> changed)
+    {
+        int newS = changed.Behaviour.weapon;
+        changed.LoadOld();
+        int oldS = changed.Behaviour.weapon;
+        if (newS != oldS)
+        {
+            changed.Behaviour.SetInt("Weapon", newS);
+        }
+    }
     static void ChangeAnimationTrigger(Changed<PlayerStateHandler> changed)
     {
         NetworkBool newS = changed.Behaviour.AnimationTrigger;
@@ -232,6 +245,18 @@ public class PlayerStateHandler : NetworkBehaviour
             changed.Behaviour.SetInt("State2", newS);
         }
     }
+    static void ChangeAttackCount(Changed<PlayerStateHandler> changed)
+    {
+        int newS = changed.Behaviour.attackCount;
+        changed.LoadOld();
+        int oldS = changed.Behaviour.attackCount;
+        if (newS != oldS)
+        {
+            changed.Behaviour.SetInt("State2", newS);
+        }
+    }
+
+    
     public void ResetJumpCount()
     {
         if (HasStateAuthority)
@@ -288,9 +313,11 @@ public class PlayerStateHandler : NetworkBehaviour
     public void SetCanMove(bool _tf)
     {
         characterMovementHandler.SetCanMove(_tf);
-        Debug.Log("Canmove = " + characterMovementHandler.canMove);
     }
-
+    public void SetStopMove(bool _tf)
+    {
+        characterMovementHandler.SetStopMove(_tf);
+    }
     public void SetAnimationTrigger(bool _tf)
     {
         animationTrigger = _tf;
@@ -299,9 +326,14 @@ public class PlayerStateHandler : NetworkBehaviour
     
     public void AttackEnter() 
     {
-        SetCanMove(false);
-        attackTime = Time.time;
+        if (attackCount < 3)
+        {
+            attackCount++;
+        }
+        SetStopMove(true);
+        lastAttackTime = Time.time;
         isFireButtonPressed = false;
+        
         Fire();
     }
     public EntityState GetCurrentState() 
@@ -313,15 +345,37 @@ public class PlayerStateHandler : NetworkBehaviour
     }
     public bool AbleFire()
     {
-        if(GetCurrentState() == null)
+        AttackCountReset();
+        if (GetCurrentState() == null)
         {
             return false;
         }
         if (GetCurrentState().isAbleAttack && !Isvisi()) 
         {
-            return true;
+            if(weapon == 0)
+            {
+                return true;
+            }
+            if (weapon == 1)
+            {
+                if (attackCount < 3)
+                {
+                    return true;
+                }
+            }
         }
+        
         return false;
+    }
+
+    public void AttackCountReset()
+    {
+        if(lastAttackTime+attackComboTime < Time.time)
+        {
+            attackCount = 0;
+        }
+
+        //if(Time.time)
     }
 
 }

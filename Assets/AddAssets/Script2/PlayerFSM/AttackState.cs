@@ -14,6 +14,7 @@ public class AttackState : PlayerState
         isAbleFly = true;
         isAbleAttack = false;
         isAbleJump = false;
+        isState2 = true;
     }
 
     public override void Enter()
@@ -41,8 +42,8 @@ public class AttackState : PlayerState
     public override void Exit()
     {
         base.Exit();
-        player.SetCanMove(true);
-        player.attackTime = Time.time;
+        player.SetStopMove(false);
+        player.lastAttackTime = Time.time;
     }
     private void AnimationTriggerErrorCheck()
     {
@@ -52,5 +53,6 @@ public class AttackState : PlayerState
             
             Debug.Log("AnimationTrigger Error State =  " + player.GetCurrentState().currentState);
         }
+        
     }
 }

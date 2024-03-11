@@ -34,11 +34,11 @@ public class PlayerState : EntityState
         base.Enter();
         startTime = Time.time;
         player.SetState(currentStateNum);
-        if (endMotionChange) 
+        if (endMotionChange)
         {
             player.SetAnimationTrigger(true);
         }
-        if (!isState2) 
+        if (!isState2)
         {
             player.SetState2(0);
         }
@@ -102,12 +102,9 @@ public class PlayerState : EntityState
         }
         if (player.isFireButtonPressed && isAbleAttack)
         {
-            if (!player.attackCoolDownOn)
-            {
-                player.nextState = player.attackState;
+            player.nextState = player.attackState;
 
-                return true;
-            }
+            return true;
         }
         if (player.isDodgeButtonPressed && isAbleDodge)
         {
@@ -127,10 +124,7 @@ public class PlayerState : EntityState
     public override void FixedUpdate()
     {
         base.FixedUpdate();
-        if (player.attackCoolDownOn && player.attackCoolDown + player.attackTime < Time.time)
-        {
-            player.attackCoolDownOn = false;
-        }
+
     }
     public override void LateUpdate()
     {

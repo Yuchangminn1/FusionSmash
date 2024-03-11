@@ -6017,7 +6017,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!81 &437476083
 AudioListener:
   m_ObjectHideFlags: 0
@@ -6090,7 +6090,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 9.637, y: 0, z: 0}
 --- !u!1001 &437699840
 PrefabInstance:
@@ -6246,7 +6246,7 @@ Transform:
   m_Children:
   - {fileID: 181194001012684165}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &452559689
 PrefabInstance:
@@ -7842,7 +7842,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &571923586
 MonoBehaviour:
@@ -9902,7 +9902,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &762044716
 PrefabInstance:
@@ -10412,6 +10412,98 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d1a3e2964e6474c4b8209bf6d547f47f, type: 3}
+--- !u!1001 &798613851
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1014265798754390853, guid: 484e5da217bd6e242934b2db4d7136cc, type: 3}
+      propertyPath: m_Name
+      value: Sword
+      objectReference: {fileID: 0}
+    - target: {fileID: 3262086213466852707, guid: 484e5da217bd6e242934b2db4d7136cc, type: 3}
+      propertyPath: Flags
+      value: 2561
+      objectReference: {fileID: 0}
+    - target: {fileID: 3262086213466852707, guid: 484e5da217bd6e242934b2db4d7136cc, type: 3}
+      propertyPath: NetworkedBehaviours.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3262086213466852707, guid: 484e5da217bd6e242934b2db4d7136cc, type: 3}
+      propertyPath: NetworkedBehaviours.Array.data[0]
+      value: 
+      objectReference: {fileID: 798613852}
+    - target: {fileID: 3262086213466852707, guid: 484e5da217bd6e242934b2db4d7136cc, type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      value: 7946510620418058645
+      objectReference: {fileID: 0}
+    - target: {fileID: 3262086213466852707, guid: 484e5da217bd6e242934b2db4d7136cc, type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      value: 4564167258983739571
+      objectReference: {fileID: 0}
+    - target: {fileID: 5900230239729461423, guid: 484e5da217bd6e242934b2db4d7136cc, type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5900230239729461423, guid: 484e5da217bd6e242934b2db4d7136cc, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 5.4904833
+      objectReference: {fileID: 0}
+    - target: {fileID: 5900230239729461423, guid: 484e5da217bd6e242934b2db4d7136cc, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 13.508064
+      objectReference: {fileID: 0}
+    - target: {fileID: 5900230239729461423, guid: 484e5da217bd6e242934b2db4d7136cc, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -13.978682
+      objectReference: {fileID: 0}
+    - target: {fileID: 5900230239729461423, guid: 484e5da217bd6e242934b2db4d7136cc, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5900230239729461423, guid: 484e5da217bd6e242934b2db4d7136cc, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5900230239729461423, guid: 484e5da217bd6e242934b2db4d7136cc, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5900230239729461423, guid: 484e5da217bd6e242934b2db4d7136cc, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5900230239729461423, guid: 484e5da217bd6e242934b2db4d7136cc, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5900230239729461423, guid: 484e5da217bd6e242934b2db4d7136cc, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 5900230239729461423, guid: 484e5da217bd6e242934b2db4d7136cc, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 90
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 484e5da217bd6e242934b2db4d7136cc, type: 3}
+--- !u!114 &798613852 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6723741104738109779, guid: 484e5da217bd6e242934b2db4d7136cc, type: 3}
+  m_PrefabInstance: {fileID: 798613851}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d389e1b43c2100540baa857c92b32932, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &801786473
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10602,7 +10694,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &816750921
 MonoBehaviour:
@@ -15528,7 +15620,7 @@ Transform:
   - {fileID: 2120533221}
   - {fileID: 90118274}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!895512359 &1197247050
 AimConstraint:
@@ -17647,7 +17739,7 @@ Transform:
   - {fileID: 1057963819}
   - {fileID: 1904392573}
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1333857663 stripped
 Transform:

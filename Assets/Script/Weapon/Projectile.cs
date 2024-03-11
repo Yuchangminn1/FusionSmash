@@ -6,13 +6,13 @@ using UnityEngine;
 using UnityEngine.UIElements;
 //using static Fusion.NetworkCharacterController;
 
-public enum EWeaponType
-{
-    Pistol,
-    Rifle,
-    Shotgun,
-    Gravity
-}
+//public enum EWeaponGunType
+//{
+//    Pistol,
+//    Rifle,
+//    Shotgun,
+//    Gravity
+//}
 
 public class Projectile : NetworkBehaviour
 {
@@ -42,20 +42,12 @@ public class Projectile : NetworkBehaviour
     float raycastDistance = 1f;
     public LayerMask layerMask;
     float radius = 0.25f;
-    /// <summary>
-    /// Set where the projectile visual should land.                                ź�� ���־��� ��ź�� ��ġ�� �����մϴ�.
-    /// </summary>
-    /// <param name="hitPosition">Position where projectile hit geometry</param>    ź���� ����ü�� ���� ��ġ
-    /// <param name="hitNormal">Normal of the hit surface</param>                   ���� ǥ���� ���� ����
-    /// <param name="showHitEffect">Whether projectile impact should be displayed   ź�� �浹 ȿ���� ǥ������ ����
-    /// (e.g. we don't want static impact effect displayed on other player's body)</param>
-    public void SetHit(Vector3 hitPosition, Vector3 hitNormal, bool showHitEffect)
+   public void SetHit(Vector3 hitPosition, Vector3 hitNormal, bool showHitEffect)
     {
         _targetPosition = hitPosition;
         _showHitEffect = showHitEffect;
         _hitNormal = hitNormal;
     }
-
     public override void FixedUpdateNetwork()
     {
         if (HasStateAuthority)
@@ -64,12 +56,8 @@ public class Projectile : NetworkBehaviour
             {
                 _transform.transform.position += _targetPosition.normalized * Speed;
                 LifeTime();
-
             }
         }
-
-
-
     }
     private void Update()
     {
