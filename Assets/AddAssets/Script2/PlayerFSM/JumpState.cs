@@ -27,8 +27,8 @@ public class JumpState : PlayerState
         }
         if (player.isJumpButtonPressed)
         {
+            player.AnimationTrigger = false;
             player.isJumpButtonPressed = false;
-            player.SetAnimationTrigger(false);
             player.nextState = player.jumpState;
             player.ChangeState();
             return true;

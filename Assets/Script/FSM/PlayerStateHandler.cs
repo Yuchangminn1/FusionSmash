@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+//using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,7 +17,6 @@ public class PlayerStateHandler : NetworkBehaviour
     public int weapon { get; set; }
     [Networked(OnChanged = nameof(ChangeAnimationTrigger))]
     public NetworkBool AnimationTrigger { get; set; }
-    private bool animationTrigger { get; set; }
 
     public bool isdead = false;
     public bool isStop = false;
@@ -56,7 +56,7 @@ public class PlayerStateHandler : NetworkBehaviour
     public HealState healState { get; private set; }
 
     //public NetworkCharacterControllerPrototypeCustom networkCC;
-    public CharacterMovementHandler characterMovementHandler;
+    CharacterMovementHandler characterMovementHandler;
 
     public bool isJumpButtonPressed = false;
 
@@ -82,8 +82,7 @@ public class PlayerStateHandler : NetworkBehaviour
     void Awake()
     {
         anima = GetComponent<Animator>();
-        SetAnimationTrigger(false);
-        characterMovementHandler = GetComponent<CharacterMovementHandler>();
+        characterMovementHandler=GetComponent<CharacterMovementHandler>();
     }
 
     // Start is called before the first frame update
@@ -108,6 +107,8 @@ public class PlayerStateHandler : NetworkBehaviour
             nextState = moveState;
             this.ChangeState();
         }
+        AnimationTrigger = false;
+
     }
 
     void Update()
@@ -140,7 +141,7 @@ public class PlayerStateHandler : NetworkBehaviour
     }
     public override void FixedUpdateNetwork()
     {
-        AnimationTrigger = animationTrigger;
+        
     }
 
     private void LateUpdate()
@@ -153,7 +154,11 @@ public class PlayerStateHandler : NetworkBehaviour
     {
         if (stateMachine == null)
         {
-            Debug.Log("stateMachine is Null");
+            //if (HasStateAuthority)
+            //{
+            //    //Debug.Log("stateMachine is Null");
+            //    ;
+            //}
             return;
         }
 
@@ -204,10 +209,9 @@ public class PlayerStateHandler : NetworkBehaviour
         NetworkBool newS = changed.Behaviour.AnimationTrigger;
         changed.LoadOld();
         NetworkBool oldS = changed.Behaviour.AnimationTrigger;
-        Debug.Log(newS);
         if (newS != oldS)
         {
-            changed.Behaviour.SetAnimationTrigger(newS);
+            changed.Behaviour.SetBool("AnimationTrigger", newS);
             
         }
     }
@@ -270,7 +274,17 @@ public class PlayerStateHandler : NetworkBehaviour
 
     public bool IsGround()
     {
-        return characterMovementHandler.IsGround();
+        if(characterMovementHandler == null)
+        {
+            if (HasStateAuthority)
+            {
+                characterMovementHandler = GetComponent<CharacterMovementHandler>();
+                Debug.Log("characterMovementHandler Is Null");
+            }
+            return false;
+        }
+        //return false;
+       return characterMovementHandler.IsGround();
     }
     #region Animator
     public void SetBool(string _parameters, bool _tf) => anima.SetBool(_parameters, _tf);
@@ -298,7 +312,7 @@ public class PlayerStateHandler : NetworkBehaviour
 
     public bool Isvisi()
     {
-        return animationTrigger;
+        return AnimationTrigger;
     }
 
     public void ChangeState()
@@ -318,24 +332,32 @@ public class PlayerStateHandler : NetworkBehaviour
     {
         characterMovementHandler.SetStopMove(_tf);
     }
-    public void SetAnimationTrigger(bool _tf)
+    
+    
+    public void AttackEnter()
     {
-        animationTrigger = _tf;
-        SetBool("AnimationTrigger", animationTrigger);
+        //AddAttackCount();
+        SetStopMove(true);
+        lastAttackTime = Time.time;
+        isFireButtonPressed = false;
+        Fire();
+    }
+    public void AttackExit()
+    {
+        SetStopMove(false);
+        lastAttackTime = Time.time;
+        GetEquipWeapon().SetCollistion(false);
     }
     
-    public void AttackEnter() 
+
+    public void AddAttackCount()
     {
         if (attackCount < 3)
         {
             attackCount++;
         }
-        SetStopMove(true);
-        lastAttackTime = Time.time;
-        isFireButtonPressed = false;
-        
-        Fire();
     }
+
     public EntityState GetCurrentState() 
     {
         if (stateMachine.GetState() == null) 
@@ -374,8 +396,10 @@ public class PlayerStateHandler : NetworkBehaviour
         {
             attackCount = 0;
         }
-
-        //if(Time.time)
+    }
+    public PlayerWeapon GetEquipWeapon()
+    {
+        return characterMovementHandler.GetEquipWeapon();
     }
 
 }

@@ -98,5 +98,8 @@ public class WeaponHandler : NetworkBehaviour
             }
         }
     }
-
+    public PlayerWeapon GetEquipWeapon()
+    {
+        return _equipWeapon;
+    }
 }

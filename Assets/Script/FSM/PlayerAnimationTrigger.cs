@@ -34,17 +34,15 @@ public class PlayerAnimationTrigger : NetworkBehaviour
     {
         if (HasStateAuthority)
         {
-            player.SetAnimationTrigger(false);
-
+            player.AnimationTrigger = false;
         }
-
     }
+
     void AnimationTriggerOn()
     {
         if (HasStateAuthority)
         {
-            player.SetAnimationTrigger(true);
-        }
+            player.AnimationTrigger = true;       }
 
     }
     void AttackColOn()

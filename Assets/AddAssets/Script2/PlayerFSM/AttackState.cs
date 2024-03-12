@@ -8,6 +8,7 @@ public class AttackState : PlayerState
 {
     int counter;
     Queue<bool> Combo;
+    float attackDelay = 0.4f;
     public AttackState(PlayerStateHandler _player,  int _currentStateNum) : base(_player,  _currentStateNum)
     {
         endMotionChange = true;
@@ -24,12 +25,18 @@ public class AttackState : PlayerState
     }
     public override bool Update()
     {
-        AnimationTriggerErrorCheck();
         if (!player.Isvisi())
         {
-            if (base.Update()) return true;
+            if (player.isFireButtonPressed)
+            {
+                player.AnimationTrigger = false;
+                player.nextState = player.attackState;
+                player.ChangeState();
+                return true;
+            }
         }
-        return false;
+        return base.Update();
+        
     }
     public override void FixedUpdate()
     {
@@ -42,14 +49,13 @@ public class AttackState : PlayerState
     public override void Exit()
     {
         base.Exit();
-        player.SetStopMove(false);
-        player.lastAttackTime = Time.time;
+        player.AttackExit();
     }
     private void AnimationTriggerErrorCheck()
     {
         if (startTime + 5f < Time.time)
         {
-            player.SetAnimationTrigger(false);
+            player.AnimationTrigger = false;
             
             Debug.Log("AnimationTrigger Error State =  " + player.GetCurrentState().currentState);
         }

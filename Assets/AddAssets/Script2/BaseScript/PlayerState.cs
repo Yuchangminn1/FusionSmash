@@ -36,7 +36,7 @@ public class PlayerState : EntityState
         player.SetState(currentStateNum);
         if (endMotionChange)
         {
-            player.SetAnimationTrigger(true);
+            player.AnimationTrigger = true;
         }
         if (!isState2)
         {

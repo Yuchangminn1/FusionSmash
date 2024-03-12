@@ -69,6 +69,12 @@ public class PlayerWeapon : NetworkBehaviour
         }
         _weaponNum = (int)Type;
     }
+
+    public virtual void SetCollistion(bool _tf)
+    {
+        ;
+    }
+
     public virtual void OnRespawn()
     {
         ;

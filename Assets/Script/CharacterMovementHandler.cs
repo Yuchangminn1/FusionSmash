@@ -259,9 +259,9 @@ public class CharacterMovementHandler : NetworkBehaviour
             }
             else 
             {
-                weaponHandler.SetFire(localCamera.transform.position, networkInputData.aimFowardVector, networkInputData.isFireButtonPressed);
-                //Debug.Log(localCamera.transform.position + networkInputData.aimFowardVector);
                 playerStateHandler.isFireButtonPressed = true;
+                playerStateHandler.AddAttackCount();
+                weaponHandler.SetFire(localCamera.transform.position, networkInputData.aimFowardVector, networkInputData.isFireButtonPressed);
                 return;
             }
         }
@@ -388,5 +388,15 @@ public class CharacterMovementHandler : NetworkBehaviour
         }
         
     }
+
+    public PlayerWeapon GetEquipWeapon()
+    {
+        if (weaponHandler == null)
+        {
+            Debug.Log("EquipWeapon is Null");
+        }
+        return weaponHandler.GetEquipWeapon();
+    }
+
 
 }

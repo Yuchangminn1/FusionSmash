@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class WeaponSword : PlayerWeapon
 {
+    MeshCollider meshCollider;
     public override bool AbleFire(bool justPressed)
     {
         return true;
@@ -21,7 +22,7 @@ public class WeaponSword : PlayerWeapon
 
     public override void Fire(Vector3 firePosition, Vector3 fireDirection)
     {
-        ;
+        SetCollistion(true);
     }
 
     public override void FixedUpdateNetwork()
@@ -37,8 +38,14 @@ public class WeaponSword : PlayerWeapon
     public override void Spawned()
     {
         base.Spawned();
+        meshCollider = GetComponent<MeshCollider>();
+        SetCollistion(false);
     }
+    public override void SetCollistion(bool _tf)
+    {
+        meshCollider.enabled = _tf;
 
+    }
     private void OnTriggerEnter(Collider other)
     {
         if (_hPHandler == null)
@@ -77,8 +84,11 @@ public class WeaponSword : PlayerWeapon
             {
                 //parentWeapon.HitEffect();
             }
+
             //Runner.Despawn(Object);
         }
-
     }
+
+
+
 }
