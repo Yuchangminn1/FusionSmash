@@ -14,43 +14,28 @@ using UnityEngine.VFX;
 
 public class CharacterMovementHandler : NetworkBehaviour
 {
+    [Header("NickName")]
+    public string _nickName;
+
     [Header("Move")]
     Vector3 moveDirection;
-
     public Transform characterRoot;
-    [Networked]
-    public NetworkBool canMove { get; set; } = true;
-    [Networked]
-    public NetworkBool StopMove { get; set; } = false;
+    
     float moveSpeed = 5f;
     float jumpTime = 0f;
     float jumpCooldown = 0f;
     float jumpForce = 10f;
     float maxGravity = -8f;
-    [Header("NickName")]
-    public string _nickName;
-
-    [Networked]
-    int _jumpGravityCount { get; set; } = 0;
-    [Networked]
-    int _dodgeCount { get; set; }
-    public int playerAttackCount { get; set; }
-    [Header("Weapon ")]
-    WeaponHandler weaponHandler;
 
     [Header("Script")]
     public CharacterInputhandler characterInputhandler;
     PlayerInput input;
     HPHandler hpHandler;
-
     CameraAimAngle cameraAimAngle;
-
     ChatSystem chatSystem;
 
     [Header("State")]
     PlayerStateHandler playerStateHandler;
-    [Networked]
-    NetworkBool isvisi { get; set; } = false;
 
     [Header("Component")]
     public NetworkRigidbody networkRigidbody;
@@ -58,25 +43,18 @@ public class CharacterMovementHandler : NetworkBehaviour
     public GameObject localCamera;
     public Camera camera;
     private NetworkObject networkObject;
-    public float rotationSpeed = 5f;
 
-    [Header("Camera")]
-    public float cameraRotationSpeed = 15.0f;
-    public float viewUpDownRotationSpeed = 50.0f;
 
     [Header("GroundCheck")]
     [SerializeField] protected float GroundCheckDis = 0.65f;
     public LayerMask groundLayer;
     float groundCheckRad = 0.2f;
 
+    //이것들 각자 스크립트로 이동 
     public bool isRespawnRequsted = false;
-
-    //임시
     public int WeaponCNum = 0;
-    //public GameObject _nickName;
 
-    //public int jumpcount2 = 0;
-    void Awake()
+    public override void Spawned()
     {
         //Input
         characterInputhandler = GetComponent<CharacterInputhandler>();
@@ -92,45 +70,17 @@ public class CharacterMovementHandler : NetworkBehaviour
         //Script
         hpHandler = GetComponent<HPHandler>();
         playerStateHandler = GetComponent<PlayerStateHandler>();
-        weaponHandler = GetComponent<WeaponHandler>();
         cameraAimAngle = GetComponentInChildren<CameraAimAngle>();
-    }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        weaponHandler.SetEq();
+        //Camera
         cameraAimAngle.camera = camera;
-        ChangeWeapon(WeaponCNum);
-        playerStateHandler.weapon = WeaponCNum;
+
+        
+
         RotateTowards(1f);
     }
-    public void PlayFireEffect()
-    {
-        ;
-    }
-    public void ChangeWeapon(int _weaponNum)
-    {
-        weaponHandler.ChangeWeapon(_weaponNum);
-    }
-
-    void ShowBoard(NetworkInputData networkInputData)
-    {
-        if (networkInputData.isShowBoardButtonPressed)
-        {
-            //if(HasStateAuthority)
-            //    _showBoard = !_showBoard;
-        }
-    }
-
-    void OnMove(InputValue value)
-    {
-        Vector2 dir = value.Get<Vector2>();
-        if (input != null)
-        {
-            moveDirection = new Vector3(dir.x, 0f, dir.y);
-        }
-    }
+    
+    
 
     public override void FixedUpdateNetwork()
     {
@@ -145,10 +95,7 @@ public class CharacterMovementHandler : NetworkBehaviour
                 return;
         }
         cameraAimAngle.SetAngle();
-        //if (HasInputAuthority)
-        //{
-        //    cameraAimAngle.SetAngle();
-        //}
+        
         if (GetInput(out NetworkInputData networkInputData))
         {
             ShowBoard(networkInputData);
@@ -162,51 +109,24 @@ public class CharacterMovementHandler : NetworkBehaviour
         }
     }
 
-    private void Chat(NetworkInputData networkInputData)
-    {
-        if (networkInputData.isChatButtonPressed)
-        {
-
-            if (HasStateAuthority)
-            {
-                SetCanMove(!chatSystem.ischating);
-                chatSystem.IsChatChange();
-            }
-        }
-
-
-    }
+    
     private void Move(NetworkInputData networkInputData)
     {
-        if (HasStateAuthority)
-        {
-            if (playerStateHandler.state == 2)
-            {
-                if (networkRigidbody.ReadVelocity().y < 0.05f && networkRigidbody.ReadVelocity().y > -0.05f)
-                {
-                    _jumpGravityCount++;
-                }
-            }
-            else
-            {
-                _jumpGravityCount = 0;
-            }
-        }
 
         Vector3 tmp = new Vector3(networkInputData.aimFowardVector.x, 0, networkInputData.aimFowardVector.z);
         transform.forward = tmp;
 
         Vector3 moveDirection = transform.right * networkInputData.movementInput.x;
         moveDirection.Normalize();
-        
-        if (StopMove)
+
+        if (GetStopMove())
         {
             Vector3 tmp22 = networkRigidbody.Rigidbody.velocity;
             float div = 1.3f;
             networkRigidbody.Rigidbody.velocity = (new Vector3(tmp22.x / div, tmp22.y, tmp22.z / div));
 
         }
-        if (!canMove)
+        if (!GetCanMove())
         {
             return;
         }
@@ -215,28 +135,21 @@ public class CharacterMovementHandler : NetworkBehaviour
             RotateTowards(networkInputData.movementInput.x);
         }
         playerStateHandler.SetInputVec(networkInputData.movementInput);
-        if (_jumpGravityCount > 10)
+        if (rb.velocity.y < maxGravity)
         {
             networkRigidbody.Rigidbody.velocity = (new Vector3(moveDirection.x * moveSpeed, maxGravity, moveDirection.z * moveSpeed));
         }
-        else
-        {
-            if (rb.velocity.y < maxGravity)
-            {
-                networkRigidbody.Rigidbody.velocity = (new Vector3(moveDirection.x * moveSpeed, maxGravity, moveDirection.z * moveSpeed));
-            }
-            networkRigidbody.Rigidbody.velocity = (new Vector3(moveDirection.x * moveSpeed, rb.velocity.y, moveDirection.z * moveSpeed));
-        }
+        networkRigidbody.Rigidbody.velocity = (new Vector3(moveDirection.x * moveSpeed, rb.velocity.y, moveDirection.z * moveSpeed));
     }
     private void Action(NetworkInputData networkInputData)
     {
         //if (!HasStateAuthority) return;
 
-        if (playerStateHandler.IsGround() && (rb.velocity.y < 0.03 && rb.velocity.y > -0.03)&& !playerStateHandler.Isvisi())
+        if (playerStateHandler.IsGround() && (rb.velocity.y < 0.03 && rb.velocity.y > -0.03) && !playerStateHandler.Isvisi())
         {
             //Reset Counter
             playerStateHandler.ResetJumpCount();
-            _dodgeCount = 0;
+            //_dodgeCount = 0;
         }
         //Jump
         if (networkInputData.isJumpButtonPressed)
@@ -251,42 +164,41 @@ public class CharacterMovementHandler : NetworkBehaviour
         if (networkInputData.isFireButtonPressed)
         {
 
-            if (!weaponHandler.AbleFire() || !playerStateHandler.AbleFire()) 
+            if (!playerStateHandler.AbleFire())
             {
-
                 playerStateHandler.isFireButtonPressed = false;
                 return;
             }
-            else 
+            else
             {
                 playerStateHandler.isFireButtonPressed = true;
                 playerStateHandler.AddAttackCount();
-                weaponHandler.SetFire(localCamera.transform.position, networkInputData.aimFowardVector, networkInputData.isFireButtonPressed);
+                playerStateHandler.GetWeaponHandler().SetFire(localCamera.transform.position, networkInputData.aimFowardVector, networkInputData.isFireButtonPressed);
                 return;
             }
         }
     }
 
-    public void Fire()
-    {
-        weaponHandler.Fire();
-    }
     void RotateTowards(float dir)
     {
         Vector3 direction;
+        Quaternion targetRotation;
         if (dir > 0)
         {
             direction = Vector3.right;
-            Quaternion targetRotation = Quaternion.LookRotation(direction, Vector3.up);
-            characterRoot.transform.rotation = Quaternion.Lerp(characterRoot.transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+            targetRotation = Quaternion.LookRotation(direction, Vector3.up);
         }
-        else if(dir < 0)
+        else if (dir < 0)
         {
             direction = Vector3.left;
-            Quaternion targetRotation = Quaternion.LookRotation(direction, Vector3.up);
-            characterRoot.transform.rotation = Quaternion.Lerp(characterRoot.transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+            targetRotation = Quaternion.LookRotation(direction, Vector3.up);
         }
-        
+        else
+        {
+            return;
+        }
+        characterRoot.transform.rotation = targetRotation;
+
     }
     private void Jump()
     {
@@ -296,7 +208,20 @@ public class CharacterMovementHandler : NetworkBehaviour
         rb.velocity = tmp;
         networkRigidbody.Rigidbody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
     }
+    public void Fire()
+    {
+        playerStateHandler.GetWeaponHandler().Fire();
+    }
+    //Respawn
+    protected virtual void Respawn()
+    {
+        SetCharacterControllerEnabled(true);
+        networkRigidbody.TeleportToPosition(Utils.GetRandomSpawnPoint());
+        playerStateHandler.GetWeaponHandler()._equipWeapon.OnRespawn();
 
+        hpHandler.OnRespawned();
+        isRespawnRequsted = false;
+    }
     void CheckFallRespawn()
     {
         if (transform.position.y < -12)
@@ -307,37 +232,11 @@ public class CharacterMovementHandler : NetworkBehaviour
             }
         }
     }
-
-    /// <summary>
-    /// isRespawnRequsted = ture
-    /// </summary>
-
     public void RequestRespawn() => isRespawnRequsted = true;
 
-    /// <summary>
-    /// �����̵� ��
-    /// hpHandler.OnRespawned();
-    /// isRespawnRequsted = false;
-    /// </summary>
-    protected virtual void Respawn()
-    {
-        SetCharacterControllerEnabled(true);
-        networkRigidbody.TeleportToPosition(Utils.GetRandomSpawnPoint());
-        weaponHandler._equipWeapon.OnRespawn();
-
-        hpHandler.OnRespawned();
-        isRespawnRequsted = false;
-    }
-    /// <summary>
-    /// CharacterController bool������ Ű�� ���?
-    /// </summary>
-    public void SetCharacterControllerEnabled(bool isEnabled)
-    {
-        networkRigidbody.enabled = isEnabled;
-    }
+    //Rule
     public bool IsGround()
     {
-        //�߹�üũ
         Vector3 tmp = transform.position;
 
         if (Physics.Raycast(transform.position + Vector3.up * GroundCheckDis / 2f, Vector3.down, GroundCheckDis, groundLayer))
@@ -361,15 +260,20 @@ public class CharacterMovementHandler : NetworkBehaviour
         }
     }
 
-    public void SetCanMove(bool _tf)
+    bool GetCanMove()
     {
-        canMove = _tf;
+        return playerStateHandler.canMove;
     }
-    public void SetStopMove(bool _tf)
+    bool GetStopMove()
     {
-        StopMove = _tf;
+        return playerStateHandler.stopMove;
     }
-    public void HitAddForce(Vector3 _attackVec,int _force)
+    public void SetCharacterControllerEnabled(bool isEnabled)
+    {
+        networkRigidbody.enabled = isEnabled;
+    }
+    //Hit
+    public void HitAddForce(Vector3 _attackVec, int _force)
     {
         Vector3 tmp = (_attackVec - transform.position);
         tmp.y = 0;
@@ -382,21 +286,30 @@ public class CharacterMovementHandler : NetworkBehaviour
         _attackVec = _attackVec / 5;
         for (int i = 1; i < 10; i++)
         {
-            float Dis = Vector3.Distance(Vector3.zero, i * _attackVec)/20;
-            rb.AddForce(i*_attackVec+Vector3.up* Dis,ForceMode.Impulse);
+            float Dis = Vector3.Distance(Vector3.zero, i * _attackVec) / 20;
+            rb.AddForce(i * _attackVec + Vector3.up * Dis, ForceMode.Impulse);
             yield return new WaitForFixedUpdate();
         }
-        
-    }
 
-    public PlayerWeapon GetEquipWeapon()
+    }
+    //UI
+    void ShowBoard(NetworkInputData networkInputData)
     {
-        if (weaponHandler == null)
+        if (networkInputData.isShowBoardButtonPressed)
         {
-            Debug.Log("EquipWeapon is Null");
+            //if(HasStateAuthority)
+            //    _showBoard = !_showBoard;
         }
-        return weaponHandler.GetEquipWeapon();
     }
-
-
+    private void Chat(NetworkInputData networkInputData)
+    {
+        if (networkInputData.isChatButtonPressed)
+        {
+            if (HasStateAuthority)
+            {
+                playerStateHandler.SetCanMove(chatSystem.ischating);
+                chatSystem.IsChatChange();
+            }
+        }
+    }
 }

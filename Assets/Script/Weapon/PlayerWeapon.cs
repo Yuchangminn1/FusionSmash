@@ -38,7 +38,7 @@ public class PlayerWeapon : NetworkBehaviour
     //private GameObject _muzzleEffectInstance; // �߻� ȿ�� �ν��Ͻ�
 
     //private SceneObjects _sceneObjects; // SceneObjects Ŭ����
-    public virtual bool AbleFire(bool justPressed) 
+    public virtual bool AbleFire() 
     {
         return true;
     }

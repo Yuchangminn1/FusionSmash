@@ -5,7 +5,7 @@ using UnityEngine;
 public class WeaponSword : PlayerWeapon
 {
     MeshCollider meshCollider;
-    public override bool AbleFire(bool justPressed)
+    public override bool AbleFire()
     {
         return true;
     }

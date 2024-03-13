@@ -756,7 +756,7 @@ AnimatorStateTransition:
     m_EventTreshold: 4
   - m_ConditionMode: 6
     m_ConditionEvent: State2
-    m_EventTreshold: 2
+    m_EventTreshold: 1
   - m_ConditionMode: 6
     m_ConditionEvent: Weapon
     m_EventTreshold: 1
@@ -787,7 +787,7 @@ AnimatorStateTransition:
     m_EventTreshold: 4
   - m_ConditionMode: 6
     m_ConditionEvent: State2
-    m_EventTreshold: 1
+    m_EventTreshold: 0
   - m_ConditionMode: 6
     m_ConditionEvent: Weapon
     m_EventTreshold: 1
@@ -1097,7 +1097,7 @@ AnimatorStateTransition:
     m_EventTreshold: 4
   - m_ConditionMode: 6
     m_ConditionEvent: State2
-    m_EventTreshold: 3
+    m_EventTreshold: 2
   - m_ConditionMode: 6
     m_ConditionEvent: Weapon
     m_EventTreshold: 1

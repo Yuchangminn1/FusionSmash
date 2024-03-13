@@ -9232,6 +9232,7 @@ MonoBehaviour:
   _interpolationDataSource: 0
   _state: 0
   _state2: 0
+  _weapon: 0
   _AnimationTrigger:
     _value: 0
   isdead: 0
@@ -9248,7 +9249,6 @@ MonoBehaviour:
   anima: {fileID: 0}
   _jumpCount: 0
   _attackCount: 0
-  characterMovementHandler: {fileID: 0}
   isJumpButtonPressed: 0
   isFireButtonPressed: 0
   isDodgeButtonPressed: 0
@@ -10386,7 +10386,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9044891736672312271}
   m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0.25, z: -4}
+  m_LocalPosition: {x: 0, y: 0.3, z: -4.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

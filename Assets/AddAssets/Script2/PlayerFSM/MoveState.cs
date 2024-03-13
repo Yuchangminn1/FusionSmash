@@ -23,7 +23,8 @@ public class MoveState : PlayerState
 
     public override bool Update()
     {
-        
+        player.AttackCountReset();
+
         if (player.nextState != this)
         {
             return true;
@@ -32,15 +33,18 @@ public class MoveState : PlayerState
             return true;
         
         return false;
-    }
-    public override void FixedUpdate()
-    {
-        base.FixedUpdate();
-        if(player.state2 != 0 && player.IsGround())
+
+        if (player.state2 != 0 && player.IsGround())
         {
             player.state2 = 0;
             player.SetState2(player.state2);
         }
+    }
+    public override void FixedUpdate()
+    {
+        base.FixedUpdate();
+
+        
         
 
     }

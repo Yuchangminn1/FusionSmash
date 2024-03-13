@@ -25,11 +25,23 @@ public class AttackState : PlayerState
     }
     public override bool Update()
     {
+        if (player.attackCount == player.maxAttackCount)
+        {
+            attackDelay = 0.8f;
+        }
+        else
+        {
+            attackDelay = 0.4f;
+        }
+        if(startTime + attackDelay > Time.time)
+        {
+            return false;
+        }
         if (!player.Isvisi())
         {
             if (player.isFireButtonPressed)
             {
-                player.AnimationTrigger = false;
+                //player.AnimationTrigger = false;
                 player.nextState = player.attackState;
                 player.ChangeState();
                 return true;
@@ -55,7 +67,7 @@ public class AttackState : PlayerState
     {
         if (startTime + 5f < Time.time)
         {
-            player.AnimationTrigger = false;
+            //player.AnimationTrigger = false;
             
             Debug.Log("AnimationTrigger Error State =  " + player.GetCurrentState().currentState);
         }

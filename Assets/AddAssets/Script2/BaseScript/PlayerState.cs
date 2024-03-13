@@ -34,10 +34,6 @@ public class PlayerState : EntityState
         base.Enter();
         startTime = Time.time;
         player.SetState(currentStateNum);
-        if (endMotionChange)
-        {
-            player.AnimationTrigger = true;
-        }
         if (!isState2)
         {
             player.SetState2(0);
@@ -47,7 +43,6 @@ public class PlayerState : EntityState
     {
         base.Update();
 
-        stateTimer = Time.time;
 
         if (player.nextState != this)
         {

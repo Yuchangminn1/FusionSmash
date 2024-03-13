@@ -17,6 +17,10 @@ public class PlayerStateHandler : NetworkBehaviour
     public int weapon { get; set; }
     [Networked(OnChanged = nameof(ChangeAnimationTrigger))]
     public NetworkBool AnimationTrigger { get; set; }
+    [Networked(OnChanged = nameof(ChangeCanMove))]
+    public NetworkBool canMove { get; set; } = true;
+    [Networked(OnChanged = nameof(ChangeStopMove))]
+    public NetworkBool stopMove { get; set; } = false;
 
     public bool isdead = false;
     public bool isStop = false;
@@ -36,13 +40,13 @@ public class PlayerStateHandler : NetworkBehaviour
     [Networked(OnChanged = nameof(ChangeJumpCount))] //
     public int jumpCount { get; set; } = 0;
     public int maxJumpCount { get; private set; } = 2;
-
+    //Attack
     [Networked(OnChanged = nameof(ChangeAttackCount))] //
     public int attackCount { get; set; } = 0;
-    public int maxAttackCount { get; private set; } = 3;
-    
-
-    #region FSM
+    public int maxAttackCount { get; private set; } = 2;
+    public float lastAttackTime { get; set; } = 0f;
+    float attackComboTime = 1.5f;
+    #region State
     protected StateMachine stateMachine;
     public PlayerState nextState;
     public MoveState moveState { get; private set; }
@@ -69,27 +73,76 @@ public class PlayerStateHandler : NetworkBehaviour
     Vector3 inputVec3;
 
     #endregion
-
-    public float lastAttackTime { get; set; } = 0f;
-
-    float attackComboTime = 1.5f;
-
-    //public float attackCoolDown { get; set; }
-
-    //public bool attackCoolDownOn { get; set; }
-
-
-    void Awake()
+    //Weapon
+    [Header("Weapon ")]
+    WeaponHandler weaponHandler;
+    public override void Spawned()
     {
+        base.Spawned();
+        AnimationTrigger = false;
         anima = GetComponent<Animator>();
-        characterMovementHandler=GetComponent<CharacterMovementHandler>();
+        characterMovementHandler = GetComponent<CharacterMovementHandler>();
+        weaponHandler = GetComponent<WeaponHandler>();
+
+        //Weapon
+        weaponHandler.SetEq();
+        weapon = (int)EWeaponType.Sword;
+        PlayerChangeWeapon((int)EWeaponType.Sword);
+
+        State_Initialize();
+        if (HasStateAuthority)
+        {
+            nextState = moveState;
+            ChangeState();
+        }
+        
+
     }
-
-    // Start is called before the first frame update
-    void Start()
+    void Update()
     {
+        if (HasStateAuthority)
+        {
+            stateMachine.Update();
+        }
+    }
+    void FixedUpdate()
+    {
+        if (HasStateAuthority)
+        {
+            stateMachine.FixedUpdate();
+        }
+    }
+    private void LateUpdate()
+    {
+        SetFloat("InputX", inputVec3.x);
+        SetFloat("InputZ", inputVec3.y);
+    }
+    #region State
+    public void StateChageUpdate()
+    {
+        if (stateMachine == null)
+        {
+            if (HasStateAuthority)
+            {
+                Debug.Log("stateMachine is Null");
+            }
+            return;
+        }
+        if (HasStateAuthority)
+        {
+            stateMachine.Update();
+            stateMachine.LateUpdate();
+        }
+    }
+    public EntityState GetCurrentState()
+    {
+        if (stateMachine.GetState() == null)
+            return null;
 
-        #region FSM_Initialize
+        return stateMachine.GetState();
+    }
+    private void State_Initialize()
+    {
         stateMachine = new StateMachine();
 
         moveState = new MoveState(this, 0);
@@ -101,79 +154,36 @@ public class PlayerStateHandler : NetworkBehaviour
         dodgeState = new DodgeState(this, 6);
         deathState = new DeathState(this, 7);
         healState = new HealState(this, 8);
-        #endregion
-        if (HasStateAuthority)
-        {
-            nextState = moveState;
-            this.ChangeState();
-        }
-        AnimationTrigger = false;
-
     }
-
-    void Update()
+    public void SetState(int num)
     {
         if (HasStateAuthority)
         {
-            stateMachine.Update();
+            state = num;
+            SetInt("State", num);
         }
-
     }
-    private void OnDrawGizmos()
-    {
-        Vector3 tmp = transform.position;
-        tmp.y += GroundCheckDis / 2f;
-        Gizmos.DrawRay(tmp, Vector3.down * GroundCheckDis);
-
-
-        Gizmos.DrawRay(tmp + Vector3.left * groundCheckRad, Vector3.down * GroundCheckDis);
-        Gizmos.DrawRay(tmp + Vector3.right * groundCheckRad, Vector3.down * GroundCheckDis);
-        Gizmos.DrawRay(tmp + Vector3.forward * groundCheckRad, Vector3.down * GroundCheckDis);
-        Gizmos.DrawRay(tmp + Vector3.back * groundCheckRad, Vector3.down * GroundCheckDis);
-
-    }
-    void FixedUpdate()
+    public void SetState2(int num)
     {
         if (HasStateAuthority)
         {
-            stateMachine.FixedUpdate();
+            state2 = num;
+            SetInt("State2", num);
         }
     }
-    public override void FixedUpdateNetwork()
+    public bool Isvisi()
     {
-        
+        return AnimationTrigger;
     }
-
-    private void LateUpdate()
+    public void ChangeState()
     {
-        SetFloat("InputX", inputVec3.x);
-        SetFloat("InputZ", inputVec3.y);
-    }
-
-    public void StateChageUpdate()
-    {
-        if (stateMachine == null)
-        {
-            //if (HasStateAuthority)
-            //{
-            //    //Debug.Log("stateMachine is Null");
-            //    ;
-            //}
-            return;
-        }
-
         if (HasStateAuthority)
         {
-            stateMachine.Update();
-            stateMachine.LateUpdate();
+            stateMachine.ChangeState(nextState);
         }
     }
-    public Vector3 SetInputVec(Vector3 vector3)
-    {
-        inputVec3 = vector3;
-        return inputVec3;
-    }
-
+    #endregion
+    #region NetworkProperty
     static void ChangeState(Changed<PlayerStateHandler> changed)
     {
         int newS = changed.Behaviour.state;
@@ -212,32 +222,7 @@ public class PlayerStateHandler : NetworkBehaviour
         if (newS != oldS)
         {
             changed.Behaviour.SetBool("AnimationTrigger", newS);
-            
         }
-    }
-
-
-    //Jump
-    public bool JumpAble()
-    {
-        if (stateMachine.GetState() == null) return false;
-        if (!stateMachine.GetState().isAbleJump) 
-        {
-            return false;
-        }
-        if (jumpCount < maxJumpCount)
-        {
-            isJumpButtonPressed = true;
-            jumpCount++;
-
-            return true;
-        }
-        isJumpButtonPressed = false;
-        return false;
-    }
-    public void Fire() 
-    {
-        characterMovementHandler.Fire();
     }
     static void ChangeJumpCount(Changed<PlayerStateHandler> changed)
     {
@@ -259,22 +244,38 @@ public class PlayerStateHandler : NetworkBehaviour
             changed.Behaviour.SetInt("State2", newS);
         }
     }
-
-    
-    public void ResetJumpCount()
+    static void ChangeCanMove(Changed<PlayerStateHandler> changed)
     {
-        if (HasStateAuthority)
+        NetworkBool newS = changed.Behaviour.canMove;
+        changed.LoadOld();
+        NetworkBool oldS = changed.Behaviour.canMove;
+        Debug.Log(newS + "입력");
+        if (newS != oldS)
         {
-            jumpCount = 0;
+            changed.Behaviour.SetCanMove(newS);
         }
     }
-
-
-    //Ʈ���Ÿ� ���� ������� 
-
+    static void ChangeStopMove(Changed<PlayerStateHandler> changed)
+    {
+        NetworkBool newS = changed.Behaviour.stopMove;
+        changed.LoadOld();
+        NetworkBool oldS = changed.Behaviour.stopMove;
+        if (newS != oldS)
+        {
+            changed.Behaviour.SetStopMove(newS);
+        }
+    }
+    #endregion
+    #region Animator
+    public void SetBool(string _parameters, bool _tf) => anima.SetBool(_parameters, _tf);
+    public void SetInt(string _parameters, int _num) => anima.SetInteger(_parameters, _num);
+    public void SetFloat(string _parameters, float value) => anima.SetFloat(_parameters, value);
+    
+    #endregion
+    #region Conditions
     public bool IsGround()
     {
-        if(characterMovementHandler == null)
+        if (characterMovementHandler == null)
         {
             if (HasStateAuthority)
             {
@@ -284,56 +285,67 @@ public class PlayerStateHandler : NetworkBehaviour
             return false;
         }
         //return false;
-       return characterMovementHandler.IsGround();
+        return characterMovementHandler.IsGround();
     }
-    #region Animator
-    public void SetBool(string _parameters, bool _tf) => anima.SetBool(_parameters, _tf);
-    public void SetInt(string _parameters, int _num) => anima.SetInteger(_parameters, _num);
-    public void SetFloat(string _parameters, float value) => anima.SetFloat(_parameters, value);
-    public void ZeroHorizontal() => anima.SetFloat("Horizontal", 0f);
-    public void AnimaPlay(string _name) => anima.Play(_name);
-    public void SetState(int num)
-    {
-        if (HasStateAuthority)
-        {
-            state = num;
-            SetInt("State", num);
-        }
-    }
-    public void SetState2(int num)
-    {
-        //Debug.Log($"State2 = {state2}");
-        if (HasStateAuthority)
-        {
-            state2 = num;
-            SetInt("State2", num);
-        }
-    }
-
-    public bool Isvisi()
-    {
-        return AnimationTrigger;
-    }
-
-    public void ChangeState()
-    {
-        if (HasStateAuthority)
-        {
-            stateMachine.ChangeState(nextState);
-        }
-    }
-    #endregion
-
     public void SetCanMove(bool _tf)
     {
-        characterMovementHandler.SetCanMove(_tf);
+        canMove = _tf;
     }
     public void SetStopMove(bool _tf)
     {
-        characterMovementHandler.SetStopMove(_tf);
+        stopMove = _tf;
     }
-    
-    
+    //public void SetCanMove(bool _tf)
+    //{
+    //    characterMovementHandler.SetCanMove(_tf);
+    //}
+    //public void SetStopMove(bool _tf)
+    //{
+    //    characterMovementHandler.SetStopMove(_tf);
+    //}
+    public void PlayerChangeWeapon(int _weaponNum)
+    {
+        weaponHandler.ChangeWeapon(_weaponNum);
+    }
+    #endregion
+    #region Move
+    public Vector3 SetInputVec(Vector3 vector3)
+    {
+        inputVec3 = vector3;
+        return inputVec3;
+    }
+    #endregion
+    #region Jump
+    public bool JumpAble()
+    {
+        if (stateMachine.GetState() == null) return false;
+        if (!stateMachine.GetState().isAbleJump)
+        {
+            return false;
+        }
+        if (jumpCount < maxJumpCount)
+        {
+            isJumpButtonPressed = true;
+            jumpCount++;
+
+            return true;
+        }
+        isJumpButtonPressed = false;
+        return false;
+    }
+    public void ResetJumpCount()
+    {
+        if (HasStateAuthority)
+        {
+            jumpCount = 0;
+        }
+    }
+    #endregion
+    #region Attack
+    public void Fire()
+    {
+        characterMovementHandler.Fire();
+    }
     public void AttackEnter()
     {
         //AddAttackCount();
@@ -348,58 +360,99 @@ public class PlayerStateHandler : NetworkBehaviour
         lastAttackTime = Time.time;
         GetEquipWeapon().SetCollistion(false);
     }
-    
-
     public void AddAttackCount()
     {
-        if (attackCount < 3)
+        if (attackCount < maxAttackCount)
         {
             attackCount++;
         }
     }
-
-    public EntityState GetCurrentState() 
+    public void SetAttackCount(int _attackCount)
     {
-        if (stateMachine.GetState() == null) 
-            return null;
-
-        return stateMachine.GetState();
-    }
-    public bool AbleFire()
-    {
-        AttackCountReset();
-        if (GetCurrentState() == null)
+        if (_attackCount < 4 && _attackCount >= 0)
         {
-            return false;
+            attackCount = _attackCount;
         }
-        if (GetCurrentState().isAbleAttack && !Isvisi()) 
-        {
-            if(weapon == 0)
-            {
-                return true;
-            }
-            if (weapon == 1)
-            {
-                if (attackCount < 3)
-                {
-                    return true;
-                }
-            }
-        }
-        
-        return false;
     }
-
     public void AttackCountReset()
     {
-        if(lastAttackTime+attackComboTime < Time.time)
+        if(state == 4)
+        {
+            return;
+        }
+        if (attackCount >=maxAttackCount)
+        {
+            attackCount = 0;
+            return;
+        }
+        if (lastAttackTime + attackComboTime < Time.time)
         {
             attackCount = 0;
         }
     }
+    public bool AbleFire()
+    {
+        
+        if (GetCurrentState() == null)
+        {
+            return false;
+        }
+        if (weaponHandler ==null || !weaponHandler.AbleFire())
+        {
+            return false;
+        }
+        EntityState tmpQ = GetCurrentState();
+        if (tmpQ.isAbleAttack)
+        {
+            if (!Isvisi() || tmpQ.isCancel)
+            {
+                if (weapon == 0)
+                {
+                    return true;
+                }
+                if (weapon == 1)
+                {
+                    if (attackCount < maxAttackCount)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    
+    #endregion
+    #region DrawGizmos
+    private void OnDrawGizmos()
+    {
+        Vector3 tmp = transform.position;
+        tmp.y += GroundCheckDis / 2f;
+        Gizmos.DrawRay(tmp, Vector3.down * GroundCheckDis);
+
+
+        Gizmos.DrawRay(tmp + Vector3.left * groundCheckRad, Vector3.down * GroundCheckDis);
+        Gizmos.DrawRay(tmp + Vector3.right * groundCheckRad, Vector3.down * GroundCheckDis);
+        Gizmos.DrawRay(tmp + Vector3.forward * groundCheckRad, Vector3.down * GroundCheckDis);
+        Gizmos.DrawRay(tmp + Vector3.back * groundCheckRad, Vector3.down * GroundCheckDis);
+
+    }
+    #endregion
+
+    //Weapon
     public PlayerWeapon GetEquipWeapon()
     {
-        return characterMovementHandler.GetEquipWeapon();
+        if (weaponHandler == null)
+        {
+            Debug.Log("EquipWeapon is Null");
+        }
+        return weaponHandler.GetEquipWeapon();
+    }
+    public void ChangeWeapon(int _weaponNum)
+    {
+        weaponHandler.ChangeWeapon(_weaponNum);
     }
 
+    public WeaponHandler GetWeaponHandler() { return weaponHandler;}
+    //임시 델리게이트로 묶어야할듯
 }

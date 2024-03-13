@@ -23,6 +23,13 @@ public class FallState : PlayerState
     }
     public override bool Update()
     {
+        if (player.isFireButtonPressed)
+        {
+            FinishAttackCount();
+            //player.SetAnimationTrigger(false);
+            player.nextState = player.attackState;
+            return true;
+        }
         if (base.Update())
             return true;
 
@@ -42,13 +49,7 @@ public class FallState : PlayerState
     public override void FixedUpdate()
     {
         base.FixedUpdate();
-        //Debug.Log($"playerIsGround {player.IsGround()}");
-        //player.CCMove();
-        //if (!player.IsGround())
-        //{
-        //    player.CCGravity(player.gravity);
-        //    player.gravity += 0.1f;
-        //}
+        
     }
     public override void LateUpdate()
     {
@@ -56,12 +57,14 @@ public class FallState : PlayerState
     }
     public override void Exit()
     {
-        //player.PlayerAnimaSetBool("Falling", false);
-        //player.ResetGravity();
+        
         player.SetState2(0);
 
         base.Exit();
     }
+    private void FinishAttackCount()
+    {
+        player.SetAttackCount(player.maxAttackCount);
+    }
 
-    
 }

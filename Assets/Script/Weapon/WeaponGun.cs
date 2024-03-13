@@ -47,10 +47,10 @@ public class WeaponGun : PlayerWeapon
         AmmoInfoUpdate();
 
     }
-    public override bool AbleFire(bool justPressed)
+    public override bool AbleFire()
     {
         //IsCollected == false ||
-        if ((justPressed == false && !IsAutomatic) || IsReloading || !_fireCooldown.ExpiredOrNotRunning(Runner))
+        if ( !IsAutomatic || IsReloading || !_fireCooldown.ExpiredOrNotRunning(Runner))
             return false;
 
         if (ClipAmmo <= 0)

@@ -10,6 +10,8 @@ public class JumpState : PlayerState
         isAbleFly = true;
         endMotionChange = true;
         isState2 = true;
+        isCancel = true;
+
     }
 
     public override void Enter()
@@ -27,7 +29,7 @@ public class JumpState : PlayerState
         }
         if (player.isJumpButtonPressed)
         {
-            player.AnimationTrigger = false;
+            //player.AnimationTrigger = false;
             player.isJumpButtonPressed = false;
             player.nextState = player.jumpState;
             player.ChangeState();
@@ -35,6 +37,7 @@ public class JumpState : PlayerState
         }
         if (player.isFireButtonPressed)
         {
+            FinishAttackCount();
             //player.SetAnimationTrigger(false);
             player.nextState = player.attackState;
             return true;
@@ -62,6 +65,12 @@ public class JumpState : PlayerState
 
 
     }
+
+    private void FinishAttackCount()
+    {
+        player.SetAttackCount(player.maxAttackCount);
+    }
+
     public override void FixedUpdate()
     {
         base.FixedUpdate();

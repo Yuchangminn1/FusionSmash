@@ -16,36 +16,18 @@ public class WeaponHandler : NetworkBehaviour
 
     public LayerMask collisionLayer;
 
-    float lastTimeFire = 0;
-
     Vector3 firePosition;
 
     Vector3 fireDirection;
 
     bool justPressed;
-    void Awake()
-    {
-    }
 
-    private void Start()
-    {
-
-        //_equipWeapon = Runner.Spawn(playerWeaponPrefab[0], transform.position, Quaternion.identity).GetComponent<PlayerWeapon>();
-        //playerWeaponPrefab[0] = Runner.Spawn(playerWeaponPrefab[0], transform.position, Quaternion.identity);
-        //playerWeaponPrefab[1] = Runner.Spawn(playerWeaponPrefab[1], transform.position, Quaternion.identity);
-        //playerWeaponPrefab[2] = Runner.Spawn(playerWeaponPrefab[2], transform.position, Quaternion.identity);
-
-        //_equipWeapon = playerWeaponPrefab[0].GetComponent<PlayerWeapon>();
-
-    }
+    float lastTimeFire = 0;
+    public int weaponNum { get; private set; } = 0;
 
     public override void FixedUpdateNetwork()
     {
 
-        //if (hpHandler.isDead)
-        //{
-        //    return;
-        //}
 
     }
     public void SetFire(Vector3 _firePosition, Vector3 _fireDirection,bool _justPressed)
@@ -67,7 +49,7 @@ public class WeaponHandler : NetworkBehaviour
     {
         if (_equipWeapon != null)
         {
-            return _equipWeapon.AbleFire(justPressed);
+            return _equipWeapon.AbleFire();
         }
         else return false;
     }

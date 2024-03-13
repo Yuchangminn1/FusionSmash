@@ -10,6 +10,7 @@ public class PlayerAnimationTrigger : NetworkBehaviour
     PlayerStateHandler player;
     Animator animator;
     TestWeapon testweapon;
+
     // Start is called before the first frame update
     private void Awake()
     {
@@ -42,8 +43,8 @@ public class PlayerAnimationTrigger : NetworkBehaviour
     {
         if (HasStateAuthority)
         {
-            player.AnimationTrigger = true;       }
-
+            player.AnimationTrigger = true;
+        }
     }
     void AttackColOn()
     {
