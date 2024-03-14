@@ -31,6 +31,7 @@ public class PlayerStateHandler : NetworkBehaviour
     public int healNum;
     public int healNumMax = 3;
 
+    [Header("GroundCheck")]
     [SerializeField] protected float GroundCheckDis = 0.65f;
     public LayerMask groundLayer;
     float groundCheckRad = 0.2f;
@@ -39,6 +40,9 @@ public class PlayerStateHandler : NetworkBehaviour
     //Jump
     [Networked(OnChanged = nameof(ChangeJumpCount))] //
     public int jumpCount { get; set; } = 0;
+    float jumpTime = 0f;
+    float jumpClearTime = 0.1f;
+
     public int maxJumpCount { get; private set; } = 2;
     //Attack
     [Networked(OnChanged = nameof(ChangeAttackCount))] //
@@ -95,8 +99,33 @@ public class PlayerStateHandler : NetworkBehaviour
             nextState = moveState;
             ChangeState();
         }
-        
+        ActionVind();
+    }
+    void ActionVind()
+    {
+        #region Event
+        //Move
+        CharacterHandler.Move += Move;
+        //Update
+        CharacterHandler.CharacterUpdate += CharacterUpdate;
+        //Attack
+        //Respawn
+        CharacterHandler.Respawn += Respawn;
+        #endregion
+    }
+    void CharacterUpdate(CharacterHandler _characterHandler)
+    {
+        StateChageUpdate();
+        ResetCondition();
+    }
 
+
+
+    void Respawn(CharacterHandler _characterHandler)
+    {
+        //SetCharacterControllerEnabled(true);
+        //networkRigidbody.TeleportToPosition(Utils.GetRandomSpawnPoint());
+        GetWeaponHandler()._equipWeapon.OnRespawn();
     }
     void Update()
     {
@@ -270,22 +299,32 @@ public class PlayerStateHandler : NetworkBehaviour
     public void SetBool(string _parameters, bool _tf) => anima.SetBool(_parameters, _tf);
     public void SetInt(string _parameters, int _num) => anima.SetInteger(_parameters, _num);
     public void SetFloat(string _parameters, float value) => anima.SetFloat(_parameters, value);
-    
+
     #endregion
     #region Conditions
     public bool IsGround()
     {
-        if (characterMovementHandler == null)
+        Vector3 tmp = transform.position;
+
+        if (Physics.Raycast(transform.position + Vector3.up * GroundCheckDis / 2f, Vector3.down, GroundCheckDis, groundLayer))
         {
-            if (HasStateAuthority)
-            {
-                characterMovementHandler = GetComponent<CharacterMovementHandler>();
-                Debug.Log("characterMovementHandler Is Null");
-            }
-            return false;
+            return true;
         }
-        //return false;
-        return characterMovementHandler.IsGround();
+        else
+        {
+            bool _l = Physics.Raycast(transform.position + Vector3.left * groundCheckRad, Vector3.down, GroundCheckDis, groundLayer);
+            bool _r = Physics.Raycast(transform.position + Vector3.right * groundCheckRad, Vector3.down, GroundCheckDis, groundLayer);
+            bool _f = Physics.Raycast(transform.position + Vector3.forward * groundCheckRad, Vector3.down, GroundCheckDis, groundLayer);
+            bool _b = Physics.Raycast(transform.position + Vector3.back * groundCheckRad, Vector3.down, GroundCheckDis, groundLayer);
+            if (_l && _r && _f && _b)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
     public void SetCanMove(bool _tf)
     {
@@ -295,20 +334,17 @@ public class PlayerStateHandler : NetworkBehaviour
     {
         stopMove = _tf;
     }
-    //public void SetCanMove(bool _tf)
-    //{
-    //    characterMovementHandler.SetCanMove(_tf);
-    //}
-    //public void SetStopMove(bool _tf)
-    //{
-    //    characterMovementHandler.SetStopMove(_tf);
-    //}
+    
     public void PlayerChangeWeapon(int _weaponNum)
     {
         weaponHandler.ChangeWeapon(_weaponNum);
     }
     #endregion
     #region Move
+    void Move(Vector2 _dirVector2)
+    {
+        SetInputVec(_dirVector2);
+    }
     public Vector3 SetInputVec(Vector3 vector3)
     {
         inputVec3 = vector3;
@@ -327,21 +363,33 @@ public class PlayerStateHandler : NetworkBehaviour
         {
             isJumpButtonPressed = true;
             jumpCount++;
-
+            jumpTime = Time.time;
             return true;
         }
         isJumpButtonPressed = false;
         return false;
     }
+    public void ResetCondition()
+    {
+        if (IsGround() && !Isvisi())
+        {
+            //Reset Counter
+            ResetJumpCount();
+            //_dodgeCount = 0;
+        }
+    }
     public void ResetJumpCount()
     {
         if (HasStateAuthority)
         {
-            jumpCount = 0;
+            if(jumpTime+jumpClearTime<Time.time)
+                jumpCount = 0;
         }
     }
     #endregion
     #region Attack
+
+    
     public void Fire()
     {
         characterMovementHandler.Fire();
@@ -376,11 +424,11 @@ public class PlayerStateHandler : NetworkBehaviour
     }
     public void AttackCountReset()
     {
-        if(state == 4)
+        if (state == 4)
         {
             return;
         }
-        if (attackCount >=maxAttackCount)
+        if (attackCount >= maxAttackCount)
         {
             attackCount = 0;
             return;
@@ -392,12 +440,11 @@ public class PlayerStateHandler : NetworkBehaviour
     }
     public bool AbleFire()
     {
-        
         if (GetCurrentState() == null)
         {
             return false;
         }
-        if (weaponHandler ==null || !weaponHandler.AbleFire())
+        if (weaponHandler == null || !weaponHandler.AbleFire())
         {
             return false;
         }
@@ -408,12 +455,16 @@ public class PlayerStateHandler : NetworkBehaviour
             {
                 if (weapon == 0)
                 {
+                    isFireButtonPressed = true;
+                    AddAttackCount();
                     return true;
                 }
                 if (weapon == 1)
                 {
                     if (attackCount < maxAttackCount)
                     {
+                        isFireButtonPressed = true;
+                        AddAttackCount();
                         return true;
                     }
                 }
@@ -421,7 +472,7 @@ public class PlayerStateHandler : NetworkBehaviour
         }
         return false;
     }
-    
+
     #endregion
     #region DrawGizmos
     private void OnDrawGizmos()
@@ -453,6 +504,6 @@ public class PlayerStateHandler : NetworkBehaviour
         weaponHandler.ChangeWeapon(_weaponNum);
     }
 
-    public WeaponHandler GetWeaponHandler() { return weaponHandler;}
+    public WeaponHandler GetWeaponHandler() { return weaponHandler; }
     //임시 델리게이트로 묶어야할듯
 }

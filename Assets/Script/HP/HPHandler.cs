@@ -4,9 +4,12 @@ using UnityEngine;
 using Fusion;
 using UnityEngine.UI;
 using TMPro;
+using Unity.VisualScripting;
+using System;
 
 public class HPHandler : NetworkBehaviour
 {
+    public static event Action<CharacterHandler> Death;
 
     int MaxHp { get; set; }
     [Networked(OnChanged = nameof(OnHPChanged))]
@@ -46,22 +49,51 @@ public class HPHandler : NetworkBehaviour
     public NetworkString<_16> _enemyNickName { get; set; }
     public HPHandler enemyHPHandler;
     public string _nickName;
+
+    [Header("Respawn")]
+    public bool isRespawnRequsted = false;
+
+
+
     //public Slider hpBar;
 
     //[SerializeField] Image hpBarImage;
     //[SerializeField] Image hpHealFillImage;
     //[SerializeField] ParticleSystem playerParticle;
 
-    void Awake()
+
+    //public void RespawnCheck()
+    //{
+    //    if (isRespawnRequsted)
+    //    {
+    //        Respawn();
+    //        return;
+    //    }
+    //}
+    //public void DeathCheck()
+    //{
+    //    if (isRespawnRequsted)
+    //    {
+    //        Respawn();
+    //        return;
+    //    }
+    //    if (hpHandler.isDead)
+    //        return;
+    //}
+
+    public void CheckFallRespawn()
     {
-        characterMovementHandler = GetComponent<CharacterMovementHandler>();
-        hitboxRoot = GetComponentInChildren<HitboxRoot>();
-        localUICanvas = GetComponentInChildren<LocalUICanvas>(); ;
-        playerStateHandler = GetComponent<PlayerStateHandler>();
-        MaxHp = 500;
-
-
+        if (transform.position.y < -12)
+        {
+            if (Object.HasStateAuthority)
+            {
+                KillSelf();
+            }
+        }
     }
+    public void RequestRespawn() => isRespawnRequsted = true;
+
+    //UI 관련은 매니저 만들어서 델리게이트 실험하기 좋을듯 
     IEnumerator OnHitCo()
     {
         //bodyMeshRender.material.color = Color.white;
@@ -79,41 +111,48 @@ public class HPHandler : NetworkBehaviour
         {
             uiONHitImage.color = new Color(0, 0, 0, 0);
         }
-
-
     }
 
     IEnumerator ServerReviveCO()
     {
         yield return new WaitForSeconds(2.0f);
-        characterMovementHandler.RequestRespawn();
-    }
-
-
-    void Start()
-    {
-        //hpBar = transform.GetComponentInChildren<Slider>();
-        HpReset();
-
-        isDead = false;
-
-
-        isInitialized = true;
-    }
-
-    
-
-    void Update()
-    {
-
+        RequestRespawn();
     }
 
     public override void Spawned()
     {
+        characterMovementHandler = GetComponent<CharacterMovementHandler>();
+        hitboxRoot = GetComponentInChildren<HitboxRoot>();
+        localUICanvas = GetComponentInChildren<LocalUICanvas>(); ;
+        playerStateHandler = GetComponent<PlayerStateHandler>();
+        MaxHp = 500;
+
         _killLogPanel = GameObject.Find("KillLogPanelnel");
+        HpReset();
+        isDead = false;
+        isInitialized = true;
+
+        ActionVind();
     }
+    void ActionVind()
+    {
+        #region Event
+        //Update
+        CharacterHandler.CharacterUpdate += CharacterUpdate;
 
-
+        //Respawn
+        CharacterHandler.Respawn += Respawn;
+        #endregion
+    }
+    void CharacterUpdate(CharacterHandler _characterHandler)
+    {
+        CheckFallRespawn();
+    }
+    void Respawn(CharacterHandler _characterHandler)
+    {
+        OnRespawned();
+        isRespawnRequsted = false;
+    }
     public void OnTakeDamage(string _hitPlayer, int weaponNum, int _addForce = 10, int _attackDamage = 1)
     {
         Debug.Log("OnTakeDamage");
@@ -213,7 +252,9 @@ public class HPHandler : NetworkBehaviour
     }
     void OnDeath()
     {
-        if(enemyHPHandler != null)
+        CharacterHandler characterHandler = GetComponent<CharacterHandler>();
+        
+        if (enemyHPHandler != null)
         {
             ++enemyHPHandler._kill;
         }
@@ -246,7 +287,7 @@ public class HPHandler : NetworkBehaviour
 
         playerModel.gameObject.SetActive(true);
         hitboxRoot.HitboxRootActive = true;
-        characterMovementHandler.SetCharacterControllerEnabled(true);
+        //characterMovementHandler.SetCharacterControllerEnabled(true);
 
 
     }
