@@ -40,8 +40,8 @@ public class PlayerStateHandler : NetworkBehaviour
     //Jump
     [Networked(OnChanged = nameof(ChangeJumpCount))] //
     public int jumpCount { get; set; } = 0;
-    float jumpTime = 0f;
-    float jumpClearTime = 0.1f;
+    public float jumpTime = 0f;
+    public float jumpClearTime = 0.1f;
 
     public int maxJumpCount { get; private set; } = 2;
     //Attack
@@ -123,8 +123,6 @@ public class PlayerStateHandler : NetworkBehaviour
 
     void Respawn(CharacterHandler _characterHandler)
     {
-        //SetCharacterControllerEnabled(true);
-        //networkRigidbody.TeleportToPosition(Utils.GetRandomSpawnPoint());
         GetWeaponHandler()._equipWeapon.OnRespawn();
     }
     void Update()
@@ -363,6 +361,7 @@ public class PlayerStateHandler : NetworkBehaviour
         {
             isJumpButtonPressed = true;
             jumpCount++;
+            //Debug.Log("JumpCount = " + jumpCount);
             jumpTime = Time.time;
             return true;
         }

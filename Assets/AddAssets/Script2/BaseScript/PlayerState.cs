@@ -34,6 +34,7 @@ public class PlayerState : EntityState
         base.Enter();
         startTime = Time.time;
         player.SetState(currentStateNum);
+        Debug.Log("State = " + currentStateNum);
         if (!isState2)
         {
             player.SetState2(0);

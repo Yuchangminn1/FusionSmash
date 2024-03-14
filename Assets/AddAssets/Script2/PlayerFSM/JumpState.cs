@@ -11,7 +11,6 @@ public class JumpState : PlayerState
         endMotionChange = true;
         isState2 = true;
         isCancel = true;
-
     }
 
     public override void Enter()
@@ -22,6 +21,11 @@ public class JumpState : PlayerState
     }
     public override bool Update()
     {
+        if (player.jumpCount < player.maxJumpCount)
+        {
+            return false;
+        }
+
         if (player.isDodgeButtonPressed)
         {
             player.nextState = player.dodgeState;
@@ -29,7 +33,6 @@ public class JumpState : PlayerState
         }
         if (player.isJumpButtonPressed)
         {
-            //player.AnimationTrigger = false;
             player.isJumpButtonPressed = false;
             player.nextState = player.jumpState;
             player.ChangeState();
@@ -38,7 +41,6 @@ public class JumpState : PlayerState
         if (player.isFireButtonPressed)
         {
             FinishAttackCount();
-            //player.SetAnimationTrigger(false);
             player.nextState = player.attackState;
             return true;
         }

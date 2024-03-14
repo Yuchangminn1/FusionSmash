@@ -9,7 +9,7 @@ using System;
 
 public class HPHandler : NetworkBehaviour
 {
-    public static event Action<CharacterHandler> Death;
+    public static event Action<HPHandler> Death;
 
     int MaxHp { get; set; }
     [Networked(OnChanged = nameof(OnHPChanged))]
@@ -24,8 +24,6 @@ public class HPHandler : NetworkBehaviour
     public Image uiONHitImage;
     public GameObject playerModel;
     public GameObject deathGameObjectPrefab;
-    //Other components
-    HitboxRoot hitboxRoot;
     CharacterMovementHandler characterMovementHandler;
     PlayerStateHandler playerStateHandler;
     LocalUICanvas localUICanvas;
@@ -53,34 +51,6 @@ public class HPHandler : NetworkBehaviour
     [Header("Respawn")]
     public bool isRespawnRequsted = false;
 
-
-
-    //public Slider hpBar;
-
-    //[SerializeField] Image hpBarImage;
-    //[SerializeField] Image hpHealFillImage;
-    //[SerializeField] ParticleSystem playerParticle;
-
-
-    //public void RespawnCheck()
-    //{
-    //    if (isRespawnRequsted)
-    //    {
-    //        Respawn();
-    //        return;
-    //    }
-    //}
-    //public void DeathCheck()
-    //{
-    //    if (isRespawnRequsted)
-    //    {
-    //        Respawn();
-    //        return;
-    //    }
-    //    if (hpHandler.isDead)
-    //        return;
-    //}
-
     public void CheckFallRespawn()
     {
         if (transform.position.y < -12)
@@ -96,12 +66,10 @@ public class HPHandler : NetworkBehaviour
     //UI 관련은 매니저 만들어서 델리게이트 실험하기 좋을듯 
     IEnumerator OnHitCo()
     {
-        //bodyMeshRender.material.color = Color.white;
 
         if (Object.HasInputAuthority)
         {
             uiONHitImage.color = uiOnHitColor;
-            //Debug.Log($"OnHitCo �� HP = {HP}");
             localUICanvas.ChangeHPBar(HP, MaxHp, transform);
 
         }
@@ -122,7 +90,6 @@ public class HPHandler : NetworkBehaviour
     public override void Spawned()
     {
         characterMovementHandler = GetComponent<CharacterMovementHandler>();
-        hitboxRoot = GetComponentInChildren<HitboxRoot>();
         localUICanvas = GetComponentInChildren<LocalUICanvas>(); ;
         playerStateHandler = GetComponent<PlayerStateHandler>();
         MaxHp = 500;
@@ -188,7 +155,6 @@ public class HPHandler : NetworkBehaviour
         isDead = true;
     }
 
-    //���ϸ� ȣ���ε� ���� �� �� 
 
 
     public void HPUIUpdate()
@@ -198,7 +164,6 @@ public class HPHandler : NetworkBehaviour
 
     void OnHPReduced()
     {
-        //Debug.Log($"OnHPReduced �� HP = {HP}");
         if (!isInitialized)
         {
             return;
@@ -207,8 +172,6 @@ public class HPHandler : NetworkBehaviour
     }
     static void OnHPChanged(Changed<HPHandler> changed)
     {
-       // Debug.Log($" OnHPChanged()");
-
 
         int newHP = changed.Behaviour.HP;
 
@@ -217,15 +180,10 @@ public class HPHandler : NetworkBehaviour
         int oldHP = changed.Behaviour.HP;
         changed.LoadNew();
 
-        //check if the HP has been decreased
         if (newHP != oldHP)
         {
             changed.Behaviour.HPUIUpdate();
-            //changed.Behaviour.HPBarValue(); �̷� ȣ��Ʈ ü���� �ٸ� �÷��̾�� UI�� �������ֳ� 
-            //changed���� ����� �����Լ�? �� �� �Լ��� ȣ�� �Ǵ� ��� �Լ����� �� ������ �ۿ� ???
-            //���⼭ ���� �Լ��� static �̱� ������ ? changed.Behaviour�� ����ϳ� ���� �غ����ҵ�
             changed.Behaviour.OnHPReduced();
-            //changed.Behaviour.HP = newHP;
         }
     }
     static void OnStateChanged(Changed<HPHandler> changed)
@@ -266,10 +224,8 @@ public class HPHandler : NetworkBehaviour
             Debug.Log("playerModel is Null");
             return;
         }
+        Death(this);
         playerModel.gameObject.SetActive(false);
-        hitboxRoot.HitboxRootActive = false;
-        characterMovementHandler.SetCharacterControllerEnabled(false);
-
 
         Instantiate(deathGameObjectPrefab, transform.position, Quaternion.identity);
 
@@ -286,8 +242,7 @@ public class HPHandler : NetworkBehaviour
             uiONHitImage.color = new Color(0, 0, 0, 0);
 
         playerModel.gameObject.SetActive(true);
-        hitboxRoot.HitboxRootActive = true;
-        //characterMovementHandler.SetCharacterControllerEnabled(true);
+        
 
 
     }

@@ -47,8 +47,10 @@ public class CharacterMovementHandler : NetworkBehaviour
 
     void ActionVind()
     {
-        
+
         #region Event
+        //Death
+        HPHandler.Death += Death;
         //Move
         CharacterHandler.Move += Move;
         //Jump
@@ -58,6 +60,12 @@ public class CharacterMovementHandler : NetworkBehaviour
 
         #endregion
     }
+    //Death
+    void Death(HPHandler _hpHandler)
+    {
+        SetCharacterControllerEnabled(false);
+    }
+
     //Respawn
     void Respawn(CharacterHandler _characterHandler)
     {
