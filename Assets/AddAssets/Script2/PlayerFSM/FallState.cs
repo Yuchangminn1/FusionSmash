@@ -12,44 +12,23 @@ public class FallState : PlayerState
         endMotionChange = false;
         isAbleFly = true;
         isState2 = true;
-
+        isCancel = true;
     }
 
     public override void Enter()
     {
         base.Enter();
-        startTime = Time.time;
-        
     }
     public override bool Update()
     {
-        if (player.isFireButtonPressed)
-        {
-            FinishAttackCount();
-            //player.SetAnimationTrigger(false);
-            player.nextState = player.attackState;
-            return true;
-        }
         if (base.Update())
             return true;
-
-        if (player.IsGround())
-        {
-            player.nextState = player.moveState;
-            return true;
-
-            
-        }
-        
-        
         return false;
-
     }
 
     public override void FixedUpdate()
     {
         base.FixedUpdate();
-        
     }
     public override void LateUpdate()
     {
@@ -57,14 +36,6 @@ public class FallState : PlayerState
     }
     public override void Exit()
     {
-        
-        player.SetState2(0);
-
         base.Exit();
     }
-    private void FinishAttackCount()
-    {
-        player.SetAttackCount(player.maxAttackCount);
-    }
-
 }

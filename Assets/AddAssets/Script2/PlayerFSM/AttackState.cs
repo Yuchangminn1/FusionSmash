@@ -13,7 +13,7 @@ public class AttackState : PlayerState
     {
         endMotionChange = true;
         isAbleFly = true;
-        isAbleAttack = false;
+        isAbleAttack = true;
         isAbleJump = false;
         isState2 = true;
     }
@@ -37,16 +37,16 @@ public class AttackState : PlayerState
         {
             return false;
         }
-        if (!player.Isvisi())
-        {
-            if (player.isFireButtonPressed)
-            {
-                //player.AnimationTrigger = false;
-                player.nextState = player.attackState;
-                player.ChangeState();
-                return true;
-            }
-        }
+        //if (!player.Isvisi())
+        //{
+        //    if (player.isFireButtonPressed)
+        //    {
+        //        //player.AnimationTrigger = false;
+        //        player.nextState = player.attackState;
+        //        player.ChangeState();
+        //        return true;
+        //    }
+        //}
         return base.Update();
         
     }

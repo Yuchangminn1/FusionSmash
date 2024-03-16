@@ -9,7 +9,7 @@ using System;
 
 public class HPHandler : NetworkBehaviour
 {
-    public static event Action<HPHandler> Death;
+    public  event Action<HPHandler> Death;
 
     int MaxHp { get; set; }
     [Networked(OnChanged = nameof(OnHPChanged))]
@@ -99,17 +99,15 @@ public class HPHandler : NetworkBehaviour
         isDead = false;
         isInitialized = true;
 
-        ActionVind();
     }
-    void ActionVind()
+    #region Vind
+    public void ActionVind(CharacterHandler characterHandler)
     {
-        #region Event
         //Update
-        CharacterHandler.CharacterUpdate += CharacterUpdate;
+        characterHandler.CharacterUpdate += CharacterUpdate;
 
         //Respawn
-        CharacterHandler.Respawn += Respawn;
-        #endregion
+        characterHandler.Respawn += Respawn;
     }
     void CharacterUpdate(CharacterHandler _characterHandler)
     {
@@ -120,6 +118,9 @@ public class HPHandler : NetworkBehaviour
         OnRespawned();
         isRespawnRequsted = false;
     }
+
+    #endregion
+
     public void OnTakeDamage(string _hitPlayer, int weaponNum, int _addForce = 10, int _attackDamage = 1)
     {
         Debug.Log("OnTakeDamage");

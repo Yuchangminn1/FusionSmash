@@ -2,10 +2,25 @@ using Fusion;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml;
+using Unity.IO.LowLevel.Unsafe;
 using Unity.VisualScripting;
 //using UnityEditorInternal;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
+using static UnityEditorInternal.VersionControl.ListControl;
+enum StateType
+{
+    Move,
+    Jump,
+    Fall,
+    Attack,
+    Hit,
+    Dodge,
+    Death,
+    Heal,
+}
 
 public class PlayerStateHandler : NetworkBehaviour
 {
@@ -49,7 +64,7 @@ public class PlayerStateHandler : NetworkBehaviour
     public int attackCount { get; set; } = 0;
     public int maxAttackCount { get; private set; } = 2;
     public float lastAttackTime { get; set; } = 0f;
-    float attackComboTime = 1.5f;
+    float attackComboTime = 1.2f;
     #region State
     protected StateMachine stateMachine;
     public PlayerState nextState;
@@ -71,11 +86,10 @@ public class PlayerStateHandler : NetworkBehaviour
     public bool isFireButtonPressed = false;
 
     public bool isDodgeButtonPressed = false;
+    [Networked]
+    public int moveDir { get; set; } = 0;
 
-
-
-    Vector3 inputVec3;
-
+    public bool conAttack = false;
     #endregion
     //Weapon
     [Header("Weapon ")]
@@ -99,18 +113,19 @@ public class PlayerStateHandler : NetworkBehaviour
             nextState = moveState;
             ChangeState();
         }
-        ActionVind();
     }
-    void ActionVind()
+    public void ActionVind(CharacterHandler characterHandler)
     {
         #region Event
+
         //Move
-        CharacterHandler.Move += Move;
+        characterHandler.Move += Move;
         //Update
-        CharacterHandler.CharacterUpdate += CharacterUpdate;
+        characterHandler.CharacterUpdate += CharacterUpdate;
         //Attack
+
         //Respawn
-        CharacterHandler.Respawn += Respawn;
+        characterHandler.Respawn += Respawn;
         #endregion
     }
     void CharacterUpdate(CharacterHandler _characterHandler)
@@ -141,8 +156,7 @@ public class PlayerStateHandler : NetworkBehaviour
     }
     private void LateUpdate()
     {
-        SetFloat("InputX", inputVec3.x);
-        SetFloat("InputZ", inputVec3.y);
+        SetFloat("InputX", (float)moveDir);
     }
     #region State
     public void StateChageUpdate()
@@ -268,7 +282,8 @@ public class PlayerStateHandler : NetworkBehaviour
         int oldS = changed.Behaviour.attackCount;
         if (newS != oldS)
         {
-            changed.Behaviour.SetInt("State2", newS);
+            Debug.Log("AttackCount = " + newS);
+            changed.Behaviour.SetInt("AttackCount", newS);
         }
     }
     static void ChangeCanMove(Changed<PlayerStateHandler> changed)
@@ -332,7 +347,7 @@ public class PlayerStateHandler : NetworkBehaviour
     {
         stopMove = _tf;
     }
-    
+
     public void PlayerChangeWeapon(int _weaponNum)
     {
         weaponHandler.ChangeWeapon(_weaponNum);
@@ -343,10 +358,12 @@ public class PlayerStateHandler : NetworkBehaviour
     {
         SetInputVec(_dirVector2);
     }
-    public Vector3 SetInputVec(Vector3 vector3)
+    public void SetInputVec(Vector2 vector2)
     {
-        inputVec3 = vector3;
-        return inputVec3;
+        if (HasStateAuthority)
+        {
+            moveDir = vector2.x == 0 ? 0 : 1;
+        }
     }
     #endregion
     #region Jump
@@ -381,29 +398,27 @@ public class PlayerStateHandler : NetworkBehaviour
     {
         if (HasStateAuthority)
         {
-            if(jumpTime+jumpClearTime<Time.time)
+            if (jumpTime + jumpClearTime < Time.time)
                 jumpCount = 0;
         }
     }
     #endregion
     #region Attack
 
-    
-    public void Fire()
-    {
-        characterMovementHandler.Fire();
-    }
+
+
     public void AttackEnter()
     {
-        //AddAttackCount();
         SetStopMove(true);
         lastAttackTime = Time.time;
         isFireButtonPressed = false;
-        Fire();
     }
     public void AttackExit()
     {
-        SetStopMove(false);
+        if (nextState.currentStateNum != (int)StateType.Attack)
+        {
+            SetStopMove(false);
+        }
         lastAttackTime = Time.time;
         GetEquipWeapon().SetCollistion(false);
     }
@@ -416,7 +431,7 @@ public class PlayerStateHandler : NetworkBehaviour
     }
     public void SetAttackCount(int _attackCount)
     {
-        if (_attackCount < 4 && _attackCount >= 0)
+        if (_attackCount < 3 && _attackCount >= 0)
         {
             attackCount = _attackCount;
         }
@@ -427,9 +442,10 @@ public class PlayerStateHandler : NetworkBehaviour
         {
             return;
         }
-        if (attackCount >= maxAttackCount)
+        if (attackCount > maxAttackCount)
         {
             attackCount = 0;
+            //lastAttackTime = 0f;
             return;
         }
         if (lastAttackTime + attackComboTime < Time.time)
@@ -450,20 +466,45 @@ public class PlayerStateHandler : NetworkBehaviour
         EntityState tmpQ = GetCurrentState();
         if (tmpQ.isAbleAttack)
         {
-            if (!Isvisi() || tmpQ.isCancel)
+            if (tmpQ.isCancel)
             {
                 if (weapon == 0)
                 {
+                    AnimationTrigger = false;
+                    SetAttackCount(maxAttackCount);
+                    Debug.Log("maxAttackCount " + maxAttackCount);
                     isFireButtonPressed = true;
-                    AddAttackCount();
                     return true;
                 }
                 if (weapon == 1)
                 {
                     if (attackCount < maxAttackCount)
                     {
+                        AnimationTrigger = false;
+                        SetAttackCount(maxAttackCount);
+                        Debug.Log("maxAttackCount " + maxAttackCount);
                         isFireButtonPressed = true;
+                        return true;
+                    }
+                }
+            }
+            if (!Isvisi())
+            {
+                if (weapon == 0)
+                {
+                    AddAttackCount();
+
+                    isFireButtonPressed = true;
+
+                    return true;
+                }
+                if (weapon == 1)
+                {
+                    if (attackCount < maxAttackCount)
+                    {
                         AddAttackCount();
+
+                        isFireButtonPressed = true;
                         return true;
                     }
                 }

@@ -13,7 +13,6 @@ public class PlayerState : EntityState
     protected float airTime;
 
     //protected int currentStateNum;
-    //protected int currentStateNum;        ���� ������Ʈ ��
     //protected float stateTimer;
     //protected float startTime;                
     //protected bool endMotionChange = true; ������ �ִϸ��̼� �ٲ���?�����?
@@ -34,7 +33,6 @@ public class PlayerState : EntityState
         base.Enter();
         startTime = Time.time;
         player.SetState(currentStateNum);
-        Debug.Log("State = " + currentStateNum);
         if (!isState2)
         {
             player.SetState2(0);
@@ -64,7 +62,7 @@ public class PlayerState : EntityState
         }
         if (endMotionChange)
         {
-            if (player.Isvisi())
+            if (player.Isvisi()&&!isCancel)
             {
 
                 return false;

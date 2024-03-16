@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class EntityState 
 {
-    protected int currentStateNum;
+    public int currentStateNum { get; protected set; }
     public EntityState currentState { get;protected set; }
     //protected float stateTimer;
     protected float startTime;

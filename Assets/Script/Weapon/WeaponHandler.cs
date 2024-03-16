@@ -25,10 +25,25 @@ public class WeaponHandler : NetworkBehaviour
     float lastTimeFire = 0;
     public int weaponNum { get; private set; } = 0;
 
-    public override void FixedUpdateNetwork()
+    public override void Spawned()
     {
-
-
+        ;
+    }
+    #region Vind
+    public void ActionVind(CharacterHandler characterHandler)
+    {
+        //Attack
+        characterHandler.Attack += Attack;
+        //Update
+        //CharacterHandler.CharacterUpdate += CharacterUpdate;
+    }
+    
+    public void Attack(CharacterHandler _characterHandler)
+    {
+        if (_equipWeapon != null)
+        {
+            _equipWeapon.Fire(firePosition, fireDirection);
+        }
     }
     public void SetFire(Vector3 _firePosition, Vector3 _fireDirection,bool _justPressed)
     {
@@ -37,13 +52,8 @@ public class WeaponHandler : NetworkBehaviour
         justPressed = _justPressed;
     }
 
-    public void Fire()
-    {
-        if(_equipWeapon != null)
-        {
-            _equipWeapon.Fire(firePosition, fireDirection);
-        }
-    }
+    #endregion
+
 
     public bool AbleFire()
     {

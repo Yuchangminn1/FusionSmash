@@ -8925,7 +8925,6 @@ GameObject:
   - component: {fileID: 4120854322022158901}
   - component: {fileID: 736881666040372141}
   - component: {fileID: 443667478350634631}
-  - component: {fileID: 1756345132192790890}
   - component: {fileID: 7254487933882325042}
   - component: {fileID: 4494087257618028865}
   - component: {fileID: 8862327610746796349}
@@ -8991,7 +8990,6 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 4120854322022158901}
   - {fileID: 443667478350634631}
-  - {fileID: 1756345132192790890}
   - {fileID: 7254487933882325042}
   - {fileID: 4494087257618028865}
   - {fileID: 3731647095904694337}
@@ -9017,16 +9015,7 @@ MonoBehaviour:
   _interpolationDataSource: 0
   _nickName: 
   characterRoot: {fileID: 2831294248512219443}
-  characterInputhandler: {fileID: 0}
   networkRigidbody: {fileID: 0}
-  rb: {fileID: 0}
-  localCamera: {fileID: 7750468113221393850}
-  camera: {fileID: 0}
-  GroundCheckDis: 0.3
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 64
-  WeaponCNum: 1
 --- !u!114 &736881666040372141
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9059,24 +9048,6 @@ MonoBehaviour:
   collisionLayer:
     serializedVersion: 2
     m_Bits: 129
---- !u!114 &1756345132192790890
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8027943520015113840}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1039544458, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
-  Config: 1
-  BroadRadius: 0.6
-  Offset: {x: 0, y: 0.5, z: 0}
-  GizmosColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  Hitboxes: []
 --- !u!114 &7254487933882325042
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9247,10 +9218,14 @@ MonoBehaviour:
     m_Bits: 64
   anima: {fileID: 0}
   _jumpCount: 0
+  jumpTime: 0
+  jumpClearTime: 0.1
   _attackCount: 0
   isJumpButtonPressed: 0
   isFireButtonPressed: 0
   isDodgeButtonPressed: 0
+  _moveDir: 0
+  conAttack: 0
 --- !u!114 &2732331744997581431
 MonoBehaviour:
   m_ObjectHideFlags: 0

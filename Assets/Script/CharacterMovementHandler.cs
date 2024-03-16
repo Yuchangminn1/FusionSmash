@@ -20,19 +20,31 @@ public class CharacterMovementHandler : NetworkBehaviour
     [Header("Move")]
     Vector3 moveDirection;
     public Transform characterRoot;
-    
+
     float moveSpeed = 5f;
     float jumpTime = 0f;
     float jumpCooldown = 0f;
     float jumpForce = 10f;
     float maxGravity = -8f;
 
+    [Networked(OnChanged = nameof(ChangeDir))]
+    float myDir { get; set; } = 0f;
+
     [Header("State")]
     PlayerStateHandler playerStateHandler;
 
     [Header("Component")]
     public NetworkRigidbody networkRigidbody;
-
+    static void ChangeDir(Changed<CharacterMovementHandler> changed)
+    {
+        float newS = changed.Behaviour.myDir;
+        changed.LoadOld();
+        float oldS = changed.Behaviour.myDir;
+        if (newS != oldS)
+        {
+            changed.Behaviour.RotateTowards(newS);
+        }
+    }
     public override void Spawned()
     {
         //Component
@@ -41,23 +53,20 @@ public class CharacterMovementHandler : NetworkBehaviour
         //Script
         playerStateHandler = GetComponent<PlayerStateHandler>();
 
-        ActionVind();
-        RotateTowards(1f);
+        RotateTowards(1);
     }
-
-    void ActionVind()
+    #region Vind
+    public void ActionVind(CharacterHandler characterHandler, HPHandler hpHandler)
     {
-
         #region Event
         //Death
-        HPHandler.Death += Death;
+        hpHandler.Death += Death;
         //Move
-        CharacterHandler.Move += Move;
+        characterHandler.Move += Move;
         //Jump
-        CharacterHandler.Jump += Jump;
+        characterHandler.Jump += Jump;
         //Respawn
-        CharacterHandler.Respawn += Respawn;
-
+        characterHandler.Respawn += Respawn;
         #endregion
     }
     //Death
@@ -74,6 +83,7 @@ public class CharacterMovementHandler : NetworkBehaviour
     }
     public void Move(Vector2 _dirVector2)
     {
+
         if (_dirVector2 == Vector2.zero)
         {
             Vector3 tmp22 = networkRigidbody.Rigidbody.velocity;
@@ -83,30 +93,32 @@ public class CharacterMovementHandler : NetworkBehaviour
         }
         else
         {
-            if (_dirVector2 != Vector2.zero)
-            {
-                RotateTowards(_dirVector2.x);
-            }
+            myDir = _dirVector2.x;
         }
         Vector3 moveDirection = transform.right * _dirVector2.x;
         moveDirection.Normalize();
-        
+
         if (networkRigidbody.Rigidbody.velocity.y < maxGravity)
         {
             networkRigidbody.Rigidbody.velocity = (new Vector3(moveDirection.x * moveSpeed, maxGravity, moveDirection.z * moveSpeed));
         }
+
         networkRigidbody.Rigidbody.velocity = (new Vector3(moveDirection.x * moveSpeed, networkRigidbody.Rigidbody.velocity.y, moveDirection.z * moveSpeed));
+
     }
-    void RotateTowards(float dir)
+    #endregion
+
+    void RotateTowards(float _dir)
     {
+        
         Vector3 direction;
         Quaternion targetRotation;
-        if (dir > 0)
+        if (_dir > 0)
         {
             direction = Vector3.right;
             targetRotation = Quaternion.LookRotation(direction, Vector3.up);
         }
-        else if (dir < 0)
+        else if (_dir < 0)
         {
             direction = Vector3.left;
             targetRotation = Quaternion.LookRotation(direction, Vector3.up);
@@ -116,6 +128,7 @@ public class CharacterMovementHandler : NetworkBehaviour
             return;
         }
         characterRoot.transform.rotation = targetRotation;
+
     }
     public void Jump(CharacterHandler characterHandler)
     {
@@ -125,17 +138,14 @@ public class CharacterMovementHandler : NetworkBehaviour
         networkRigidbody.Rigidbody.velocity = tmp;
         networkRigidbody.Rigidbody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
     }
-    public void Fire()
-    {
-        playerStateHandler.GetWeaponHandler().Fire();
-    }
-    
+
+
     //Rule
     public void SetCharacterControllerEnabled(bool isEnabled)
     {
         networkRigidbody.enabled = isEnabled;
     }
-   
+
     //Hit
     public void HitAddForce(Vector3 _attackVec, int _force)
     {
@@ -156,5 +166,5 @@ public class CharacterMovementHandler : NetworkBehaviour
         }
 
     }
-    
+
 }

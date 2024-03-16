@@ -17,42 +17,35 @@ public class MoveState : PlayerState
     public override void Enter()
     {
         base.Enter();
-        
-       // Debug.Log("����ī��Ʈ ���� �߾��");
     }
 
     public override bool Update()
     {
         player.AttackCountReset();
 
-        if (player.nextState != this)
-        {
-            return true;
-        }
+        //if (player.nextState != this)
+        //{
+        //    return true;
+        //}
         if (base.Update())
             return true;
         
         return false;
 
-        if (player.state2 != 0 && player.IsGround())
-        {
-            player.state2 = 0;
-            player.SetState2(player.state2);
-        }
+        //if (player.state2 != 0 && player.IsGround())
+        //{
+        //    player.state2 = 0;
+        //    player.SetState2(player.state2);
+        //}
     }
     public override void FixedUpdate()
     {
         base.FixedUpdate();
-
-        
-        
-
     }
 
     public override void LateUpdate()
     {
         base.LateUpdate();
-        
     }
     public override void Exit()
     {

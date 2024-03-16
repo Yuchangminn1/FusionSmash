@@ -5,14 +5,25 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
+struct PlayerData
+{
+    public string Name { get;  set; }
+    public string EnemyName { get;  set; }
+    public int Weapon { get;  set; }
+    public int Kill { get;  set; }
+    public int Death { get;  set; }
+
+}
+
 public class CharacterHandler : NetworkBehaviour
 {
-    public static event Action<CharacterHandler> Jump;
-    public static event Action<CharacterHandler> Attack;
-    public static event Action<CharacterHandler> CharacterUpdate;
-    public static event Action<CharacterHandler> Respawn;
+    PlayerData playerdata;
+    public event Action<CharacterHandler> Jump;
+    public event Action<CharacterHandler> Attack;
+    public event Action<CharacterHandler> CharacterUpdate;
+    public event Action<CharacterHandler> Respawn;
 
-    public static event Action<Vector2> Move;
+    public event Action<Vector2> Move;
 
     //Handler
     CharacterInputhandler inputhandler;
@@ -28,6 +39,18 @@ public class CharacterHandler : NetworkBehaviour
         playerStateHandler = GetComponent<PlayerStateHandler>();
         hpHandler = GetComponent<HPHandler>();
         chatSystem = GetComponent<ChatSystem>();
+
+        //Vind
+        playerStateHandler.ActionVind(this);
+        movementHandler.ActionVind(this, hpHandler);
+        hpHandler.ActionVind(this);
+
+        playerdata.Name = "임시";
+        playerdata.EnemyName = "";
+        playerdata.Kill = 0;
+        playerdata.Death = 0;
+        playerdata.Weapon = 1;
+
     }
     public override void FixedUpdateNetwork()
     {
@@ -40,11 +63,17 @@ public class CharacterHandler : NetworkBehaviour
                 ActionMove(networkInputData);
                 ActionCase(networkInputData);
             }
-            if(CharacterUpdate!=null)
+            if (CharacterUpdate == null) 
+            {
+                Debug.Log("CharacterUpdate is null");
+            }
+            else
+            {
                 CharacterUpdate(this);
+            }
         }
     }
-    
+
     private void ActionCase(NetworkInputData networkInputData)
     {
         if (Jump != null)
@@ -59,14 +88,20 @@ public class CharacterHandler : NetworkBehaviour
 
             }
         }
+
         if (networkInputData.isFireButtonPressed)
         {
             if (playerStateHandler.AbleFire())
             {
-                //Attack(this);
+                if (Attack != null)
+                {
+                    Attack(this);
+                }
                 return;
             }
         }
+        
+
 
     }
     private void ActionMove(NetworkInputData networkInputData)
@@ -75,6 +110,8 @@ public class CharacterHandler : NetworkBehaviour
         {
             if (playerStateHandler.canMove)
             {
+                //Vector2 tmp = networkInputData.movementInput;
+
                 Vector2 tmp = playerStateHandler.stopMove == true ? Vector2.zero : networkInputData.movementInput;
                 Move(tmp);
             }
@@ -84,6 +121,7 @@ public class CharacterHandler : NetworkBehaviour
     //UI
     void ShowBoard(NetworkInputData networkInputData)
     {
+
         if (networkInputData.isShowBoardButtonPressed)
         {
             //if(HasStateAuthority)
