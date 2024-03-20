@@ -5,6 +5,7 @@ using UnityEngine;
 public class WeaponSword : PlayerWeapon
 {
     MeshCollider meshCollider;
+    PlayerInfo playerInfo;
     public override bool AbleFire()
     {
         return true;
@@ -23,6 +24,7 @@ public class WeaponSword : PlayerWeapon
     public override void Fire(Vector3 firePosition, Vector3 fireDirection)
     {
         SetCollistion(true);
+        Debug.Log("Collistion " + true);
     }
 
     public override void FixedUpdateNetwork()
@@ -39,11 +41,14 @@ public class WeaponSword : PlayerWeapon
     {
         base.Spawned();
         meshCollider = GetComponent<MeshCollider>();
+        playerInfo = GetComponentInParent<PlayerInfo>(); 
         SetCollistion(false);
     }
     public override void SetCollistion(bool _tf)
     {
         meshCollider.enabled = _tf;
+        Debug.Log("Collistion " + _tf);
+
 
     }
     private void OnTriggerEnter(Collider other)
@@ -57,23 +62,23 @@ public class WeaponSword : PlayerWeapon
         HPHandler hitHP = other.GetComponent<HPHandler>();
         if (hitHP != null && hitHP != _hPHandler)
         {
-            hitHP.enemyHPHandler = _hPHandler;
+            //hitHP.enemyHPHandler = _hPHandler;
             Vector3 tmp = other.transform.position - transform.position;
             //tmp.y = 0;
             //other.GetComponent<Rigidbody>().AddForce(tmp.normalized * hitHP.AddForce, ForceMode.VelocityChange);
-            if (_hPHandler._nickName == null)
-            {
-                Debug.Log("attackHP._nickName Is Null");
-                _hPHandler._nickName = "tmp";
-                return;
-            }
+            //if (_hPHandler._nickName == null)
+            //{
+            //    Debug.Log("attackHP._nickName Is Null");
+            //    _hPHandler._nickName = "tmp";
+            //    return;
+            //}
             if ((int)Type < 0 || (int)Type > 3)
             {
                 Debug.Log("Type Error");
 
                 return;
             }
-            hitHP.OnTakeDamage(_hPHandler._nickName, (int)Type);
+            hitHP.OnTakeDamage(playerInfo.GetName(), (int)Type);
             other.GetComponent<CharacterMovementHandler>().HitAddForce(tmp, hitHP.AddForce);
 
             if (hitHP.isDead)

@@ -9,6 +9,8 @@ using System;
 
 public class HPHandler : NetworkBehaviour
 {
+    public PlayerInfo playerInfo;
+    //player
     public  event Action<HPHandler> Death;
 
     int MaxHp { get; set; }
@@ -39,18 +41,12 @@ public class HPHandler : NetworkBehaviour
     public Sprite[] _weaponSprite;
     [Networked]
     public int _weaponSpriteNum { get; set; }
-    [Networked(OnChanged = nameof(KillPlayer))]
-    public int _kill { get; set; }
-    [Networked(OnChanged = nameof(DeathPlayer))]
-    public int _death { get; set; }
-    [Networked]
-    public NetworkString<_16> _enemyNickName { get; set; }
-    public HPHandler enemyHPHandler;
-    public string _nickName;
+    public TMP_Text playerNickNameTM;
 
     [Header("Respawn")]
     public bool isRespawnRequsted = false;
 
+    
     public void CheckFallRespawn()
     {
         if (transform.position.y < -12)
@@ -92,14 +88,20 @@ public class HPHandler : NetworkBehaviour
         characterMovementHandler = GetComponent<CharacterMovementHandler>();
         localUICanvas = GetComponentInChildren<LocalUICanvas>(); ;
         playerStateHandler = GetComponent<PlayerStateHandler>();
+        playerInfo = GetComponent<PlayerInfo>();
         MaxHp = 500;
 
         _killLogPanel = GameObject.Find("KillLogPanelnel");
         HpReset();
         isDead = false;
         isInitialized = true;
-
+        if (HasInputAuthority)
+        {
+            playerNickNameTM.color = new Color(0, 0, 0, 0);
+        }
+        
     }
+    
     #region Vind
     public void ActionVind(CharacterHandler characterHandler)
     {
@@ -132,7 +134,7 @@ public class HPHandler : NetworkBehaviour
         {
             return;
         }
-        _enemyNickName = _hitPlayer;
+        playerInfo.SetEnemyName(_hitPlayer);
         AddForce += _addForce;
         HP -= _attackDamage;
         if (HP <= 0)
@@ -211,15 +213,7 @@ public class HPHandler : NetworkBehaviour
     }
     void OnDeath()
     {
-        CharacterHandler characterHandler = GetComponent<CharacterHandler>();
         
-        if (enemyHPHandler != null)
-        {
-            ++enemyHPHandler._kill;
-        }
-
-        KillLogUpdate();
-
         if (playerModel == null)
         {
             Debug.Log("playerModel is Null");
@@ -243,17 +237,13 @@ public class HPHandler : NetworkBehaviour
             uiONHitImage.color = new Color(0, 0, 0, 0);
 
         playerModel.gameObject.SetActive(true);
-        
-
-
     }
 
     public void OnRespawned()
     {
         if (HasStateAuthority)
         {
-            ++_death;
-            _enemyNickName = "";
+            playerInfo.OnRespawned();
         }
         isDead = false;
         HpReset();
@@ -280,12 +270,12 @@ public class HPHandler : NetworkBehaviour
         Q.transform.parent = _killLogPanel.transform;
 
         //Ǯ�Ƿ� ������
-        if (_enemyNickName.ToString() == "")
+        if (playerInfo.GetEnemyName() == "")
         {
-            Q.GetComponent<KillLog>().SetLog(_nickName, " ", _weaponSprite[((int)EWeaponType.Gravity)]);
+            Q.GetComponent<KillLog>().SetLog(playerInfo.GetName(), " ", _weaponSprite[((int)EWeaponType.Gravity)]);
         }
         else
-            Q.GetComponent<KillLog>().SetLog(_enemyNickName.ToString(), _nickName, _weaponSprite[_weaponSpriteNum]);
+            Q.GetComponent<KillLog>().SetLog(playerInfo.GetEnemyName(), playerInfo.GetName(), _weaponSprite[_weaponSpriteNum]);
 
 
     }
@@ -303,7 +293,7 @@ public class HPHandler : NetworkBehaviour
     {
         if (HasInputAuthority)
         {
-            UIManager.Instance.PlayerKDAScoreUI(_kill, _death);
+            UIManager.Instance.PlayerKDAScoreUI(playerInfo.kill, playerInfo.death);
         }
     }
 

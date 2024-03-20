@@ -38,23 +38,17 @@ public class ChatSystem : NetworkBehaviour
     //Ŭ���̾�Ʈ���� ���� onoffonoff�ݺ��ϴ°� ����
     float inputTime = 0f;
     // Checks if there is anything entered into the input field.
-    public void Awake()
+    
+    public override void Spawned()
     {
-        //�̰� �����ũ���� ���ϸ� null�̶� ������ 
         playerControls = new PlayerInputAction();
         chatLog = GameObject.FindWithTag("ChatDisplay").GetComponentInChildren<TMP_Text>();
         scrollV = GameObject.FindWithTag("ScrollV").GetComponent<Scrollbar>();
-    }
-    
-    public void Start()
-    {
         mainInputField.characterLimit = 1024;
         if (Object.HasInputAuthority || HasStateAuthority)
         {
             mainInputField.enabled = true;
         }
-        //Debug.Log("chatLog = " + chatLog);
-
     }
 
     private void FixedUpdate()
@@ -117,9 +111,7 @@ public class ChatSystem : NetworkBehaviour
         changed.Behaviour.PushMessage();
 
     }
-    public override void Spawned()
-    {
-    }
+    
 
 
     public void PushMessage()
@@ -154,19 +146,21 @@ public class ChatSystem : NetworkBehaviour
         //Debug.Log($"[RPC] SetNickname : {mychat}");
         this.myChat = mychat;
     }
+    //NewIinputSystem Enter 
+    //private void OnEnable()
+    //{
+    //    if (gameObject != null)
+    //    {
+    //        sumit = playerControls.Player.Sumit;
+    //        sumit.Enable();
 
-    private void OnEnable()
-    {
-        //Debug.Log("chatDown change true ");
-        sumit = playerControls.Player.Sumit;
-        sumit.Enable();
-
-        sumit.performed += Sumit;
-    }
-    private void OnDisable()
-    {
-        sumit.Disable();
-    }
+    //        sumit.performed += Sumit;
+    //    }
+    //}
+    //private void OnDisable()
+    //{
+    //    sumit.Disable();
+    //}
     private void Sumit(InputAction.CallbackContext context)
     {
         Debug.Log("chatDown change true ");

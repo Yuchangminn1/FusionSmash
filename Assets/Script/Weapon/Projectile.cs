@@ -105,25 +105,19 @@ public class Projectile : NetworkBehaviour
 
         if (Physics.SphereCast(transform.position, radius, Dir, out hit, raycastDistance, layerMask))
         {
-
+            //PlayerInfo hitinfo = hit.transform.GetComponent<PlayerInfo>();
             HPHandler hitHP = hit.transform.GetComponent<HPHandler>();
             if (hitHP != null && hitHP != attackHP)
             {
-                hitHP.enemyHPHandler = attackHP;
+                //hitinfo.SetEnemyName(attackHP.playerInfo.GetName());
                 Vector3 tmp = hit.transform.position - _startPosition;
                 //tmp.y = 0;
                 //other.GetComponent<Rigidbody>().AddForce(tmp.normalized * hitHP.AddForce, ForceMode.VelocityChange);
-                if (attackHP._nickName == null)
-                {
-                    attackHP._nickName = "tmp";
-                    return;
-                }
                 if ((int)Type < 0 || (int)Type > 3)
                 {
-
                     return;
                 }
-                hitHP.OnTakeDamage(attackHP._nickName, (int)Type);
+                hitHP.OnTakeDamage(attackHP.playerInfo.GetName(), (int)Type);
                 hit.transform.GetComponent<CharacterMovementHandler>().HitAddForce(tmp, hitHP.AddForce);
 
                 if (hitHP.isDead)

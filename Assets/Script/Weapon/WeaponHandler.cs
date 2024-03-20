@@ -23,7 +23,6 @@ public class WeaponHandler : NetworkBehaviour
     bool justPressed;
 
     float lastTimeFire = 0;
-    public int weaponNum { get; private set; } = 0;
 
     public override void Spawned()
     {
@@ -38,10 +37,11 @@ public class WeaponHandler : NetworkBehaviour
         //CharacterHandler.CharacterUpdate += CharacterUpdate;
     }
     
-    public void Attack(CharacterHandler _characterHandler)
+    public void Attack()
     {
         if (_equipWeapon != null)
         {
+            Debug.Log("Attack Event");
             _equipWeapon.Fire(firePosition, fireDirection);
         }
     }

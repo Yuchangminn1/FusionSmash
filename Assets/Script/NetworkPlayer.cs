@@ -11,7 +11,7 @@ using Unity.VisualScripting;
 public class NetworkPlayer : NetworkBehaviour,IPlayerLeft
 {
     public TMP_Text playerNickNameTM;
-
+    PlayerInfo playerInfo;
     public static NetworkPlayer Local { get; set; }
     public int mySNum = 0;
 
@@ -42,6 +42,7 @@ public class NetworkPlayer : NetworkBehaviour,IPlayerLeft
 
     public override void Spawned()
     {
+        playerInfo = GetComponent<PlayerInfo>();
         if (Object.HasInputAuthority) // ���ӿ��� ������ �Ǹ� ? ������   > ������Ʈ�� �̵���ų �Ǹ�?  NetworkObject��ũ��Ʈ�� �ٿ��ָ� Ʈ��
         {
             Local = this;
@@ -83,10 +84,6 @@ public class NetworkPlayer : NetworkBehaviour,IPlayerLeft
         
         transform.name = transform.GetComponent<NetworkPlayer>().nickName.Value;
 
-        if (HasInputAuthority)
-        {
-            playerNickNameTM.color = new Color(0,0,0,0);
-        }
         
 
         //ü�¹� ��Ƽ�� ���̰� �ҷ��� ��ȣ �Ѱǵ� �� �����ε� �𸣰ڴ� �𸣰� ��
@@ -107,10 +104,13 @@ public class NetworkPlayer : NetworkBehaviour,IPlayerLeft
     private void OnNickNameChanged()
     {
         //Debug.Log($"Nickname chaged for player to {nickName} for player {gameObject.name}");
+        //characterHandler.playerdata.Name = nickName.ToString();
+        playerInfo.SetName(nickName.ToString());
 
-        playerNickNameTM.text = nickName.ToString();
+
+
+
         characterMovementHandler._nickName = nickName.ToString();
-        hphandler._nickName = nickName.ToString();
         chatSystem._nickName = nickName.ToString();
 
     }

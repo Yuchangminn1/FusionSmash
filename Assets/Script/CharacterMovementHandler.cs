@@ -130,7 +130,7 @@ public class CharacterMovementHandler : NetworkBehaviour
         characterRoot.transform.rotation = targetRotation;
 
     }
-    public void Jump(CharacterHandler characterHandler)
+    public void Jump()
     {
         Vector3 tmp = Vector3.zero;
         tmp.x = networkRigidbody.Rigidbody.velocity.x;
@@ -150,7 +150,7 @@ public class CharacterMovementHandler : NetworkBehaviour
     public void HitAddForce(Vector3 _attackVec, int _force)
     {
         Vector3 tmp = (_attackVec - transform.position);
-        tmp.y = 0;
+        tmp.z = 0;
         tmp = tmp.normalized * _force;
         StartCoroutine(HitAddForce(tmp));
     }

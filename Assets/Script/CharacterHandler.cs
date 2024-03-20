@@ -4,54 +4,49 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using static UnityEngine.Video.VideoPlayer;
 
-struct PlayerData
-{
-    public string Name { get;  set; }
-    public string EnemyName { get;  set; }
-    public int Weapon { get;  set; }
-    public int Kill { get;  set; }
-    public int Death { get;  set; }
 
-}
 
 public class CharacterHandler : NetworkBehaviour
 {
-    PlayerData playerdata;
-    public event Action<CharacterHandler> Jump;
-    public event Action<CharacterHandler> Attack;
+    //Input 
+    public event Action Jump;
+    public event Action Attack;
     public event Action<CharacterHandler> CharacterUpdate;
     public event Action<CharacterHandler> Respawn;
 
     public event Action<Vector2> Move;
 
     //Handler
+    EventHandler eventHandler;
     CharacterInputhandler inputhandler;
     CharacterMovementHandler movementHandler;
     PlayerStateHandler playerStateHandler;
+    WeaponHandler weaponHandler;
     HPHandler hpHandler;
     ChatSystem chatSystem;
     public override void Spawned()
     {
         //Input
+        eventHandler = GetComponent<EventHandler>();
         inputhandler = GetComponent<CharacterInputhandler>();
         movementHandler = GetComponent<CharacterMovementHandler>();
         playerStateHandler = GetComponent<PlayerStateHandler>();
+        weaponHandler = GetComponent<WeaponHandler>();
         hpHandler = GetComponent<HPHandler>();
         chatSystem = GetComponent<ChatSystem>();
 
         //Vind
         playerStateHandler.ActionVind(this);
         movementHandler.ActionVind(this, hpHandler);
+        weaponHandler.ActionVind(this);
         hpHandler.ActionVind(this);
 
-        playerdata.Name = "임시";
-        playerdata.EnemyName = "";
-        playerdata.Kill = 0;
-        playerdata.Death = 0;
-        playerdata.Weapon = 1;
+
 
     }
+
     public override void FixedUpdateNetwork()
     {
         if (PlayerAble())
@@ -60,10 +55,13 @@ public class CharacterHandler : NetworkBehaviour
             {
                 ShowBoard(networkInputData);
                 Chat(networkInputData);
-                ActionMove(networkInputData);
-                ActionCase(networkInputData);
+                if (playerStateHandler.canMove)
+                {
+                    ActionMove(networkInputData);
+                    ActionCase(networkInputData);
+                }
             }
-            if (CharacterUpdate == null) 
+            if (CharacterUpdate == null)
             {
                 Debug.Log("CharacterUpdate is null");
             }
@@ -76,31 +74,26 @@ public class CharacterHandler : NetworkBehaviour
 
     private void ActionCase(NetworkInputData networkInputData)
     {
-        if (Jump != null)
-        {
-            if (networkInputData.isJumpButtonPressed)
-            {
-                if (playerStateHandler.JumpAble())
-                {
-                    Jump(this);
-                    return;
-                }
 
+        if (networkInputData.isJumpButtonPressed)
+        {
+            if (playerStateHandler.JumpAble())
+            {
+                Jump?.Invoke();
+                return;
             }
+
         }
 
         if (networkInputData.isFireButtonPressed)
         {
             if (playerStateHandler.AbleFire())
             {
-                if (Attack != null)
-                {
-                    Attack(this);
-                }
+                Attack?.Invoke();
                 return;
             }
         }
-        
+
 
 
     }

@@ -9,7 +9,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
-using static UnityEditorInternal.VersionControl.ListControl;
+//using static UnityEditorInternal.VersionControl.ListControl;
 enum StateType
 {
     Move,
@@ -156,7 +156,12 @@ public class PlayerStateHandler : NetworkBehaviour
     }
     private void LateUpdate()
     {
-        SetFloat("InputX", (float)moveDir);
+        if(canMove)
+            SetFloat("InputX", (float)moveDir);
+        else
+        {
+            SetFloat("InputX", 0f);
+        }
     }
     #region State
     public void StateChageUpdate()

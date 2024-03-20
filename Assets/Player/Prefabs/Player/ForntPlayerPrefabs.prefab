@@ -8937,6 +8937,7 @@ GameObject:
   - component: {fileID: 8756920997767441270}
   - component: {fileID: 1124359941217124669}
   - component: {fileID: 5595622307214061470}
+  - component: {fileID: 6627235512539963941}
   m_Layer: 7
   m_Name: ForntPlayerPrefabs
   m_TagString: Player22
@@ -8997,6 +8998,7 @@ MonoBehaviour:
   - {fileID: 2732331744997581431}
   - {fileID: 588212177309837440}
   - {fileID: 5595622307214061470}
+  - {fileID: 6627235512539963941}
   - {fileID: 8633729289858305221}
   - {fileID: 5234221705099186607}
   SimulationBehaviours: []
@@ -9087,6 +9089,7 @@ MonoBehaviour:
       Data: 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   enemyHPHandler: {fileID: 0}
   _nickName: 
+  playerNickNameTM: {fileID: 2227494634827152295}
   isRespawnRequsted: 0
 --- !u!114 &4494087257618028865
 MonoBehaviour:
@@ -9343,6 +9346,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 11026587ca9c73645b827c2c6fc7f321, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+--- !u!114 &6627235512539963941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8027943520015113840}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1aecf8aa5bd13d440953ac5caa23e5b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0

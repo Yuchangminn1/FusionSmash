@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657892, g: 0.4964128, b: 0.5748173, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -459,6 +459,7 @@ GameObject:
   - component: {fileID: 435718791}
   - component: {fileID: 435718790}
   - component: {fileID: 435718794}
+  - component: {fileID: 435718795}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -567,7 +568,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
   inputField: {fileID: 1528341306}
-  _loadSceneName: MyS
+  _loadSceneName: MyS2
+--- !u!114 &435718795
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 435718789}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectInterest: 1
+  DefaultInterestGroups: []
+  DestroyWhenStateAuthorityLeaves: 0
+  AllowStateAuthorityOverride: 1
+  AoiPositionSource: {fileID: 0}
+  Flags: 2561
+  NetworkGuid:
+    RawGuidValue: aad8dcf171d4495b89978692fafc34b0
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 435718794}
+  SimulationBehaviours: []
 --- !u!1 &580267863
 GameObject:
   m_ObjectHideFlags: 0
@@ -1425,7 +1450,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1950037932}
   - component: {fileID: 1950037931}
-  - component: {fileID: 1950037933}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -1510,15 +1534,3 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
---- !u!114 &1950037933
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1950037930}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
