@@ -40,6 +40,7 @@ public class WeaponSword : PlayerWeapon
     public override void Spawned()
     {
         base.Spawned();
+        _weaponNum = (int)EWeaponType.Sword;
         meshCollider = GetComponent<MeshCollider>();
         playerInfo = GetComponentInParent<PlayerInfo>(); 
         SetCollistion(false);

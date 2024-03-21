@@ -9,10 +9,10 @@ using System.IO.Pipes;
 using TMPro;
 using UnityEngine.UI;
 
-public class WeaponHandler : NetworkBehaviour
+public class WeaponHandler : NetworkBehaviour, IPlayerActionListener
 {
     public List<NetworkObject> playerWeaponPrefab;
-    public PlayerWeapon _equipWeapon { get; private set; }
+    public PlayerWeapon equipWeapon { get; private set; }
 
     public LayerMask collisionLayer;
 
@@ -26,24 +26,27 @@ public class WeaponHandler : NetworkBehaviour
 
     public override void Spawned()
     {
-        ;
+        SetEq();
+        ChangeWeapon((int)EWeaponType.Sword);
     }
-    #region Vind
-    public void ActionVind(CharacterHandler characterHandler)
+    #region Event
+    public void SubscribeToPlayerActionEvents(PlayerActionEvents _playerActionEvents)
     {
-        //Attack
-        characterHandler.Attack += Attack;
-        //Update
-        //CharacterHandler.CharacterUpdate += CharacterUpdate;
+        _playerActionEvents.OnPlayerAttack += OnPlayerAttack;
+        _playerActionEvents.OnPlyaerRespawn += OnPlyaerRespawn;
+
     }
-    
-    public void Attack()
+    public void OnPlayerAttack()
     {
-        if (_equipWeapon != null)
+        if (equipWeapon != null)
         {
             Debug.Log("Attack Event");
-            _equipWeapon.Fire(firePosition, fireDirection);
+            equipWeapon.Fire(firePosition, fireDirection);
         }
+    }
+    void OnPlyaerRespawn()
+    {
+        equipWeapon.OnRespawn();
     }
     public void SetFire(Vector3 _firePosition, Vector3 _fireDirection,bool _justPressed)
     {
@@ -57,9 +60,9 @@ public class WeaponHandler : NetworkBehaviour
 
     public bool AbleFire()
     {
-        if (_equipWeapon != null)
+        if (equipWeapon != null)
         {
-            return _equipWeapon.AbleFire();
+            return equipWeapon.AbleFire();
         }
         else return false;
     }
@@ -67,16 +70,16 @@ public class WeaponHandler : NetworkBehaviour
     public void ChangeWeapon(int num)
     {
         //�� ������Ʈ ü����
-        if (_equipWeapon != null)
+        if (equipWeapon != null)
         {
 
-            _equipWeapon.gameObject.SetActive(false);
-            _equipWeapon.DisEquip();
+            equipWeapon.gameObject.SetActive(false);
+            equipWeapon.DisEquip();
 
         }
-        _equipWeapon = playerWeaponPrefab[num].GetComponent<PlayerWeapon>();
-        _equipWeapon.gameObject.SetActive(true);
-        _equipWeapon.Equip();
+        equipWeapon = playerWeaponPrefab[num].GetComponent<PlayerWeapon>();
+        equipWeapon.gameObject.SetActive(true);
+        equipWeapon.Equip();
     }
 
 
@@ -92,6 +95,6 @@ public class WeaponHandler : NetworkBehaviour
     }
     public PlayerWeapon GetEquipWeapon()
     {
-        return _equipWeapon;
+        return equipWeapon;
     }
 }

@@ -1,17 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
-using Unity.VisualScripting;
-using TMPro;
-using JetBrains.Annotations;
 using UnityEngine.InputSystem;
-using ExitGames.Client.Photon.StructWrapping;
-using UnityEngine.EventSystems;
+using System.Collections; 
 using System;
-using UnityEngine.Animations;
-using UnityEngine.VFX;
-
 public class CharacterMovementHandler : NetworkBehaviour
 {
     [Header("NickName")]
@@ -24,7 +15,7 @@ public class CharacterMovementHandler : NetworkBehaviour
     float moveSpeed = 5f;
     float jumpTime = 0f;
     float jumpCooldown = 0f;
-    float jumpForce = 10f;
+    float jumpForce = 8f;
     float maxGravity = -8f;
 
     [Networked(OnChanged = nameof(ChangeDir))]
@@ -35,6 +26,7 @@ public class CharacterMovementHandler : NetworkBehaviour
 
     [Header("Component")]
     public NetworkRigidbody networkRigidbody;
+    
     static void ChangeDir(Changed<CharacterMovementHandler> changed)
     {
         float newS = changed.Behaviour.myDir;
@@ -55,36 +47,41 @@ public class CharacterMovementHandler : NetworkBehaviour
 
         RotateTowards(1);
     }
-    #region Vind
-    public void ActionVind(CharacterHandler characterHandler, HPHandler hpHandler)
+    #region Event
+    public void SubscribeToPlayerActionEvents(PlayerActionEvents _playerActionEvents)
     {
-        #region Event
-        //Death
-        hpHandler.Death += Death;
-        //Move
-        characterHandler.Move += Move;
-        //Jump
-        characterHandler.Jump += Jump;
-        //Respawn
-        characterHandler.Respawn += Respawn;
-        #endregion
+        if (_playerActionEvents == null)
+        {
+            Debug.LogError("PlayerActionEvents component is missing!");
+            return;
+        }
+        //Death 
+        _playerActionEvents.OnPlyaerDeath += OnPlyaerDeath;
+        //Move 
+        _playerActionEvents.OnPlayerMove += OnPlayerMove;
+        Debug.Log("등록");
+        //Jump 
+        _playerActionEvents.OnPlayerJump += OnPlayerJump;
+        //Respawn 
+        _playerActionEvents.OnPlyaerRespawn += OnPlyaerRespawn;
+
     }
     //Death
-    void Death(HPHandler _hpHandler)
+    void OnPlyaerDeath()
     {
         SetCharacterControllerEnabled(false);
     }
 
     //Respawn
-    void Respawn(CharacterHandler _characterHandler)
+    void OnPlyaerRespawn()
     {
         SetCharacterControllerEnabled(true);
         networkRigidbody.TeleportToPosition(Utils.GetRandomSpawnPoint());
     }
-    public void Move(Vector2 _dirVector2)
+    public void OnPlayerMove(float _dir)
     {
-
-        if (_dirVector2 == Vector2.zero)
+        //Debug.Log("무브 실행중");
+        if (_dir == 0)
         {
             Vector3 tmp22 = networkRigidbody.Rigidbody.velocity;
             float div = 1.3f;
@@ -93,9 +90,9 @@ public class CharacterMovementHandler : NetworkBehaviour
         }
         else
         {
-            myDir = _dirVector2.x;
+            myDir = _dir;
         }
-        Vector3 moveDirection = transform.right * _dirVector2.x;
+        Vector3 moveDirection = transform.right * _dir;
         moveDirection.Normalize();
 
         if (networkRigidbody.Rigidbody.velocity.y < maxGravity)
@@ -105,6 +102,14 @@ public class CharacterMovementHandler : NetworkBehaviour
 
         networkRigidbody.Rigidbody.velocity = (new Vector3(moveDirection.x * moveSpeed, networkRigidbody.Rigidbody.velocity.y, moveDirection.z * moveSpeed));
 
+    }
+    public void OnPlayerJump()
+    {
+        Vector3 tmp = Vector3.zero;
+        tmp.x = networkRigidbody.Rigidbody.velocity.x;
+        tmp.z = networkRigidbody.Rigidbody.velocity.z;
+        networkRigidbody.Rigidbody.velocity = tmp;
+        networkRigidbody.Rigidbody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
     }
     #endregion
 
@@ -130,14 +135,7 @@ public class CharacterMovementHandler : NetworkBehaviour
         characterRoot.transform.rotation = targetRotation;
 
     }
-    public void Jump()
-    {
-        Vector3 tmp = Vector3.zero;
-        tmp.x = networkRigidbody.Rigidbody.velocity.x;
-        tmp.z = networkRigidbody.Rigidbody.velocity.z;
-        networkRigidbody.Rigidbody.velocity = tmp;
-        networkRigidbody.Rigidbody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-    }
+    
 
 
     //Rule

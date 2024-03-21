@@ -75,9 +75,10 @@ public class NewInputTest : MonoBehaviour
         return _float;
     }
 
-    //public void OnMove(InputValue value)
+    //public void
+    //(InputValue value)
     //{
-    //    Debug.Log("move È£Ãâ");
+    //    Debug.Log("move È£ï¿½ï¿½");
     //    dir = value.Get<Vector2>();
 
     //}

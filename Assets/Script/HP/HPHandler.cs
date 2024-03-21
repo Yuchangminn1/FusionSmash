@@ -7,11 +7,9 @@ using TMPro;
 using Unity.VisualScripting;
 using System;
 
-public class HPHandler : NetworkBehaviour
+public class HPHandler : NetworkBehaviour, IPlayerActionListener
 {
     public PlayerInfo playerInfo;
-    //player
-    public  event Action<HPHandler> Death;
 
     int MaxHp { get; set; }
     [Networked(OnChanged = nameof(OnHPChanged))]
@@ -101,21 +99,21 @@ public class HPHandler : NetworkBehaviour
         }
         
     }
-    
-    #region Vind
-    public void ActionVind(CharacterHandler characterHandler)
+
+    #region Event
+    public void SubscribeToPlayerActionEvents(PlayerActionEvents _playerActionEvents)
     {
         //Update
-        characterHandler.CharacterUpdate += CharacterUpdate;
+        _playerActionEvents.OnPlayerUpdate += OnPlayerUpdate;
 
         //Respawn
-        characterHandler.Respawn += Respawn;
+        _playerActionEvents.OnPlyaerRespawn += OnPlyaerRespawn;
     }
-    void CharacterUpdate(CharacterHandler _characterHandler)
+    void OnPlayerUpdate()
     {
         CheckFallRespawn();
     }
-    void Respawn(CharacterHandler _characterHandler)
+    void OnPlyaerRespawn()
     {
         OnRespawned();
         isRespawnRequsted = false;
@@ -219,7 +217,8 @@ public class HPHandler : NetworkBehaviour
             Debug.Log("playerModel is Null");
             return;
         }
-        Death(this);
+        PlayerActionEvents eventHandler = GetComponent<PlayerActionEvents>();
+        eventHandler.TriggerDeath();
         playerModel.gameObject.SetActive(false);
 
         Instantiate(deathGameObjectPrefab, transform.position, Quaternion.identity);

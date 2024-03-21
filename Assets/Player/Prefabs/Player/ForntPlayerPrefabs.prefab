@@ -8938,6 +8938,7 @@ GameObject:
   - component: {fileID: 1124359941217124669}
   - component: {fileID: 5595622307214061470}
   - component: {fileID: 6627235512539963941}
+  - component: {fileID: 1616345659808816836}
   m_Layer: 7
   m_Name: ForntPlayerPrefabs
   m_TagString: Player22
@@ -9063,6 +9064,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  playerInfo: {fileID: 0}
   _HP: 0
   _AddForce: 0
   _isDead: 0
@@ -9081,14 +9083,6 @@ MonoBehaviour:
   - {fileID: 21300000, guid: e88f6ccf903ead341b36c74292f79d0a, type: 3}
   - {fileID: 21300000, guid: 57f41301ccc84be4f94f2005706a51e2, type: 3}
   __weaponSpriteNum: 0
-  __kill: 0
-  __death: 0
-  __enemyNickName:
-    _length: 0
-    _data:
-      Data: 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-  enemyHPHandler: {fileID: 0}
-  _nickName: 
   playerNickNameTM: {fileID: 2227494634827152295}
   isRespawnRequsted: 0
 --- !u!114 &4494087257618028865
@@ -9362,6 +9356,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  _name:
+    _length: 0
+    _data:
+      Data: 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  _enemyName:
+    _length: 0
+    _data:
+      Data: 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  _kill: 0
+  _death: 0
+--- !u!114 &1616345659808816836
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8027943520015113840}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fcc093d8bc858e0468f04259bbfc2815, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8064012626400475042
 GameObject:
   m_ObjectHideFlags: 0
@@ -10671,6 +10687,10 @@ PrefabInstance:
       propertyPath: _weaponUI
       value: 
       objectReference: {fileID: 2599257348319873914}
+    - target: {fileID: 6723741104738109779, guid: 484e5da217bd6e242934b2db4d7136cc, type: 3}
+      propertyPath: _weaponNum
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

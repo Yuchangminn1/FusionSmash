@@ -7,46 +7,52 @@ using UnityEngine;
 using static UnityEngine.Video.VideoPlayer;
 
 
-
-public class CharacterHandler : NetworkBehaviour
+public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
 {
-    //Input 
-    public event Action Jump;
-    public event Action Attack;
-    public event Action<CharacterHandler> CharacterUpdate;
-    public event Action<CharacterHandler> Respawn;
-
-    public event Action<Vector2> Move;
 
     //Handler
-    EventHandler eventHandler;
-    CharacterInputhandler inputhandler;
+    PlayerActionEvents eventHandler;
+    CharacterInputhandler inputHandler;
     CharacterMovementHandler movementHandler;
     PlayerStateHandler playerStateHandler;
     WeaponHandler weaponHandler;
     HPHandler hpHandler;
     ChatSystem chatSystem;
+
     public override void Spawned()
     {
         //Input
-        eventHandler = GetComponent<EventHandler>();
-        inputhandler = GetComponent<CharacterInputhandler>();
+        inputHandler = GetComponent<CharacterInputhandler>();
         movementHandler = GetComponent<CharacterMovementHandler>();
         playerStateHandler = GetComponent<PlayerStateHandler>();
         weaponHandler = GetComponent<WeaponHandler>();
         hpHandler = GetComponent<HPHandler>();
         chatSystem = GetComponent<ChatSystem>();
 
-        //Vind
-        playerStateHandler.ActionVind(this);
-        movementHandler.ActionVind(this, hpHandler);
-        weaponHandler.ActionVind(this);
-        hpHandler.ActionVind(this);
+        //Event
+        eventHandler = GetComponent<PlayerActionEvents>();
+        if (eventHandler == null)
+        {
+            Debug.LogError("PlayerActionEvents component is missing!");
+            return;
+        }
+        if (HasInputAuthority || HasStateAuthority)
+        {
+            playerStateHandler.SubscribeToPlayerActionEvents(eventHandler);
+            movementHandler.SubscribeToPlayerActionEvents(eventHandler);
+            weaponHandler.SubscribeToPlayerActionEvents(eventHandler);
+            hpHandler.SubscribeToPlayerActionEvents(eventHandler);
+        }
 
 
+        //eventHandler.TriggerInit();
 
     }
 
+    public void SubscribeToPlayerActionEvents(PlayerActionEvents _playerActionEvents)
+    {
+        ;
+    }
     public override void FixedUpdateNetwork()
     {
         if (PlayerAble())
@@ -61,14 +67,7 @@ public class CharacterHandler : NetworkBehaviour
                     ActionCase(networkInputData);
                 }
             }
-            if (CharacterUpdate == null)
-            {
-                Debug.Log("CharacterUpdate is null");
-            }
-            else
-            {
-                CharacterUpdate(this);
-            }
+            eventHandler.TriggerCharacterUpdate();
         }
     }
 
@@ -79,7 +78,7 @@ public class CharacterHandler : NetworkBehaviour
         {
             if (playerStateHandler.JumpAble())
             {
-                Jump?.Invoke();
+                eventHandler.TriggerJump();
                 return;
             }
 
@@ -87,11 +86,12 @@ public class CharacterHandler : NetworkBehaviour
 
         if (networkInputData.isFireButtonPressed)
         {
-            if (playerStateHandler.AbleFire())
+            if (weaponHandler.AbleFire() && playerStateHandler.AbleFire())
             {
-                Attack?.Invoke();
+                eventHandler.TriggerAttack();
                 return;
             }
+
         }
 
 
@@ -99,15 +99,12 @@ public class CharacterHandler : NetworkBehaviour
     }
     private void ActionMove(NetworkInputData networkInputData)
     {
-        if (Move != null)
+        if (playerStateHandler.canMove)
         {
-            if (playerStateHandler.canMove)
-            {
-                //Vector2 tmp = networkInputData.movementInput;
-
-                Vector2 tmp = playerStateHandler.stopMove == true ? Vector2.zero : networkInputData.movementInput;
-                Move(tmp);
-            }
+           
+            Vector2 tmp = playerStateHandler.stopMove == true ? Vector2.zero : networkInputData.movementInput;
+            eventHandler.TriggerMove(tmp.x);
+            
         }
     }
 
@@ -138,11 +135,8 @@ public class CharacterHandler : NetworkBehaviour
         {
             if (hpHandler.isRespawnRequsted)
             {
-                if (Respawn != null)
-                {
-                    Respawn(this);
-                    return false;
-                }
+                eventHandler.TriggerRespawn();
+                return false;
             }
             if (hpHandler.isDead)
                 return false;

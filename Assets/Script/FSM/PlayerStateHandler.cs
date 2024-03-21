@@ -22,7 +22,7 @@ enum StateType
     Heal,
 }
 
-public class PlayerStateHandler : NetworkBehaviour
+public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
 {
     [Networked(OnChanged = nameof(ChangeState))]
     public int state { get; set; }
@@ -101,44 +101,71 @@ public class PlayerStateHandler : NetworkBehaviour
         anima = GetComponent<Animator>();
         characterMovementHandler = GetComponent<CharacterMovementHandler>();
         weaponHandler = GetComponent<WeaponHandler>();
-
-        //Weapon
-        weaponHandler.SetEq();
-        weapon = (int)EWeaponType.Sword;
-        PlayerChangeWeapon((int)EWeaponType.Sword);
-
         State_Initialize();
         if (HasStateAuthority)
         {
             nextState = moveState;
             ChangeState();
         }
+        weapon = weaponHandler.equipWeapon._weaponNum;
     }
-    public void ActionVind(CharacterHandler characterHandler)
+    public void SubscribeToPlayerActionEvents(PlayerActionEvents _playerActionEvents)
     {
-        #region Event
-
         //Move
-        characterHandler.Move += Move;
+        _playerActionEvents.OnPlayerMove += OnPlayerMove;
         //Update
-        characterHandler.CharacterUpdate += CharacterUpdate;
-        //Attack
-
+        _playerActionEvents.OnPlayerUpdate += OnPlayerUpdate;
         //Respawn
-        characterHandler.Respawn += Respawn;
-        #endregion
+        _playerActionEvents.OnPlyaerRespawn += OnPlyaerRespawn;
     }
-    void CharacterUpdate(CharacterHandler _characterHandler)
+    public void OnPlyaerRespawn()
+    {
+        AnimationTrigger = false;
+    }
+    public void OnPlayerMove(float _dirVector2)
+    {
+        SetInputVec(_dirVector2);
+    }
+    public void SetInputVec(float vector2)
+    {
+        if (HasStateAuthority)
+        {
+            moveDir = vector2 == 0 ? 0 : 1;
+        }
+    }
+    void OnPlayerUpdate()
     {
         StateChageUpdate();
         ResetCondition();
     }
-
-
-
-    void Respawn(CharacterHandler _characterHandler)
+    void OnPlayerDeath()
     {
-        GetWeaponHandler()._equipWeapon.OnRespawn();
+
+    }
+    public void StateChageUpdate()
+    {
+        if (stateMachine == null)
+        {
+            if (HasStateAuthority)
+            {
+                Debug.Log("stateMachine is Null");
+            }
+            return;
+        }
+        if (HasStateAuthority)
+        {
+            stateMachine.Update();
+            stateMachine.LateUpdate();
+        }
+    }
+    public void ResetCondition()
+    {
+        if (IsGround() && !Isvisi())
+        {
+            //Reset Counter
+            ResetJumpCount();
+            //_dodgeCount = 0;
+        }
     }
     void Update()
     {
@@ -164,22 +191,7 @@ public class PlayerStateHandler : NetworkBehaviour
         }
     }
     #region State
-    public void StateChageUpdate()
-    {
-        if (stateMachine == null)
-        {
-            if (HasStateAuthority)
-            {
-                Debug.Log("stateMachine is Null");
-            }
-            return;
-        }
-        if (HasStateAuthority)
-        {
-            stateMachine.Update();
-            stateMachine.LateUpdate();
-        }
-    }
+    
     public EntityState GetCurrentState()
     {
         if (stateMachine.GetState() == null)
@@ -352,25 +364,8 @@ public class PlayerStateHandler : NetworkBehaviour
     {
         stopMove = _tf;
     }
-
-    public void PlayerChangeWeapon(int _weaponNum)
-    {
-        weaponHandler.ChangeWeapon(_weaponNum);
-    }
     #endregion
-    #region Move
-    void Move(Vector2 _dirVector2)
-    {
-        SetInputVec(_dirVector2);
-    }
-    public void SetInputVec(Vector2 vector2)
-    {
-        if (HasStateAuthority)
-        {
-            moveDir = vector2.x == 0 ? 0 : 1;
-        }
-    }
-    #endregion
+    
     #region Jump
     public bool JumpAble()
     {
@@ -385,20 +380,13 @@ public class PlayerStateHandler : NetworkBehaviour
             jumpCount++;
             //Debug.Log("JumpCount = " + jumpCount);
             jumpTime = Time.time;
+
             return true;
         }
         isJumpButtonPressed = false;
         return false;
     }
-    public void ResetCondition()
-    {
-        if (IsGround() && !Isvisi())
-        {
-            //Reset Counter
-            ResetJumpCount();
-            //_dodgeCount = 0;
-        }
-    }
+    
     public void ResetJumpCount()
     {
         if (HasStateAuthority)
@@ -409,9 +397,6 @@ public class PlayerStateHandler : NetworkBehaviour
     }
     #endregion
     #region Attack
-
-
-
     public void AttackEnter()
     {
         SetStopMove(true);
@@ -425,7 +410,8 @@ public class PlayerStateHandler : NetworkBehaviour
             SetStopMove(false);
         }
         lastAttackTime = Time.time;
-        GetEquipWeapon().SetCollistion(false);
+        //GetEquipWeapon().SetCollistion(false);
+        //이거 고민중
     }
     public void AddAttackCount()
     {
@@ -471,6 +457,8 @@ public class PlayerStateHandler : NetworkBehaviour
         EntityState tmpQ = GetCurrentState();
         if (tmpQ.isAbleAttack)
         {
+
+            //AttackCount + Max Attack ~~ 이거 웨폰 핸들러로 이동 해야할듯 
             if (tmpQ.isCancel)
             {
                 if (weapon == 0)
@@ -535,20 +523,4 @@ public class PlayerStateHandler : NetworkBehaviour
     }
     #endregion
 
-    //Weapon
-    public PlayerWeapon GetEquipWeapon()
-    {
-        if (weaponHandler == null)
-        {
-            Debug.Log("EquipWeapon is Null");
-        }
-        return weaponHandler.GetEquipWeapon();
-    }
-    public void ChangeWeapon(int _weaponNum)
-    {
-        weaponHandler.ChangeWeapon(_weaponNum);
-    }
-
-    public WeaponHandler GetWeaponHandler() { return weaponHandler; }
-    //임시 델리게이트로 묶어야할듯
 }
