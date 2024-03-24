@@ -25,8 +25,8 @@ public class CharacterMovementHandler : NetworkBehaviour
     PlayerStateHandler playerStateHandler;
 
     [Header("Component")]
-    public NetworkRigidbody networkRigidbody;
-    
+    NetworkRigidbody networkRigidbody;
+    CapsuleCollider capsuleCollider;
     static void ChangeDir(Changed<CharacterMovementHandler> changed)
     {
         float newS = changed.Behaviour.myDir;
@@ -41,7 +41,7 @@ public class CharacterMovementHandler : NetworkBehaviour
     {
         //Component
         networkRigidbody = GetComponent<NetworkRigidbody>();
-
+        capsuleCollider = GetComponent<CapsuleCollider>();
         //Script
         playerStateHandler = GetComponent<PlayerStateHandler>();
 
@@ -147,19 +147,29 @@ public class CharacterMovementHandler : NetworkBehaviour
     //Hit
     public void HitAddForce(Vector3 _attackVec, int _force)
     {
-        Vector3 tmp = (_attackVec - transform.position);
-        tmp.z = 0;
-        tmp = tmp.normalized * _force;
-        StartCoroutine(HitAddForce(tmp));
+        _attackVec.z = 0;
+        _attackVec = _attackVec.normalized;
+        //Debug.Log("전 HitDir = " + _attackVec.x + "Target AngleY = " + characterRoot.transform.rotation.y + "Power = " + _force);
+        if (characterRoot.transform.rotation.y < 0)
+        {
+            _attackVec.x *= -1;
+        }
+        //Debug.Log("후 HitDir = " + _attackVec.x + "Target AngleY = " + characterRoot.transform.rotation.y + "Power = " + _force);
+
+        _attackVec = _attackVec * _force;
+        StartCoroutine(HitAddForce(_attackVec));
     }
 
     IEnumerator HitAddForce(Vector3 _attackVec)
     {
-        _attackVec = _attackVec / 5;
-        for (int i = 1; i < 10; i++)
+        float DivForce = 10f;
+        float UpperForce = DivForce;
+        _attackVec = _attackVec / DivForce;
+        _attackVec.y = _attackVec.x > 0 ? _attackVec.x / UpperForce : -_attackVec.x / UpperForce;
+        int maxC =12;
+        for (int i = 1; i < maxC; i++)
         {
-            float Dis = Vector3.Distance(Vector3.zero, i * _attackVec) / 20;
-            networkRigidbody.Rigidbody.AddForce(i * _attackVec + Vector3.up * Dis, ForceMode.Impulse);
+            networkRigidbody.Rigidbody.AddForce((maxC-i) * _attackVec , ForceMode.Impulse);
             yield return new WaitForFixedUpdate();
         }
 

@@ -33,7 +33,7 @@ public class PlayerAnimationTrigger : NetworkBehaviour
 
     void AnimationTriggerOFF()
     {
-        if (HasStateAuthority)
+        if (HasStateAuthority || HasInputAuthority)
         {
             player.AnimationTrigger = false;
         }
@@ -41,39 +41,39 @@ public class PlayerAnimationTrigger : NetworkBehaviour
 
     void AnimationTriggerOn()
     {
-        if (HasStateAuthority)
+        if (HasStateAuthority || HasInputAuthority)
         {
             player.AnimationTrigger = true;
         }
     }
-    void AttackColOn()
-    {
-        if (Object.HasInputAuthority)
-        {
-            //�ӽ÷� ���� ���߿� ���� �ڵ鷯�� �ٸ� ���� ��ġ
-            testweapon.SetDirect(true);
-            //Debug.Log("���ݽõ�");
-            if (testweapon != null)
-                testweapon.WeaponColOn();
-            else
-            {
-                Debug.Log($"testweapon = Null");
-            }
-        }
-    }
-    void AttackColOff()
-    {
-        if (Object.HasInputAuthority)
-        {
-            //�ӽ÷� ���� ���߿� ���� �ڵ鷯�� �ٸ� ���� ��ġ
-            testweapon.SetDirect(true);
-            //Debug.Log("���ݽõ�");
-            if (testweapon != null)
-                testweapon.WeaponColOff();
-            else
-            {
-                Debug.Log($"testweapon = Null");
-            }
-        }
-    }
+    //void AttackColOn()
+    //{
+    //    if (Object.HasInputAuthority)
+    //    {
+    //        //�ӽ÷� ���� ���߿� ���� �ڵ鷯�� �ٸ� ���� ��ġ
+    //        testweapon.SetDirect(true);
+    //        //Debug.Log("���ݽõ�");
+    //        if (testweapon != null)
+    //            testweapon.WeaponColOn();
+    //        else
+    //        {
+    //            Debug.Log($"testweapon = Null");
+    //        }
+    //    }
+    //}
+    //void AttackColOff()
+    //{
+    //    if (Object.HasInputAuthority)
+    //    {
+    //        //�ӽ÷� ���� ���߿� ���� �ڵ鷯�� �ٸ� ���� ��ġ
+    //        testweapon.SetDirect(true);
+    //        //Debug.Log("���ݽõ�");
+    //        if (testweapon != null)
+    //            testweapon.WeaponColOff();
+    //        else
+    //        {
+    //            Debug.Log($"testweapon = Null");
+    //        }
+    //    }
+    //}
 }

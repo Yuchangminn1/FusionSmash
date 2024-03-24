@@ -38,14 +38,18 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
         }
         if (HasInputAuthority || HasStateAuthority)
         {
-            playerStateHandler.SubscribeToPlayerActionEvents(eventHandler);
             movementHandler.SubscribeToPlayerActionEvents(eventHandler);
-            weaponHandler.SubscribeToPlayerActionEvents(eventHandler);
-            hpHandler.SubscribeToPlayerActionEvents(eventHandler);
+            playerStateHandler.SubscribeToPlayerActionEvents(eventHandler);
+            if (HasStateAuthority)
+            {
+                weaponHandler.SubscribeToPlayerActionEvents(eventHandler);
+                hpHandler.SubscribeToPlayerActionEvents(eventHandler);
+            }
+                
         }
 
 
-        //eventHandler.TriggerInit();
+        eventHandler.TriggerInit();
 
     }
 

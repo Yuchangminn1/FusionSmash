@@ -1,4 +1,5 @@
 
+using ExitGames.Client.Photon.StructWrapping;
 using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ public class AttackState : PlayerState
     {
         endMotionChange = true;
         isAbleFly = true;
-        isAbleAttack = true;
+        isAbleAttack = false;
         isAbleJump = false;
         isState2 = true;
     }
@@ -22,31 +23,26 @@ public class AttackState : PlayerState
     {
         base.Enter();
         player.AttackEnter();
+        Debug.Log("Enter Time" + Time.time);
     }
     public override bool Update()
     {
         if (player.attackCount == player.maxAttackCount)
         {
-            attackDelay = 0.8f;
+            attackDelay = 0.9f;
         }
         else
         {
-            attackDelay = 0.4f;
+            attackDelay = 0.5f;
         }
-        if(startTime + attackDelay > Time.time)
+        if (startTime + attackDelay > Time.time)
         {
             return false;
         }
-        //if (!player.Isvisi())
-        //{
-        //    if (player.isFireButtonPressed)
-        //    {
-        //        //player.AnimationTrigger = false;
-        //        player.nextState = player.attackState;
-        //        player.ChangeState();
-        //        return true;
-        //    }
-        //}
+        if (!player.Isvisi()&& player.isFireButtonPressed)
+        {
+            player.ChangeState();
+        }
         return base.Update();
         
     }
@@ -61,7 +57,10 @@ public class AttackState : PlayerState
     public override void Exit()
     {
         base.Exit();
+        Debug.Log("Exit Time" + Time.time);
+
         player.AttackExit();
+
     }
     private void AnimationTriggerErrorCheck()
     {

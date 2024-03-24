@@ -102,6 +102,10 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
         characterMovementHandler = GetComponent<CharacterMovementHandler>();
         weaponHandler = GetComponent<WeaponHandler>();
         State_Initialize();
+        if (stateMachine == null)
+        {
+            Debug.LogError("stateMachine is null after initialization.");
+        }
         if (HasStateAuthority)
         {
             nextState = moveState;
@@ -120,7 +124,11 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
     }
     public void OnPlyaerRespawn()
     {
-        AnimationTrigger = false;
+        if (HasStateAuthority)
+        {
+            AnimationTrigger = false;
+            stateMachine.ChangeState(nextState);
+        }
     }
     public void OnPlayerMove(float _dirVector2)
     {
@@ -128,21 +136,21 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
     }
     public void SetInputVec(float vector2)
     {
-        if (HasStateAuthority)
+        if (HasStateAuthority || HasInputAuthority)
         {
             moveDir = vector2 == 0 ? 0 : 1;
         }
     }
     void OnPlayerUpdate()
     {
-        StateChageUpdate();
+        StatechangeUpdate();
         ResetCondition();
     }
     void OnPlayerDeath()
     {
 
     }
-    public void StateChageUpdate()
+    public void StatechangeUpdate()
     {
         if (stateMachine == null)
         {
@@ -171,19 +179,19 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
     {
         if (HasStateAuthority)
         {
-            stateMachine.Update();
+            //stateMachine.Update();
         }
     }
     void FixedUpdate()
     {
         if (HasStateAuthority)
         {
-            stateMachine.FixedUpdate();
+            //stateMachine.FixedUpdate();
         }
     }
     private void LateUpdate()
     {
-        if(canMove)
+        if (canMove)
             SetFloat("InputX", (float)moveDir);
         else
         {
@@ -191,7 +199,7 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
         }
     }
     #region State
-    
+
     public EntityState GetCurrentState()
     {
         if (stateMachine.GetState() == null)
@@ -199,6 +207,8 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
 
         return stateMachine.GetState();
     }
+
+
     private void State_Initialize()
     {
         stateMachine = new StateMachine();
@@ -272,6 +282,7 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
             changed.Behaviour.SetInt("Weapon", newS);
         }
     }
+
     static void ChangeAnimationTrigger(Changed<PlayerStateHandler> changed)
     {
         NetworkBool newS = changed.Behaviour.AnimationTrigger;
@@ -365,7 +376,7 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
         stopMove = _tf;
     }
     #endregion
-    
+
     #region Jump
     public bool JumpAble()
     {
@@ -386,7 +397,7 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
         isJumpButtonPressed = false;
         return false;
     }
-    
+
     public void ResetJumpCount()
     {
         if (HasStateAuthority)
@@ -397,14 +408,33 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
     }
     #endregion
     #region Attack
+    
     public void AttackEnter()
     {
         SetStopMove(true);
+        if (weapon == 1)
+        {
+            weaponHandler.GetEquipWeapon().SetCollistion(true);
+            if (attackCount == maxAttackCount)
+            {
+                weaponHandler.GetEquipWeapon().SetAttackType(EAttackType.Knockback);
+            }
+            else
+            {
+                weaponHandler.GetEquipWeapon().SetAttackType(EAttackType.Nomal);
+            }
+        }
+
         lastAttackTime = Time.time;
         isFireButtonPressed = false;
     }
+
     public void AttackExit()
     {
+        if (weapon == 1)
+        {
+            weaponHandler.GetEquipWeapon().SetCollistion(false);
+        }
         if (nextState.currentStateNum != (int)StateType.Attack)
         {
             SetStopMove(false);
@@ -463,7 +493,7 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
             {
                 if (weapon == 0)
                 {
-                    AnimationTrigger = false;
+                    //AnimationTrigger = false;
                     SetAttackCount(maxAttackCount);
                     Debug.Log("maxAttackCount " + maxAttackCount);
                     isFireButtonPressed = true;
@@ -473,7 +503,7 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
                 {
                     if (attackCount < maxAttackCount)
                     {
-                        AnimationTrigger = false;
+                        //AnimationTrigger = false;
                         SetAttackCount(maxAttackCount);
                         Debug.Log("maxAttackCount " + maxAttackCount);
                         isFireButtonPressed = true;

@@ -13,12 +13,18 @@ public enum EWeaponType
     Sword,
     Gravity
 }
-
+public enum EAttackType
+{
+    Nomal,
+    Knockback,
+}
 
 public class PlayerWeapon : NetworkBehaviour
 {
     // �ѱ� ����
+    public EAttackType AttackType;
     public EWeaponType Type;
+    //public int maxAttackCount { get; protected set; } = 2;
 
     [Header("Weapon UI")]
     public GameObject _weaponUI;    //��  ��������Ʈ �ް� ��ü�ϴ� �ɷ� �ٲ��� 
@@ -34,7 +40,7 @@ public class PlayerWeapon : NetworkBehaviour
     public LayerMask HitMask; // ��Ʈ ����ũ
     [Networked]
     public NetworkBool IsCollected { get; set; }  // ȹ�� ����
-    
+
     //private GameObject _muzzleEffectInstance; // �߻� ȿ�� �ν��Ͻ�
 
     //private SceneObjects _sceneObjects; // SceneObjects Ŭ����
@@ -57,7 +63,7 @@ public class PlayerWeapon : NetworkBehaviour
     public override void Spawned()
     {
         base.Spawned();
-        
+        AttackType = EAttackType.Nomal;
         if (HasStateAuthority)
         {
             IsCollected = true;
@@ -69,7 +75,10 @@ public class PlayerWeapon : NetworkBehaviour
         }
         _weaponNum = (int)Type;
     }
-
+    public void SetAttackType(EAttackType eAttackType)
+    {
+        AttackType = eAttackType;
+    }
     public virtual void SetCollistion(bool _tf)
     {
         ;

@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class WeaponGun : PlayerWeapon
 {
-
+    
     [Header("Weapon UI")]
     public TMP_Text _weaponAmmoText;//�Ѿ� ����
     [Range(1, 20)]
@@ -50,7 +50,7 @@ public class WeaponGun : PlayerWeapon
     public override bool AbleFire()
     {
         //IsCollected == false ||
-        if ( !IsAutomatic || IsReloading || !_fireCooldown.ExpiredOrNotRunning(Runner))
+        if (!IsAutomatic || IsReloading || !_fireCooldown.ExpiredOrNotRunning(Runner))
             return false;
 
         if (ClipAmmo <= 0)
@@ -137,6 +137,7 @@ public class WeaponGun : PlayerWeapon
     public override void Spawned()
     {
         base.Spawned();
+        //maxAttackCount = 1;
 
         if (HasStateAuthority)
         {
@@ -149,7 +150,7 @@ public class WeaponGun : PlayerWeapon
         float fireTime = 60f / FireRate;
         _fireTicks = Mathf.CeilToInt(fireTime / Runner.DeltaTime);
     }
-    
+
     public override void OnRespawn()
     {
         RemainingAmmo = StartAmmo - MaxClipAmmo;

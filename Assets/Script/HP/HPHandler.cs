@@ -15,7 +15,7 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
     [Networked(OnChanged = nameof(OnHPChanged))]
     public int HP { get; private set; }
     [Networked]
-    public int AddForce { get;private set; }
+    public int AddForce { get; private set; }
     [Networked(OnChanged = nameof(OnStateChanged))]
     public bool isDead { get; set; }
 
@@ -44,7 +44,9 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
     [Header("Respawn")]
     public bool isRespawnRequsted = false;
 
-    
+    float lastHitTime = 0f;
+    float KnockbackDelay = 1f;
+
     public void CheckFallRespawn()
     {
         if (transform.position.y < -12)
@@ -97,7 +99,7 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
         {
             playerNickNameTM.color = new Color(0, 0, 0, 0);
         }
-        
+
     }
 
     #region Event
@@ -121,12 +123,27 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
 
     #endregion
 
-    public void OnTakeDamage(string _hitPlayer, int weaponNum, int _addForce = 10, int _attackDamage = 1)
+    public void OnTakeDamage(string _hitPlayer, int weaponNum,Vector3 _attackDir, EAttackType eAttackType = EAttackType.Knockback, int _addForce = 1, int _attackDamage = 1)
     {
-        Debug.Log("OnTakeDamage");
-        if (HasStateAuthority)
+        //Debug.Log("OnTakeDamage");
+        if (!HasStateAuthority&&HasInputAuthority)
         {
-            _weaponSpriteNum = weaponNum;
+            return;
+        }
+        _weaponSpriteNum = weaponNum;
+
+        if (eAttackType == EAttackType.Knockback)
+        {
+            if (lastHitTime + KnockbackDelay > Time.time && playerInfo.GetEnemyName() == _hitPlayer)
+            {
+                Debug.Log("버그로 타격판정");
+                lastHitTime = Time.time;
+                return;
+            }
+            else
+            {
+                lastHitTime = Time.time;
+            }
         }
         if (isDead && !Object.HasStateAuthority)
         {
@@ -144,7 +161,8 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
         }
         playerStateHandler.isHit = true;
 
-        
+        if (eAttackType == EAttackType.Knockback)
+            characterMovementHandler.HitAddForce(_attackDir, AddForce);
 
     }
 
@@ -211,7 +229,7 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
     }
     void OnDeath()
     {
-        
+
         if (playerModel == null)
         {
             Debug.Log("playerModel is Null");
@@ -246,7 +264,7 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
         }
         isDead = false;
         HpReset();
-        AddForce =1;
+        AddForce = 1;
 
     }
 

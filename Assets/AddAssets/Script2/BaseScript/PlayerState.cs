@@ -45,24 +45,27 @@ public class PlayerState : EntityState
 
         if (player.nextState != this)
         {
-
             return true;
         }
         if (player.isdead)
         {
+            player.AnimationTrigger = false;
             player.nextState = player.deathState;
 
             return true;
         }
         if (player.isHit)
         {
+            player.AnimationTrigger = false;
+
             player.nextState = player.hitState;
 
             return true;
         }
         if (endMotionChange)
         {
-            if (player.Isvisi()&&!isCancel)
+
+            if (player.Isvisi() && !isCancel)
             {
 
                 return false;
@@ -97,7 +100,6 @@ public class PlayerState : EntityState
         if (player.isFireButtonPressed && isAbleAttack)
         {
             player.nextState = player.attackState;
-
             return true;
         }
         if (player.isDodgeButtonPressed && isAbleDodge)

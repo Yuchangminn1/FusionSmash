@@ -103,7 +103,10 @@ public class NetworkPlayer : NetworkBehaviour,IPlayerLeft
     }
     private void OnNickNameChanged()
     {
-        //Debug.Log($"Nickname chaged for player to {nickName} for player {gameObject.name}");
+        //Debug.Log($"Nickname
+        //
+        //
+        //d for player to {nickName} for player {gameObject.name}");
         //characterHandler.playerdata.Name = nickName.ToString();
         playerInfo.SetName(nickName.ToString());
 

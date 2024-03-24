@@ -117,8 +117,8 @@ public class Projectile : NetworkBehaviour
                 {
                     return;
                 }
-                hitHP.OnTakeDamage(attackHP.playerInfo.GetName(), (int)Type);
-                hit.transform.GetComponent<CharacterMovementHandler>().HitAddForce(tmp, hitHP.AddForce);
+                hitHP.OnTakeDamage(attackHP.playerInfo.GetName(), (int)Type,tmp);
+                //hit.transform.GetComponent<CharacterMovementHandler>().HitAddForce(tmp, hitHP.AddForce);
 
                 if (hitHP.isDead)
                 {
