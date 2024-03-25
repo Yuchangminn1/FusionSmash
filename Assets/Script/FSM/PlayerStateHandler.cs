@@ -15,6 +15,7 @@ enum StateType
     Move,
     Jump,
     Fall,
+    Land,
     Attack,
     Hit,
     Dodge,
@@ -64,7 +65,7 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
     public int attackCount { get; set; } = 0;
     public int maxAttackCount { get; private set; } = 2;
     public float lastAttackTime { get; set; } = 0f;
-    float attackComboTime = 1.2f;
+    float attackComboTime = 0.3f;
     #region State
     protected StateMachine stateMachine;
     public PlayerState nextState;
@@ -408,7 +409,7 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
     }
     #endregion
     #region Attack
-    
+
     public void AttackEnter()
     {
         SetStopMove(true);
@@ -440,15 +441,13 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
             SetStopMove(false);
         }
         lastAttackTime = Time.time;
+        AddAttackCount();
         //GetEquipWeapon().SetCollistion(false);
         //이거 고민중
     }
     public void AddAttackCount()
     {
-        if (attackCount < maxAttackCount)
-        {
-            attackCount++;
-        }
+        attackCount++;
     }
     public void SetAttackCount(int _attackCount)
     {
@@ -459,20 +458,19 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
     }
     public void AttackCountReset()
     {
-        if (state == 4)
+        if (IsGround())
         {
-            return;
+            if (attackCount > maxAttackCount)
+            {
+                attackCount = 0;
+                return;
+            }
+            if (lastAttackTime + attackComboTime < Time.time)
+            {
+                attackCount = 0;
+            }
         }
-        if (attackCount > maxAttackCount)
-        {
-            attackCount = 0;
-            //lastAttackTime = 0f;
-            return;
-        }
-        if (lastAttackTime + attackComboTime < Time.time)
-        {
-            attackCount = 0;
-        }
+        
     }
     public bool AbleFire()
     {
@@ -495,7 +493,6 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
                 {
                     //AnimationTrigger = false;
                     SetAttackCount(maxAttackCount);
-                    Debug.Log("maxAttackCount " + maxAttackCount);
                     isFireButtonPressed = true;
                     return true;
                 }
@@ -505,7 +502,6 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
                     {
                         //AnimationTrigger = false;
                         SetAttackCount(maxAttackCount);
-                        Debug.Log("maxAttackCount " + maxAttackCount);
                         isFireButtonPressed = true;
                         return true;
                     }
@@ -515,7 +511,6 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
             {
                 if (weapon == 0)
                 {
-                    AddAttackCount();
 
                     isFireButtonPressed = true;
 
@@ -523,9 +518,8 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
                 }
                 if (weapon == 1)
                 {
-                    if (attackCount < maxAttackCount)
+                    if (attackCount <= maxAttackCount)
                     {
-                        AddAttackCount();
 
                         isFireButtonPressed = true;
                         return true;

@@ -45,7 +45,7 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
     public bool isRespawnRequsted = false;
 
     float lastHitTime = 0f;
-    float KnockbackDelay = 1f;
+    float damageDelay = 0.4f;
 
     public void CheckFallRespawn()
     {
@@ -123,27 +123,25 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
 
     #endregion
 
-    public void OnTakeDamage(string _hitPlayer, int weaponNum,Vector3 _attackDir, EAttackType eAttackType = EAttackType.Knockback, int _addForce = 1, int _attackDamage = 1)
+    public void OnTakeDamage(string _hitPlayer, int weaponNum, Vector3 _attackDir, EAttackType eAttackType = EAttackType.Knockback, int _addForce = 2, int _attackDamage = 1)
     {
         //Debug.Log("OnTakeDamage");
-        if (!HasStateAuthority&&HasInputAuthority)
+        if (!HasStateAuthority && HasInputAuthority)
         {
             return;
         }
         _weaponSpriteNum = weaponNum;
 
-        if (eAttackType == EAttackType.Knockback)
+
+        if (lastHitTime + damageDelay > Time.time && playerInfo.GetEnemyName() == _hitPlayer)
         {
-            if (lastHitTime + KnockbackDelay > Time.time && playerInfo.GetEnemyName() == _hitPlayer)
-            {
-                Debug.Log("버그로 타격판정");
-                lastHitTime = Time.time;
-                return;
-            }
-            else
-            {
-                lastHitTime = Time.time;
-            }
+            Debug.Log("버그로 타격판정");
+            lastHitTime = Time.time;
+            return;
+        }
+        else
+        {
+            lastHitTime = Time.time;
         }
         if (isDead && !Object.HasStateAuthority)
         {

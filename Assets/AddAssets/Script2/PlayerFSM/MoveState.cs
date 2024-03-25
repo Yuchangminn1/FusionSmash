@@ -17,11 +17,11 @@ public class MoveState : PlayerState
     public override void Enter()
     {
         base.Enter();
+
     }
 
     public override bool Update()
     {
-        player.AttackCountReset();
 
         //if (player.nextState != this)
         //{

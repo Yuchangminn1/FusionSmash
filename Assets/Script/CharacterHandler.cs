@@ -85,7 +85,10 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
                 eventHandler.TriggerJump();
                 return;
             }
-
+        }
+        else
+        {
+            playerStateHandler.isJumpButtonPressed = false;
         }
 
         if (networkInputData.isFireButtonPressed)
@@ -96,6 +99,10 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
                 return;
             }
 
+        }
+        else
+        {
+            playerStateHandler.isFireButtonPressed = false;
         }
 
 
@@ -142,6 +149,13 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
                 eventHandler.TriggerRespawn();
                 return false;
             }
+            if (hpHandler.isDead)
+                return false;
+        }
+        if (HasInputAuthority)
+        {
+            if (hpHandler.isRespawnRequsted)
+                return false;
             if (hpHandler.isDead)
                 return false;
         }
