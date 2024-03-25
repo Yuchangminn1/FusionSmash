@@ -19,6 +19,8 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
     HPHandler hpHandler;
     ChatSystem chatSystem;
 
+    //Component
+    public GameObject virtualCamera;
     public override void Spawned()
     {
         //Input
@@ -47,9 +49,14 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
             }
                 
         }
-
+        if (!HasInputAuthority)
+        {
+            virtualCamera.SetActive(false);
+        }
+        
 
         eventHandler.TriggerInit();
+        
 
     }
 
@@ -63,7 +70,7 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
         {
             if (GetInput(out NetworkInputData networkInputData))
             {
-                ShowBoard(networkInputData);
+                //ShowBoard(networkInputData);
                 Chat(networkInputData);
                 if (playerStateHandler.canMove)
                 {
@@ -120,15 +127,15 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
     }
 
     //UI
-    void ShowBoard(NetworkInputData networkInputData)
-    {
+    //void ShowBoard(NetworkInputData networkInputData)
+    //{
 
-        if (networkInputData.isShowBoardButtonPressed)
-        {
-            //if(HasStateAuthority)
-            //    _showBoard = !_showBoard;
-        }
-    }
+    //    if (networkInputData.isShowBoardButtonPressed)
+    //    {
+    //        //if(HasStateAuthority)
+    //        //    _showBoard = !_showBoard;
+    //    }
+    //}
     private void Chat(NetworkInputData networkInputData)
     {
         if (networkInputData.isChatButtonPressed)

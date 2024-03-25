@@ -34,13 +34,13 @@ public class CharacterInputhandler : MonoBehaviour
 
     CharacterMovementHandler characterMovementHandler;
     //other components
-    LocalCameraHandler localCameraHandler;
+    //LocalCameraHandler localCameraHandler;
 
     void Awake()
     {
         playerControls = new  PlayerInputAction();
 
-        localCameraHandler = GetComponentInChildren<LocalCameraHandler>();
+        //localCameraHandler = GetComponentInChildren<LocalCameraHandler>();
         characterMovementHandler = GetComponent<CharacterMovementHandler>();
     }
     // Start is called before the first frame update
@@ -61,7 +61,7 @@ public class CharacterInputhandler : MonoBehaviour
         viewInputVector.x = lookVec.x;
         viewInputVector.y = lookVec.y * -1; //Invert the mouse look
 
-        localCameraHandler.SetViewInputVector(viewInputVector);
+        //localCameraHandler.SetViewInputVector(viewInputVector);
 
 
 
@@ -89,7 +89,7 @@ public class CharacterInputhandler : MonoBehaviour
 
         //View data
          //networkInputData.rotationInput = viewInputVector.x;
-        networkInputData.aimFowardVector = localCameraHandler.transform.forward;
+        //networkInputData.aimFowardVector = localCameraHandler.transform.forward;
         //Move data
         networkInputData.movementInput = moveInputVector;
 

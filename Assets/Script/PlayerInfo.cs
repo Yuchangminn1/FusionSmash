@@ -55,7 +55,7 @@ public class PlayerInfo : NetworkBehaviour
     {
         name = _nickName;
         HPHandler hp = GetComponent<HPHandler>();
-        hp.playerNickNameTM.text = _nickName;
+        hp.nickNameText.text = _nickName;
     }
     public void SetEnemyName(string _enemyName)
     {

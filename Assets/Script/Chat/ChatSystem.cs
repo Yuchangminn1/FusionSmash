@@ -38,14 +38,15 @@ public class ChatSystem : NetworkBehaviour
     //Ŭ���̾�Ʈ���� ���� onoffonoff�ݺ��ϴ°� ����
     float inputTime = 0f;
     // Checks if there is anything entered into the input field.
-    
+
     public override void Spawned()
     {
+        mainInputField = GameObject.Find("InputField").GetComponent<InputField>();
         playerControls = new PlayerInputAction();
         chatLog = GameObject.FindWithTag("ChatDisplay").GetComponentInChildren<TMP_Text>();
         scrollV = GameObject.FindWithTag("ScrollV").GetComponent<Scrollbar>();
         mainInputField.characterLimit = 1024;
-        if (Object.HasInputAuthority || HasStateAuthority)
+        if (Object.HasInputAuthority)
         {
             mainInputField.enabled = true;
         }
@@ -84,7 +85,7 @@ public class ChatSystem : NetworkBehaviour
     }
     public void IsChatChange()
     {
-        if (HasStateAuthority)
+        if (HasInputAuthority)
             ischating = !ischating;
     }
 
@@ -111,7 +112,7 @@ public class ChatSystem : NetworkBehaviour
         changed.Behaviour.PushMessage();
 
     }
-    
+
 
 
     public void PushMessage()

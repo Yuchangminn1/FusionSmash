@@ -109,10 +109,6 @@ public class NetworkPlayer : NetworkBehaviour,IPlayerLeft
         //d for player to {nickName} for player {gameObject.name}");
         //characterHandler.playerdata.Name = nickName.ToString();
         playerInfo.SetName(nickName.ToString());
-
-
-
-
         characterMovementHandler._nickName = nickName.ToString();
         chatSystem._nickName = nickName.ToString();
 

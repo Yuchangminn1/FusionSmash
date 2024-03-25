@@ -27,9 +27,9 @@ public class PlayerWeapon : NetworkBehaviour
     //public int maxAttackCount { get; protected set; } = 2;
 
     [Header("Weapon UI")]
-    public GameObject _weaponUI;    //��  ��������Ʈ �ް� ��ü�ϴ� �ɷ� �ٲ��� 
+    //public GameObject _weaponUI;    //��  ��������Ʈ �ް� ��ü�ϴ� �ɷ� �ٲ��� 
     //public Sprite _weaponSprite;    //���� �̹��� ��������Ʈ
-    public Image _killIcon;         //ų �̹���
+    //public Image _killIcon;         //ų �̹���
     public int _weaponNum;
     protected HPHandler _hPHandler;
 
@@ -54,11 +54,11 @@ public class PlayerWeapon : NetworkBehaviour
     }
     public virtual void Equip()
     {
-        _weaponUI.SetActive(true);
+        //_weaponUI.SetActive(true);
     }
     public virtual void DisEquip()
     {
-        _weaponUI.SetActive(false);
+        //_weaponUI.SetActive(false);
     }
     public override void Spawned()
     {
