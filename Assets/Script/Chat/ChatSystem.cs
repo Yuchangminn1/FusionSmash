@@ -38,23 +38,29 @@ public class ChatSystem : NetworkBehaviour
     //Ŭ���̾�Ʈ���� ���� onoffonoff�ݺ��ϴ°� ����
     float inputTime = 0f;
     // Checks if there is anything entered into the input field.
+    private void Start()
+    {
+        if (HasInputAuthority)
+        {
+            mainInputField = GameObject.Find("InputField").GetComponent<InputField>();
+            playerControls = new PlayerInputAction();
+            chatLog = GameObject.Find("Chat_Display").GetComponentInChildren<TMP_Text>();
+            scrollV = GameObject.Find("ScrollbarVertical").GetComponent<Scrollbar>();
+            mainInputField.characterLimit = 1024;
+        }
 
+    }
     public override void Spawned()
     {
-        mainInputField = GameObject.Find("InputField").GetComponent<InputField>();
-        playerControls = new PlayerInputAction();
-        chatLog = GameObject.FindWithTag("ChatDisplay").GetComponentInChildren<TMP_Text>();
-        scrollV = GameObject.FindWithTag("ScrollV").GetComponent<Scrollbar>();
-        mainInputField.characterLimit = 1024;
-        if (Object.HasInputAuthority)
-        {
-            mainInputField.enabled = true;
-        }
+
     }
 
     private void FixedUpdate()
     {
-        scrollV.value = 0;
+        if (HasInputAuthority)
+        {
+            scrollV.value = 0;
+        }
     }
     static void OnChangeSumit(Changed<ChatSystem> changed)
     {
@@ -63,29 +69,31 @@ public class ChatSystem : NetworkBehaviour
 
     public void Sumit(bool ischating)
     {
-        if (!ischating)
+        if (HasInputAuthority)
         {
-            if (mainInputField.text != "" && mainInputField.text != " ")
+            if (!ischating)
             {
-                // ���� �� ��� 
-                Debug.Log(mainInputField.text.Length);
-                StartCoroutine(SumitE());
+                if (mainInputField.text != "" && mainInputField.text != " ")
+                {
+                    // ���� �� ��� 
+                    Debug.Log(mainInputField.text.Length);
+                    StartCoroutine(SumitE());
+                }
+                else
+                {
+                    mainInputField.interactable = false;
+                }
             }
             else
             {
-                mainInputField.interactable = false;
+                mainInputField.interactable = true;
+                mainInputField.Select();
             }
         }
-        else
-        {
-            mainInputField.interactable = true;
-            mainInputField.Select();
-        }
-
     }
     public void IsChatChange()
     {
-        if (HasInputAuthority)
+        if(HasStateAuthority)
             ischating = !ischating;
     }
 
@@ -93,8 +101,8 @@ public class ChatSystem : NetworkBehaviour
     {
         myChat = mainInputField.text;
         chatLog.text += $"\n {_nickName} : {myChat}";
-        RPC_SetChat(myChat.ToString(), _nickName);
-        //Debug.Log($"Send MyChat = {myChat}");
+        if(HasInputAuthority && !Runner.IsServer)
+            RPC_SetChat(myChat.ToString(), _nickName);
         mainInputField.text = "";
         mainInputField.interactable = false;
         ischating = false;
@@ -107,8 +115,6 @@ public class ChatSystem : NetworkBehaviour
         {
             return;
         }
-
-
         changed.Behaviour.PushMessage();
 
     }
@@ -117,6 +123,7 @@ public class ChatSystem : NetworkBehaviour
 
     public void PushMessage()
     {
+        
         string nullcheck = null;
         foreach (var chatSystem in myChat)
         {
@@ -126,42 +133,27 @@ public class ChatSystem : NetworkBehaviour
         }
         if (Object.HasInputAuthority)
         {
+            scrollV.value = 0;
             return;
         }
         if (chatLog == null)
         {
-            chatLog = GameObject.FindWithTag("ChatDisplay").GetComponent<TMP_Text>();
+            chatLog = GameObject.Find("Chat_Display").GetComponentInChildren<TMP_Text>();
         }
 
         chatLog.text += $"\n {sendName} : {myChat}";
         myChat = "";
-        scrollV.value = 0;
+        
 
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
     public void RPC_SetChat(string mychat, string _sendName, RpcInfo info = default)
     {
-
         sendName = _sendName;
-        //Debug.Log($"[RPC] SetNickname : {mychat}");
         this.myChat = mychat;
     }
-    //NewIinputSystem Enter 
-    //private void OnEnable()
-    //{
-    //    if (gameObject != null)
-    //    {
-    //        sumit = playerControls.Player.Sumit;
-    //        sumit.Enable();
-
-    //        sumit.performed += Sumit;
-    //    }
-    //}
-    //private void OnDisable()
-    //{
-    //    sumit.Disable();
-    //}
+    
     private void Sumit(InputAction.CallbackContext context)
     {
         Debug.Log("chatDown change true ");

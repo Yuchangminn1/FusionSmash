@@ -117,6 +117,7 @@ public class Projectile : NetworkBehaviour
                 {
                     return;
                 }
+                hitHP.enemyInfo = attackHP.playerInfo;
                 hitHP.OnTakeDamage(attackHP.playerInfo.GetName(), (int)Type,tmp);
                 //hit.transform.GetComponent<CharacterMovementHandler>().HitAddForce(tmp, hitHP.AddForce);
 

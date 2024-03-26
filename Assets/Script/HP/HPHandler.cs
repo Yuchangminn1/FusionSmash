@@ -10,6 +10,7 @@ using System;
 public class HPHandler : NetworkBehaviour, IPlayerActionListener
 {
     public PlayerInfo playerInfo;
+    public PlayerInfo enemyInfo;
 
     [Networked]
     public int AddForce { get; private set; }
@@ -68,6 +69,19 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
 
         //Respawn
         _playerActionEvents.OnPlyaerRespawn += OnPlyaerRespawn;
+
+        //Respawn
+        _playerActionEvents.OnPlyaerDeath += OnPlyaerDeath;
+    }
+    void OnPlyaerDeath()
+    {
+        if (HasStateAuthority)
+        {
+            if (enemyInfo != null)
+            {
+                enemyInfo.kill += 1;
+            }
+        }
     }
     void OnPlayerUpdate()
     {
@@ -93,6 +107,10 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
     {
         Debug.Log($"{transform.name} isDead");
         StartCoroutine(ServerReviveCO());
+        //if (HasStateAuthority)
+        //{
+        //    playerInfo.enemyinfo.kill += 1;
+        //}
         isDead = true;
     }
     void OnDeath()
@@ -101,14 +119,14 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
         eventHandler.TriggerDeath();
     }
     #endregion
-    public void OnTakeDamage(string _hitPlayer, int weaponNum, Vector3 _attackDir, EAttackType eAttackType = EAttackType.Knockback, int _addForce = 2, int _attackDamage = 1)
+    public void OnTakeDamage(string enemyname, int weaponNum, Vector3 _attackDir, EAttackType eAttackType = EAttackType.Knockback, int _addForce = 2, int _attackDamage = 1)
     {
         if (!HasStateAuthority && HasInputAuthority)
         {
             return;
         }
 
-        if (lastHitTime + damageDelay > Time.time && playerInfo.GetEnemyName() == _hitPlayer)
+        if (lastHitTime + damageDelay > Time.time && playerInfo.GetEnemyName() == enemyname)
         {
             Debug.Log("버그로 타격판정");
             lastHitTime = Time.time;
@@ -122,10 +140,10 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
         {
             return;
         }
-
-        playerInfo.SetEnemyName(_hitPlayer);
+        //playerInfo.enemyinfo =_enemyInfo;
         AddForce += _addForce;
-        
+        //playerInfo.SetEnemyName(_enemyInfo.GetName());
+        playerInfo.enemyName = enemyname;
         playerStateHandler.isHit = true;
 
         if (eAttackType == EAttackType.Knockback)

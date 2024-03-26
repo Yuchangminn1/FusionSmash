@@ -18,9 +18,20 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
     WeaponHandler weaponHandler;
     HPHandler hpHandler;
     ChatSystem chatSystem;
-
     //Component
     public GameObject virtualCamera;
+    void Start()
+    {
+        
+        if (HasInputAuthority)
+        {
+            if (Runner.IsServer)
+            {
+                return;
+            }
+            chatSystem = GetComponent<ChatSystem>();
+        }
+    }
     public override void Spawned()
     {
         //Input
@@ -38,7 +49,7 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
             Debug.LogError("PlayerActionEvents component is missing!");
             return;
         }
-        if (HasInputAuthority || HasStateAuthority)
+        if (HasStateAuthority)
         {
             movementHandler.SubscribeToPlayerActionEvents(eventHandler);
             playerStateHandler.SubscribeToPlayerActionEvents(eventHandler);
@@ -56,6 +67,7 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
         
 
         eventHandler.TriggerInit();
+
         
 
     }
@@ -145,6 +157,7 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
                 playerStateHandler.SetCanMove(chatSystem.ischating);
                 chatSystem.IsChatChange();
             }
+            
         }
     }
     bool PlayerAble()

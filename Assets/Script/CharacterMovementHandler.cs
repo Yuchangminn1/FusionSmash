@@ -15,7 +15,7 @@ public class CharacterMovementHandler : NetworkBehaviour
     float moveSpeed = 5f;
     float jumpTime = 0f;
     float jumpCooldown = 0f;
-    float jumpForce = 8f;
+    float jumpForce = 6f;
     float maxGravity = -8f;
 
     [Networked(OnChanged = nameof(ChangeDir))]
@@ -112,7 +112,7 @@ public class CharacterMovementHandler : NetworkBehaviour
         networkRigidbody.Rigidbody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
     }
     #endregion
-
+    
     void RotateTowards(float _dir)
     {
         
@@ -174,5 +174,7 @@ public class CharacterMovementHandler : NetworkBehaviour
         }
 
     }
+    
+
 
 }

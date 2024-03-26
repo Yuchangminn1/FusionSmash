@@ -4,11 +4,12 @@ using UnityEngine;
 using Fusion;
 using TMPro;
 using Unity.VisualScripting;
+using System;
 
 /// <summary>
 /// �÷��̾� ��ȯ�� �� ���� �߰��ϰ������ ����ٰ� �߰��ϼ���
 /// </summary>
-public class NetworkPlayer : NetworkBehaviour,IPlayerLeft
+public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
 {
     public TMP_Text playerNickNameTM;
     PlayerInfo playerInfo;
@@ -37,7 +38,6 @@ public class NetworkPlayer : NetworkBehaviour,IPlayerLeft
     void Start()
     {
 
-        
     }
 
     public override void Spawned()
@@ -47,9 +47,7 @@ public class NetworkPlayer : NetworkBehaviour,IPlayerLeft
         {
             Local = this;
 
-            //Disable main camera ���� ī�޶� ����
-            //Camera.main.gameObject.SetActive(false);
-            if(PlayerPrefs.GetString("PlayerNickname") == "" || PlayerPrefs.GetString("PlayerNickname") == null)
+            if (PlayerPrefs.GetString("PlayerNickname") == "" || PlayerPrefs.GetString("PlayerNickname") == null)
             {
                 RPC_SetNickName(PlayerPrefs.GetString("�г��� ��������"));
 
@@ -58,39 +56,18 @@ public class NetworkPlayer : NetworkBehaviour,IPlayerLeft
             {
                 RPC_SetNickName(PlayerPrefs.GetString("PlayerNickname"));
             }
-            //Debug.Log("Spawned local player");
-
-}
+        }
         else
         {
-            //RPC_SetNickNameTOIn(PlayerPrefs.GetString("PlayerNickname"));
-            Camera localCamera = GetComponentInChildren<Camera>();
-            localCamera.enabled = false;
 
-            AudioListener audioListner = GetComponentInChildren<AudioListener>();
-            audioListner.enabled = false;
-            Canvas[] localCanvas = GetComponentsInChildren<Canvas>();
-            foreach(Canvas c in localCanvas)
-            {
-                if(c.gameObject.tag == "Nickname")
-                {
-                    continue;
-                }
-                c.enabled = false;
-            }
-
-            Debug.Log("spawned remote player");
         }
-        
+
         transform.name = transform.GetComponent<NetworkPlayer>().nickName.Value;
 
-        
-
-        //ü�¹� ��Ƽ�� ���̰� �ҷ��� ��ȣ �Ѱǵ� �� �����ε� �𸣰ڴ� �𸣰� ��
     }
     public void PlayerLeft(PlayerRef player)
     {
-        if(player == Object.InputAuthority)
+        if (player == Object.InputAuthority)
         {
             Runner.Despawn(Object);
         }
@@ -103,23 +80,18 @@ public class NetworkPlayer : NetworkBehaviour,IPlayerLeft
     }
     private void OnNickNameChanged()
     {
-        //Debug.Log($"Nickname
-        //
-        //
-        //d for player to {nickName} for player {gameObject.name}");
-        //characterHandler.playerdata.Name = nickName.ToString();
         playerInfo.SetName(nickName.ToString());
         characterMovementHandler._nickName = nickName.ToString();
         chatSystem._nickName = nickName.ToString();
 
     }
 
-    [Rpc(RpcSources.InputAuthority,RpcTargets.StateAuthority)]
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     public void RPC_SetNickName(string nickName, RpcInfo info = default)
     {
         //Debug.Log($"[RPC] SetNickname : {nickName}");
         this.nickName = nickName;
     }
-    
-    
+
+
 }

@@ -80,6 +80,7 @@ public class WeaponSword : PlayerWeapon
 
                 return;
             }
+            hitHP.enemyInfo = playerInfo;
             hitHP.OnTakeDamage(playerInfo.GetName(), (int)Type, tmp, AttackType);
 
             if (hitHP.isDead)

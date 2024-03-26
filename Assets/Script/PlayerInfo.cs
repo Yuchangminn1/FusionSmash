@@ -15,13 +15,23 @@ public class PlayerInfo : NetworkBehaviour
     public int kill { get; set; } = 0;
     [Networked(OnChanged = nameof(ChangeDeath))]
     public int death { get; set; } = 0;
+    [Networked]
+    public int playerNumber { get; set; }
+    PlayerInfoUIManager playerInfoUIManager;
 
-    
+    //public PlayerInfo enemyinfo;
     public override void Spawned()
     {
+        PlayerInfo[] players = FindObjectsOfType<PlayerInfo>();
+        playerNumber = players.Length;
 
+        playerInfoUIManager = GameObject.Find("PlayersInfos").GetComponent<PlayerInfoUIManager>();
+        if (playerInfoUIManager != null)
+        {
+            playerInfoUIManager.AddPlayerInfo(playerNumber, Name);
+        }
     }
-
+    
     static void NickNameChanged(Changed<PlayerInfo> changed)
     {
         changed.Behaviour.SetName(changed.Behaviour.name.ToString());
