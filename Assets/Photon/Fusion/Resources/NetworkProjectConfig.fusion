@@ -41,13 +41,13 @@
     "HostMigrationSnapshotInterval": 60,
     "Simulation": {
         "InputDataWordCount": 0,
-        "TickRate": 60,
+        "TickRate": 30,
         "MaxPrediction": 60,
         "DefaultPlayers": 10,
         "ReplicationMode": 0,
         "ObjectInterest": false,
-        "ServerPacketInterval": 1,
-        "ClientPacketInterval": 1
+        "ServerPacketInterval": 2,
+        "ClientPacketInterval": 2
     },
     "Interpolation": {
         "DeltaAdjustment": 1,
@@ -130,23 +130,23 @@
                 "_hash": -1382104104
             },
             {
-                "_value": 0.0010000000474974514,
-                "_inverse": 999.9999389648438,
+                "_value": 0.009999999776482582,
+                "_inverse": 100.0,
                 "_hash": -814817977
             },
             {
-                "_value": 0.0010000000474974514,
-                "_inverse": 999.9999389648438,
+                "_value": 0.009999999776482582,
+                "_inverse": 100.0,
                 "_hash": -194233199
             },
             {
-                "_value": 0.0010000000474974514,
-                "_inverse": 999.9999389648438,
+                "_value": 0.009999999776482582,
+                "_inverse": 100.0,
                 "_hash": -258202764
             },
             {
-                "_value": 0.00009999999747378752,
-                "_inverse": 10000.0,
+                "_value": 0.0010000000474974514,
+                "_inverse": 999.9999389648438,
                 "_hash": 1061325578
             }
         ],

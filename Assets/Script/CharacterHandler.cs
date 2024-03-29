@@ -19,7 +19,7 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
     HPHandler hpHandler;
     ChatSystem chatSystem;
     //Component
-    public GameObject virtualCamera;
+    //public GameObject virtualCamera;
     void Start()
     {
         
@@ -60,10 +60,10 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
             }
                 
         }
-        if (!HasInputAuthority)
-        {
-            virtualCamera.SetActive(false);
-        }
+        //if (!HasInputAuthority)
+        //{
+        //    virtualCamera.SetActive(false);
+        //}
         
 
         eventHandler.TriggerInit();

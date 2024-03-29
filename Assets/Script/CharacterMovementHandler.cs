@@ -1,8 +1,9 @@
 using UnityEngine;
 using Fusion;
 using UnityEngine.InputSystem;
-using System.Collections; 
+using System.Collections;
 using System;
+using Cinemachine;
 public class CharacterMovementHandler : NetworkBehaviour
 {
     [Header("NickName")]
@@ -27,6 +28,7 @@ public class CharacterMovementHandler : NetworkBehaviour
     [Header("Component")]
     NetworkRigidbody networkRigidbody;
     CapsuleCollider capsuleCollider;
+    
     static void ChangeDir(Changed<CharacterMovementHandler> changed)
     {
         float newS = changed.Behaviour.myDir;
@@ -46,7 +48,19 @@ public class CharacterMovementHandler : NetworkBehaviour
         playerStateHandler = GetComponent<PlayerStateHandler>();
 
         RotateTowards(1);
+        GameObject VirtualCamera = GameObject.Find("PlayerVirtualCamera");
+        if(VirtualCamera && HasInputAuthority)
+            VirtualCamera.GetComponent<CinemachineVirtualCamera>().Follow = this.transform;
+        if (HasInputAuthority)
+        {
+            GameObject CameraCC = GameObject.Find("CameraCC");
+            CameraCC.GetComponent<CMCameraTest>().plyaerTransform = transform;
+        }
+        
+
+
     }
+
     #region Event
     public void SubscribeToPlayerActionEvents(PlayerActionEvents _playerActionEvents)
     {
@@ -85,6 +99,11 @@ public class CharacterMovementHandler : NetworkBehaviour
         {
             Vector3 tmp22 = networkRigidbody.Rigidbody.velocity;
             float div = 1.3f;
+            if (networkRigidbody.Rigidbody.velocity.y < maxGravity)
+            {
+                networkRigidbody.Rigidbody.velocity = (new Vector3(tmp22.x / div, maxGravity, tmp22.z / div));
+
+            }
             networkRigidbody.Rigidbody.velocity = (new Vector3(tmp22.x / div, tmp22.y, tmp22.z / div));
             return;
         }
@@ -92,15 +111,15 @@ public class CharacterMovementHandler : NetworkBehaviour
         {
             myDir = _dir;
         }
-        Vector3 moveDirection = transform.right * _dir;
+        Vector3 moveDirection = transform.right * -Math.Abs(_dir);
         moveDirection.Normalize();
 
         if (networkRigidbody.Rigidbody.velocity.y < maxGravity)
         {
-            networkRigidbody.Rigidbody.velocity = (new Vector3(moveDirection.x * moveSpeed, maxGravity, moveDirection.z * moveSpeed));
+            networkRigidbody.Rigidbody.velocity = (new Vector3(moveDirection.z * moveSpeed, maxGravity, moveDirection.x * moveSpeed));
         }
 
-        networkRigidbody.Rigidbody.velocity = (new Vector3(moveDirection.x * moveSpeed, networkRigidbody.Rigidbody.velocity.y, moveDirection.z * moveSpeed));
+        networkRigidbody.Rigidbody.velocity = (new Vector3(moveDirection.z * moveSpeed, networkRigidbody.Rigidbody.velocity.y, moveDirection.x * moveSpeed));
 
     }
     public void OnPlayerJump()
@@ -112,10 +131,10 @@ public class CharacterMovementHandler : NetworkBehaviour
         networkRigidbody.Rigidbody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
     }
     #endregion
-    
+
     void RotateTowards(float _dir)
     {
-        
+
         Vector3 direction;
         Quaternion targetRotation;
         if (_dir > 0)
@@ -132,10 +151,11 @@ public class CharacterMovementHandler : NetworkBehaviour
         {
             return;
         }
-        characterRoot.transform.rotation = targetRotation;
+        networkRigidbody.transform.forward = direction;
+        //characterRoot.GetComponent<NetworkObject>().transform.rotation = targetRotation;
 
     }
-    
+
 
 
     //Rule
@@ -166,15 +186,15 @@ public class CharacterMovementHandler : NetworkBehaviour
         float UpperForce = DivForce;
         _attackVec = _attackVec / DivForce;
         _attackVec.y = _attackVec.x > 0 ? _attackVec.x / UpperForce : -_attackVec.x / UpperForce;
-        int maxC =12;
+        int maxC = 12;
         for (int i = 1; i < maxC; i++)
         {
-            networkRigidbody.Rigidbody.AddForce((maxC-i) * _attackVec , ForceMode.Impulse);
+            networkRigidbody.Rigidbody.AddForce((maxC - i) * _attackVec, ForceMode.Impulse);
             yield return new WaitForFixedUpdate();
         }
 
     }
-    
+
 
 
 }

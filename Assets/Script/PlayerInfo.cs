@@ -25,11 +25,11 @@ public class PlayerInfo : NetworkBehaviour
         PlayerInfo[] players = FindObjectsOfType<PlayerInfo>();
         playerNumber = players.Length;
 
-        playerInfoUIManager = GameObject.Find("PlayersInfos").GetComponent<PlayerInfoUIManager>();
-        if (playerInfoUIManager != null)
-        {
-            playerInfoUIManager.AddPlayerInfo(playerNumber, Name);
-        }
+        //playerInfoUIManager = GameObject.Find("PlayersInfos").GetComponent<PlayerInfoUIManager>();
+        //if (playerInfoUIManager != null)
+        //{
+        //    playerInfoUIManager.AddPlayerInfo(playerNumber, Name);
+        //}
     }
     
     static void NickNameChanged(Changed<PlayerInfo> changed)

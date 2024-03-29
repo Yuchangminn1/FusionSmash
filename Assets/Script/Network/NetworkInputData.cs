@@ -5,6 +5,7 @@ using Fusion;
 
 public struct NetworkInputData : INetworkInput
 {
+
     public Vector2 movementInput;
     public Vector3 aimFowardVector;
     public NetworkBool isJumpButtonPressed;
