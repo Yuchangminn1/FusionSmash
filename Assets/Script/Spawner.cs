@@ -16,37 +16,65 @@ public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
 
     CharacterInputhandler characterInputhandler;
 
+    SessionListUIHandler sessionListUIHandler;
 
     // Start is called before the first frame update
+
+    private void Awake()
+    {
+        sessionListUIHandler = FindObjectOfType<SessionListUIHandler>(true);
+    }
     void Start()
     {
         
 
+    }
+    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
+    {
+        if(sessionListUIHandler == null)
+            return;
+        if(sessionList.Count == 0)
+        {
+            Debug.Log("Joined lobby no session found");
+            sessionListUIHandler.OnNoSessionFound();
+        }
+        else
+        {
+            sessionListUIHandler.ClearList();
+
+            foreach (SessionInfo sessionInfo in sessionList)
+            {
+                sessionListUIHandler.AddToList(sessionInfo);
+
+                Debug.Log($"Found session {sessionInfo.Name} playerCount {sessionInfo.PlayerCount}");
+            }
+        }
+    }
+    IEnumerator CallSpawnedCo()
+    {
+        yield return new WaitForSeconds(0.5f);
     }
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
         if (runner.IsServer) //����Ǿ�������?
         {
             runner.Spawn(playerPrefab, Utils.GetRandomSpawnPoint(), Quaternion.identity, player);
-
+        }
+        else
+        {
+            Debug.Log("OnPlayerJoined");
         }
         
     }
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
-        //�Է��� �� �Լ������� �ϴ°ɷ� ���� 
 
-        //Local != null  >> ���� ������Ʈ�� ��ȣ�ۿ��� �� �ִ� �÷��̾�   
         if (characterInputhandler == null && NetworkPlayer.Local != null )
             characterInputhandler = NetworkPlayer.Local.GetComponent<CharacterInputhandler>();
-        // >> NetworkPlayer �� ������ ���� ������Ʈ ĳ���Ϳ� �پ�����   
-        // runner �� ������ �÷��̾�
 
         if (characterInputhandler != null)
         {
-            // NetworkInput.Set(NetworkInputData) �÷� ���� 
             input.Set(characterInputhandler.GetNetworkInput());
-            //��Ʈ��ũ ��ǲ �����ϴ� �������?���� 
         }
     }
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
@@ -109,11 +137,7 @@ public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
         //throw new NotImplementedException();
     }
 
-    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
-    {
-        //throw new NotImplementedException();
-    }
-
+    
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
     {
         //throw new NotImplementedException();

@@ -1,43 +1,84 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Fusion;
-using TMPro;
 using UnityEngine.SceneManagement;
+using TMPro;
+//using UnityEditor.Build.Content;
 
-public class MainMenuUIHandler : NetworkBehaviour
+public class MainMenuUIHandler : MonoBehaviour
 {
-    public TMP_InputField inputField;
-    public string _loadSceneName;
+    [Header("Panels")]
+    public GameObject playerDetailsPanel;
+    public GameObject sessionBrowserPanel;
+    public GameObject createSessionPanel;
+    public GameObject statusPanel;
+
+
+    [Header("Players settings")]
+    public TMP_InputField PlayerNameInputField;
+
+    [Header("New game session")]
+    public TMP_InputField sessionNameInputField;
+
+    public string mySceneName = "MyS2";
 
     // Start is called before the first frame update
     void Start()
     {
-
-        if (PlayerPrefs.HasKey("PlayerNickname"))
-            inputField.text = PlayerPrefs.GetString("PlayerNickname");
-
-    }
-
-
-    public void OnJoinGameClikedWorld1()
-    {
-        PlayerPrefs.SetString("PlayerNickname", inputField.text);
-        PlayerPrefs.Save();
-
-        SceneManager.LoadScene("World1");
-    }
-    public void OnJoinGameClikedISO()
-    {
-        PlayerPrefs.SetString("PlayerNickname", inputField.text);
-        PlayerPrefs.Save();
-        if (_loadSceneName == "")
+        if (PlayerPrefs.HasKey("PlayerNickName"))
         {
-            SceneManager.LoadScene("MyS");
-        }
-        else
-        {
-            SceneManager.LoadScene(_loadSceneName);
+            PlayerNameInputField.text = PlayerPrefs.GetString("PlayerNickName");
         }
     }
+    void HideAllPanel()
+    {
+        playerDetailsPanel.SetActive(false);
+        sessionBrowserPanel.SetActive(false);
+        createSessionPanel.SetActive(false);
+        statusPanel.SetActive(false);
+    }
+    public void OnFindGameClicked()
+    {
+        PlayerPrefs.SetString("PlayaerNickName", PlayerNameInputField.text);
+        PlayerPrefs.Save();
+
+        NetworkRunnerHandler networkRunnerHandler = FindObjectOfType<NetworkRunnerHandler>();
+        networkRunnerHandler.OnJoinLobby();
+        HideAllPanel();
+
+
+        //GameManager.instance.playerNickName = inputField.text;
+
+        sessionBrowserPanel.gameObject.SetActive(true);
+
+        FindObjectOfType<SessionListUIHandler>(true).OnLookingForGameSession();
+
+
+        //SceneManager.LoadScene(mySceneName);
+    }
+
+    public void OnCreateNewGameClicked()
+    {
+        HideAllPanel();
+
+        createSessionPanel.SetActive(true);
+    }
+
+    public void OnStartNewSessionClicked()
+    {
+        NetworkRunnerHandler networkRunnerHandler = FindObjectOfType<NetworkRunnerHandler>();
+
+        networkRunnerHandler.CreateGame(sessionNameInputField.text, mySceneName);
+
+        HideAllPanel();
+
+        statusPanel.gameObject.SetActive(true);
+    }
+
+    public void OnJoiningSever()
+    {
+        HideAllPanel();
+        statusPanel.gameObject.SetActive(true);
+    }
+
 }

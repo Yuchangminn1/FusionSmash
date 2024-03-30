@@ -59,7 +59,8 @@ public class ChatSystem : NetworkBehaviour
     {
         if (HasInputAuthority)
         {
-            scrollV.value = 0;
+            if(scrollV)
+                scrollV.value = 0;
         }
     }
     static void OnChangeSumit(Changed<ChatSystem> changed)

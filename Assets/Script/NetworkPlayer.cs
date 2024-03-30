@@ -42,9 +42,12 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
 
     public override void Spawned()
     {
+        Debug.Log("NetworkPlayer Spawned");
         playerInfo = GetComponent<PlayerInfo>();
         if (Object.HasInputAuthority) // ���ӿ��� ������ �Ǹ� ? ������   > ������Ʈ�� �̵���ų �Ǹ�?  NetworkObject��ũ��Ʈ�� �ٿ��ָ� Ʈ��
         {
+            Debug.Log("NetworkPlayer Spawned HasInputAuthority");
+
             Local = this;
 
             if (PlayerPrefs.GetString("PlayerNickname") == "" || PlayerPrefs.GetString("PlayerNickname") == null)

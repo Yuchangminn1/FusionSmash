@@ -15,7 +15,14 @@ public class UISize : MonoBehaviour
 
     private void Awake()
     {
-        UIManager.Instance.uISizeChange += SetScreenSize;
+        if(UIManager.Instance != null)
+        {
+            if(UIManager.Instance.uISizeChange != null)
+            {
+                UIManager.Instance.uISizeChange += SetScreenSize;
+
+            }
+        }
     }
 
 
