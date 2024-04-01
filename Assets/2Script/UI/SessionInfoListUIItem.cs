@@ -5,7 +5,6 @@ using Fusion;
 using System;
 public class SessionInfoListUIItem : MonoBehaviour
 {
-    
 
     public TextMeshProUGUI sessionNameText;
     public TextMeshProUGUI playerCountText;

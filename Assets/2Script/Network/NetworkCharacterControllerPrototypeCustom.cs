@@ -9,9 +9,9 @@ using UnityEngine;
 // ReSharper disable once CheckNamespace
 public class NetworkCharacterControllerPrototypeCustom : NetworkTransform
 {
-    //>> NetworkTransform  ÀÌ¶õ °ÔÀÓ¿ÀºêÁ§Æ®À§ Æ®·£½ºÆûÀ» ´Ù¸¥ ¸ðµç ÇÇ¾î·Î º¹Á¦ÇÏ¿© ? 
-    // µ¿±âÈ­ÇÏ´Â °Í  ÀÌ °ÔÀÓ¿ÀºêÁ§Æ®ÀÇ ºÎ¸ð¿¡´Â networkObject°¡ ÇÊ¿äÇÏ´Ù´Âµ¥ ?
-    //¾ß¸¦ ÇÃ·¹ÀÌ¾î ÄÁÆ®·Ñ·¯ ´ë¿ëÀ¸·Î ½áº¾½Ã´Ù 
+    //>> NetworkTransform  ï¿½Ì¶ï¿½ ï¿½ï¿½ï¿½Ó¿ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ Æ®ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ù¸ï¿½ ï¿½ï¿½ï¿½ ï¿½Ç¾ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ ? 
+    // ï¿½ï¿½ï¿½ï¿½È­ï¿½Ï´ï¿½ ï¿½ï¿½  ï¿½ï¿½ ï¿½ï¿½ï¿½Ó¿ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½Î¸ð¿¡´ï¿½ networkObjectï¿½ï¿½ ï¿½Ê¿ï¿½ï¿½Ï´Ù´Âµï¿½ ?
+    //ï¿½ß¸ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½Æ®ï¿½Ñ·ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½áº¾ï¿½Ã´ï¿½ 
     [Header("Character Controller Settings")]
     public float gravity = -20.0f;
     public float jumpImpulse = 8.0f;
@@ -129,7 +129,7 @@ public class NetworkCharacterControllerPrototypeCustom : NetworkTransform
         {
             horizontalVel = Vector3.ClampMagnitude(horizontalVel + direction * acceleration * deltaTime, maxSpeed);
             //transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), rotationSpeed * Runner.DeltaTime);
-            //¾Æ¸¶ Ä³¸¯ÅÍ°¡ µ¹¸é ±× ¹æÇâÀ¸·Î Á¤¸éÀ» º¸°ÔÇØÁÖ´Â °ÍÀ¸·Î º¸ÀÓ
+            //ï¿½Æ¸ï¿½ Ä³ï¿½ï¿½ï¿½Í°ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         }
 
         moveVelocity.x = horizontalVel.x;
