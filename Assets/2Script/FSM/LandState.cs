@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class LandState : PlayerState
 {
-    [SerializeField] private float landTime = 1f;
+    //[SerializeField] private float landTime = 1f;
 
     public LandState(PlayerStateHandler _player, int _currentStateNum) : base(_player, _currentStateNum)
     {
@@ -22,25 +22,12 @@ public class LandState : PlayerState
     public override void Enter()
     {
         base.Enter();
-        Debug.Log("���� ����");
         player.isStop = true;
 
     }
     public override bool Update()
     {
-
-        player.nextState = player.moveState;
-        return true;
-        if (!player.Isvisi())
-        {
-            if (base.Update())
-                return true;
-
-            player.nextState = player.moveState;
-            return true;
-        }
-        return false;
-        
+        return base.Update();
     }
     public override void LateUpdate()
     {

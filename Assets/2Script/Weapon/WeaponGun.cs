@@ -112,7 +112,7 @@ public class WeaponGun : PlayerWeapon
 
         var projectileData = new ProjectileData();
 
-        var hitOptions = HitOptions.IncludePhysX | HitOptions.IgnoreInputAuthority;
+        //var hitOptions = HitOptions.IncludePhysX | HitOptions.IgnoreInputAuthority;
 
         Debug.DrawRay(firePosition + fireDirection * 2.5f, fireDirection * MaxHitDistance, Color.green, 1);
 

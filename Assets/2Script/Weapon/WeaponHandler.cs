@@ -24,7 +24,7 @@ public class WeaponHandler : NetworkBehaviour, IPlayerActionListener
 
     bool justPressed;
 
-    float lastTimeFire = 0;
+    //float lastTimeFire = 0;
 
     public override void Spawned()
     {

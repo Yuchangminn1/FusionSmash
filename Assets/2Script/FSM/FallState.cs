@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class FallState : PlayerState
 {
-    float gravityOrigin = 0.1f;
+    //float gravityOrigin = 0.1f;
     
 
     public FallState(PlayerStateHandler _player, int _currentStateNum) : base(_player, _currentStateNum)

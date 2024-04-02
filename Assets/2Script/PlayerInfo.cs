@@ -7,10 +7,10 @@ using UnityEngine;
 public class PlayerInfo : NetworkBehaviour
 {
     [Networked(OnChanged = nameof(NickNameChanged))]
-    public NetworkString<_16> name { get; set; }
+    public NetworkString<_16> playerName { get; set; }
     [Networked(OnChanged = nameof(EnemyNameChanged))]
     public NetworkString<_16> enemyName { get; set; }
-    public string Name { get; set; }
+    //public string Name { get; set; }
     [Networked(OnChanged = nameof(ChangeKill))]
     public int kill { get; set; } = 0;
     [Networked(OnChanged = nameof(ChangeDeath))]
@@ -34,7 +34,7 @@ public class PlayerInfo : NetworkBehaviour
     
     static void NickNameChanged(Changed<PlayerInfo> changed)
     {
-        changed.Behaviour.SetName(changed.Behaviour.name.ToString());
+        changed.Behaviour.SetName(changed.Behaviour.playerName.ToString());
     }
     static void EnemyNameChanged(Changed<PlayerInfo> changed)
     {
@@ -63,7 +63,7 @@ public class PlayerInfo : NetworkBehaviour
     }
     public void SetName(string _nickName)
     {
-        name = _nickName;
+        playerName = _nickName;
         HPHandler hp = GetComponent<HPHandler>();
         hp.nickNameText.text = _nickName;
     }
@@ -73,7 +73,7 @@ public class PlayerInfo : NetworkBehaviour
     }
     public string GetName()
     {
-        return name.ToString();
+        return playerName.ToString();
     }
     public string GetEnemyName()
     {

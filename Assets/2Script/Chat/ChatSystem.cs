@@ -25,12 +25,12 @@ public class ChatSystem : NetworkBehaviour
     [SerializeField] InputField mainInputField;
 
     //bool isEnter = false;
-    bool chatOnOff = false;
+    //bool chatOnOff = false;
 
     public TMP_Text chatLog;
     public Scrollbar scrollV;
 
-    bool chatDown = false;
+    //bool chatDown = false;
 
     [Networked(OnChanged = nameof(OnChangeSumit))]
     public NetworkBool ischating { get; set; }
@@ -155,11 +155,11 @@ public class ChatSystem : NetworkBehaviour
         this.myChat = mychat;
     }
     
-    private void Sumit(InputAction.CallbackContext context)
-    {
-        Debug.Log("chatDown change true ");
-        chatDown = true;
-    }
+    //private void Sumit(InputAction.CallbackContext context)
+    //{
+    //    Debug.Log("chatDown change true ");
+    //    chatDown = true;
+    //}
     IEnumerator SumitE()
     {
         yield return new WaitForFixedUpdate();

@@ -14,8 +14,8 @@ public class CharacterMovementHandler : NetworkBehaviour
     public Transform characterRoot;
 
     float moveSpeed = 5f;
-    float jumpTime = 0f;
-    float jumpCooldown = 0f;
+    //float jumpTime = 0f;
+    //float jumpCooldown = 0f;
     float jumpForce = 6f;
     float maxGravity = -8f;
 
