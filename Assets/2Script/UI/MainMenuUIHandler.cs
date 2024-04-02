@@ -31,10 +31,10 @@ public class MainMenuUIHandler : MonoBehaviour
         Debug.Log("is New = " + NetworkRunnerHandler.Instance.GetIsNew());
         if (!NetworkRunnerHandler.Instance.GetIsNew())
         {
-            OnFindGameClicked();
+            MainMenuJoinLobby();
         }
 
-        PlayerNameInputField.text = PlayerPrefs.GetString("PlayerNickName"); 
+        //PlayerNameInputField.text = PlayerPrefs.GetString("PlayerNickName"); 
         //if (PlayerPrefs.HasKey("PlayerNickName"))
         //{
         //    PlayerNameInputField.text = PlayerPrefs.GetString("PlayerNickName");
@@ -52,21 +52,23 @@ public class MainMenuUIHandler : MonoBehaviour
         PlayerPrefs.SetString("PlayaerNickName", PlayerNameInputField.text);
         PlayerPrefs.Save();
         Debug.Log("Player Name = " + PlayerPrefs.GetString("PlayaerNickName"));
+        MainMenuJoinLobby();
+        //SceneManager.LoadScene(mySceneName);
+
+
+    }
+
+    private void MainMenuJoinLobby()
+    {
         NetworkRunnerHandler networkRunnerHandler = FindObjectOfType<NetworkRunnerHandler>();
         networkRunnerHandler.OnJoinLobby();
         HideAllPanel();
-
-
-        //GameManager.instance.playerNickName = inputField.text;
 
         sessionBrowserPanel.gameObject.SetActive(true);
 
         FindObjectOfType<SessionListUIHandler>(true).OnLookingForGameSession();
         CreatesessionButton.interactable = false;
         Invoke("CreateButtonSet", 3f);
-
-
-        //SceneManager.LoadScene(mySceneName);
     }
 
     public void CreateButtonSet() => CreatesessionButton.interactable = true;
