@@ -7,45 +7,60 @@ using UnityEngine.SceneManagement;
 using System.Threading.Tasks;
 using System;
 using System.Linq;
+using Unity.VisualScripting;
 //using UnityEditor.Build.Content;
 
 
 public class NetworkRunnerHandler : MonoBehaviour
 {
+    public static NetworkRunnerHandler Instance { get; private set; }
     public NetworkRunner networkRunnerPrefab;
-
+    bool isNew = true;
     NetworkRunner networkRunner;
     private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+            // 여기에 네트워크 초기화 및 설정 코드 추가
+
+        }
+        else if (Instance != this)
+        {
+            Instance.isNew = false;
+            Instance.CMSpawnNetworkRunner();
+            Instance.Start();
+            Destroy(gameObject);
+            return;
+        }
+        
+
+        CMSpawnNetworkRunner();
+    }
+    public bool GetIsNew() => isNew;
+    void CMSpawnNetworkRunner()
     {
         NetworkRunner networkRunnerInScene = FindObjectOfType<NetworkRunner>();
 
         if (networkRunnerInScene != null)
             networkRunner = networkRunnerInScene;
     }
+
     void Start()
     {
         if(networkRunner == null)
         {
             networkRunner = Instantiate(networkRunnerPrefab);
             networkRunner.name = "Network Runner";
-
-            if(SceneManager.GetActiveScene().name != "MainMenu")
+            if (SceneManager.GetActiveScene().name != "MainMenu")
             {
                 var clienTask = InitializeNetworkRunner(networkRunner, GameMode.AutoHostOrClient,"TestSession", NetAddress.Any(), SceneManager.GetActiveScene().buildIndex, null);
             }
             Debug.Log("sever networkRunner started.");
-
         }
     }
-    //public void StarthostMigration(HostMigrationToken hostMigrationToken)
-    //{
-    //    networkRunner = Instantiate(networkRunnerPrefab);
-    //    networkRunner.name = "Network runner - Migrated";
-
-    //    var clientTask = InitializeNetworkRunnerHostMigration(networkRunner, hostMigrationToken);
-
-    //    Debug.Log($"Host migration started");
-    //}
+    
 
     INetworkSceneManager GetSceneManager(NetworkRunner runner)
     {
@@ -81,46 +96,30 @@ public class NetworkRunnerHandler : MonoBehaviour
         }) ;
     }
 
-    //protected virtual Task InitializeNetworkRunnerHostMigration(NetworkRunner runner,HostMigrationToken hostMigrationToken)
-    //{
-    //    var sceneManager = GetSceneManager(runner);
 
-    //    runner.ProvideInput = true;
+    public void ReturnToLobby()
+    {
+        StartCoroutine(ReturnToLobbyCoroutine());
+    }
 
-    //    return runner.StartGame(new StartGameArgs
-    //    {
-    //        SceneManager = sceneManager,
-    //        HostMigrationToken = hostMigrationToken,
-    //        HostMigrationResume = HostMigrationResume,
-    //        ConnectionToken = GameManager.instance.GetConnectionToken(),
+    // 비동기 작업을 사용하여 네트워크 연결 종료 및 씬 전환 수행
+    private IEnumerator ReturnToLobbyCoroutine()
+    {
+        // 네트워크 연결이 활성화되어 있는 경우, 연결 종료
+        if (networkRunner != null && networkRunner.IsRunning)
+        {
+            networkRunner.Shutdown();
+            while (networkRunner.IsRunning)
+            {
+                // 네트워크 종료가 완료될 때까지 대기
+                yield return null;
+            }
+        }
 
-    //    }) ;
+        // 로비 씬으로 전환
+        SceneManager.LoadScene("MainMenu"); // "LobbySceneName"을 실제 로비 씬 이름으로 바꿔주세요.
+    }
 
-    //}
-
-    //void HostMigrationResume(NetworkRunner runner)
-    //{
-    //    Debug.Log($"HostMigrationResume started");
-
-    //    foreach(var resumeNetworkObject in runner.GetResumeSnapshotNetworkObjects())
-    //    {
-    //        if(resumeNetworkObject.TryGetBehaviour<CharacterMovementHandler>(out var networkrigidbody))
-    //        {
-    //            runner.Spawn(resumeNetworkObject,position: networkrigidbody.transform.position,rotation:networkrigidbody.transform.rotation,onBeforeSpawned: (runner, newNetworkobject) =>
-    //            {
-    //                newNetworkobject.CopyStateFrom(resumeNetworkObject);
-
-    //                if(resumeNetworkObject.TryGetBehaviour<HPHandler>(out HPHandler oldHPHandler))
-    //                {
-    //                    HPHandler newHPHandler = newNetworkobject.GetComponent<HPHandler>();
-    //                    newHPHandler.CopyStateFrom(oldHPHandler);
-                        
-    //                }
-    //            } 
-    //        }
-
-    //    }
-    //}
 
     private async Task JoinLobby()
     {

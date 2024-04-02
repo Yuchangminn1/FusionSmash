@@ -86,7 +86,7 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
 
             if (GetInput(out NetworkInputData networkInputData))
             {
-                Debug.Log("networkInputData");
+                //Debug.Log("networkInputData");
 
                 //ShowBoard(networkInputData);
                 Chat(networkInputData);

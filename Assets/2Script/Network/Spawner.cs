@@ -33,7 +33,7 @@ public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
     {
         if(sessionListUIHandler == null)
             return;
-        if(sessionList.Count == 0)
+        if (sessionList.Count == 0)
         {
             Debug.Log("Joined lobby no session found");
             sessionListUIHandler.OnNoSessionFound();

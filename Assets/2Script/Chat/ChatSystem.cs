@@ -24,7 +24,7 @@ public class ChatSystem : NetworkBehaviour
 
     [SerializeField] InputField mainInputField;
 
-    bool isEnter = false;
+    //bool isEnter = false;
     bool chatOnOff = false;
 
     public TMP_Text chatLog;
@@ -36,7 +36,7 @@ public class ChatSystem : NetworkBehaviour
     public NetworkBool ischating { get; set; }
 
     //Ŭ���̾�Ʈ���� ���� onoffonoff�ݺ��ϴ°� ����
-    float inputTime = 0f;
+    //float inputTime = 0f;
     // Checks if there is anything entered into the input field.
     private void Start()
     {

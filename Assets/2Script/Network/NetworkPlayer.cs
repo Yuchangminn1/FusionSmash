@@ -5,6 +5,7 @@ using Fusion;
 using TMPro;
 using Unity.VisualScripting;
 using System;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// �÷��̾� ��ȯ�� �� ���� �߰��ϰ������ ����ٰ� �߰��ϼ���
@@ -39,7 +40,7 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
     {
 
     }
-
+    
     public override void Spawned()
     {
         Debug.Log("NetworkPlayer Spawned");
@@ -48,17 +49,19 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
         {
             Debug.Log("NetworkPlayer Spawned HasInputAuthority");
 
-            Local = this;
+            Local = this; 
 
-            if (PlayerPrefs.GetString("PlayerNickname") == "" || PlayerPrefs.GetString("PlayerNickname") == null)
+            if (PlayerPrefs.GetString("PlayaerNickName") == "" || PlayerPrefs.GetString("PlayaerNickName") == null)
             {
-                RPC_SetNickName(PlayerPrefs.GetString("�г��� ��������"));
+                RPC_SetNickName(PlayerPrefs.GetString("PlayaerNickName"));
 
             }
             else
             {
-                RPC_SetNickName(PlayerPrefs.GetString("PlayerNickname"));
+                nickName = PlayerPrefs.GetString("PlayaerNickName");
+                RPC_SetNickName(nickName.ToSafeString());
             }
+
         }
         else
         {

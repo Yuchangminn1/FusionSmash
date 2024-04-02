@@ -13,7 +13,7 @@ public class NewInputTest : MonoBehaviour
     private InputAction look;
 
 
-    bool isis = false;
+    //bool isis = false;
     Vector2 moveDirection = Vector2.zero;
     Vector2 lookVec = Vector2.zero;
     Vector2 dir;
