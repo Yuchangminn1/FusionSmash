@@ -18,11 +18,12 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
     WeaponHandler weaponHandler;
     HPHandler hpHandler;
     ChatSystem chatSystem;
+    PlayerCharacterUIHandler characterUIHandler;
     //Component
     //public GameObject virtualCamera;
     void Start()
     {
-        
+
         if (HasInputAuthority)
         {
             if (Runner.IsServer)
@@ -41,7 +42,7 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
         weaponHandler = GetComponent<WeaponHandler>();
         hpHandler = GetComponent<HPHandler>();
         chatSystem = GetComponent<ChatSystem>();
-
+        characterUIHandler = GetComponent<PlayerCharacterUIHandler>();
         //Event
         eventHandler = GetComponent<PlayerActionEvents>();
         if (eventHandler == null)
@@ -49,26 +50,27 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
             Debug.LogError("PlayerActionEvents component is missing!");
             return;
         }
-        if (HasStateAuthority)
-        {
-            movementHandler.SubscribeToPlayerActionEvents(eventHandler);
-            playerStateHandler.SubscribeToPlayerActionEvents(eventHandler);
-            if (HasStateAuthority)
-            {
-                weaponHandler.SubscribeToPlayerActionEvents(eventHandler);
-                hpHandler.SubscribeToPlayerActionEvents(eventHandler);
-            }
-                
-        }
+        //if (HasStateAuthority)
+        //{
+        movementHandler.SubscribeToPlayerActionEvents(eventHandler);
+        playerStateHandler.SubscribeToPlayerActionEvents(eventHandler);
+        characterUIHandler.SubscribeToPlayerActionEvents(eventHandler);
+        //if (HasStateAuthority)
+        //{
+        weaponHandler.SubscribeToPlayerActionEvents(eventHandler);
+        hpHandler.SubscribeToPlayerActionEvents(eventHandler);
+        //}
+
+        //}
         //if (!HasInputAuthority)
         //{
         //    virtualCamera.SetActive(false);
         //}
-        
+
 
         eventHandler.TriggerInit();
 
-        
+
 
     }
 
@@ -78,11 +80,11 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
     }
     public override void FixedUpdateNetwork()
     {
-        
+
 
         if (PlayerAble())
         {
-            
+
 
             if (GetInput(out NetworkInputData networkInputData))
             {
@@ -137,10 +139,10 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
     {
         if (playerStateHandler.canMove)
         {
-           
+
             Vector2 tmp = playerStateHandler.stopMove == true ? Vector2.zero : networkInputData.movementInput;
             eventHandler.TriggerMove(tmp.x);
-            
+
         }
     }
 
@@ -163,28 +165,25 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
                 playerStateHandler.SetCanMove(chatSystem.ischating);
                 chatSystem.IsChatChange();
             }
-            
+
         }
     }
     bool PlayerAble()
     {
-        if (HasStateAuthority)
+        if (hpHandler.isRespawnRequsted)
         {
-            if (hpHandler.isRespawnRequsted)
-            {
-                eventHandler.TriggerRespawn();
-                return false;
-            }
-            if (hpHandler.isDead)
-                return false;
+            eventHandler.TriggerRespawn();
+            return false;
         }
-        if (HasInputAuthority)
-        {
-            if (hpHandler.isRespawnRequsted)
-                return false;
-            if (hpHandler.isDead)
-                return false;
-        }
+        if (hpHandler.isDead)
+            return false;
+        //if (HasInputAuthority)
+        //{
+        //    if (hpHandler.isRespawnRequsted)
+        //        return false;
+        //    if (hpHandler.isDead)
+        //        return false;
+        //}
         return true;
     }
 }

@@ -13,11 +13,14 @@ public class CharacterMovementHandler : NetworkBehaviour
     Vector3 moveDirection;
     public Transform characterRoot;
 
-    float moveSpeed = 5f;
+
+    float moveSpeed = 150f;
+    float dampener = 4f;
     //float jumpTime = 0f;
     //float jumpCooldown = 0f;
     float jumpForce = 6f;
     float maxGravity = -8f;
+
 
     [Networked(OnChanged = nameof(ChangeDir))]
     float myDir { get; set; } = 0f;
@@ -28,7 +31,11 @@ public class CharacterMovementHandler : NetworkBehaviour
     [Header("Component")]
     NetworkRigidbody networkRigidbody;
     CapsuleCollider capsuleCollider;
-    
+
+    PlayerActionEvents playerActionEvents;
+
+
+    float dir;
     static void ChangeDir(Changed<CharacterMovementHandler> changed)
     {
         float newS = changed.Behaviour.myDir;
@@ -48,15 +55,16 @@ public class CharacterMovementHandler : NetworkBehaviour
         playerStateHandler = GetComponent<PlayerStateHandler>();
 
         RotateTowards(1);
+        myDir = 1;
         GameObject VirtualCamera = GameObject.Find("PlayerVirtualCamera");
-        if(VirtualCamera && HasInputAuthority)
+        if (VirtualCamera && HasInputAuthority)
             VirtualCamera.GetComponent<CinemachineVirtualCamera>().Follow = this.transform;
         if (HasInputAuthority)
         {
             GameObject CameraCC = GameObject.Find("CameraCC");
             CameraCC.GetComponent<CMCameraTest>().plyaerTransform = transform;
         }
-        
+
 
 
     }
@@ -68,6 +76,10 @@ public class CharacterMovementHandler : NetworkBehaviour
         {
             Debug.LogError("PlayerActionEvents component is missing!");
             return;
+        }
+        else
+        {
+            playerActionEvents = _playerActionEvents;
         }
         //Death 
         _playerActionEvents.OnPlyaerDeath += OnPlyaerDeath;
@@ -95,31 +107,41 @@ public class CharacterMovementHandler : NetworkBehaviour
     public void OnPlayerMove(float _dir)
     {
         //Debug.Log("무브 실행중");
+        Vector3 currentVelocity = networkRigidbody.ReadVelocity();
+
+        //Debug.Log(currentVelocity);
+
         if (_dir == 0)
         {
-            Vector3 tmp22 = networkRigidbody.Rigidbody.velocity;
-            float div = 1.3f;
-            if (networkRigidbody.Rigidbody.velocity.y < maxGravity)
-            {
-                networkRigidbody.Rigidbody.velocity = (new Vector3(tmp22.x / div, maxGravity, tmp22.z / div));
 
-            }
-            networkRigidbody.Rigidbody.velocity = (new Vector3(tmp22.x / div, tmp22.y, tmp22.z / div));
+            //if (Math.Abs(currentVelocity.x) < 0.1f)
+            //{
+            //    networkRigidbody.Rigidbody.velocity = new Vector3(0f, networkRigidbody.ReadVelocity().y, 0);
+            //    return;
+            //}
+            Vector3 targetVelocity = currentVelocity;
+            targetVelocity.x = 0; targetVelocity.z = 0;
+            // networkRigidbody.Rigidbody.velocity = new Vector3(0f, networkRigidbody.ReadVelocity().y, 0);
+            networkRigidbody.Rigidbody.AddForce(targetVelocity - currentVelocity * networkRigidbody.ReadMass() * dampener, ForceMode.Force);
             return;
         }
         else
         {
-            myDir = _dir;
+            if (_dir > 0)
+            {
+                myDir = -1;
+            }
+            else if (_dir < 0)
+            {
+                myDir = 1;
+            }
         }
         Vector3 moveDirection = transform.right * -Math.Abs(_dir);
         moveDirection.Normalize();
 
-        if (networkRigidbody.Rigidbody.velocity.y < maxGravity)
-        {
-            networkRigidbody.Rigidbody.velocity = (new Vector3(moveDirection.z * moveSpeed, maxGravity, moveDirection.x * moveSpeed));
-        }
+        networkRigidbody.Rigidbody.velocity = new Vector3(0f, networkRigidbody.ReadVelocity().y, 0f);
+        networkRigidbody.Rigidbody.AddForce((new Vector3(moveDirection.z * moveSpeed, 0f, moveDirection.x * moveSpeed)), ForceMode.Force);
 
-        networkRigidbody.Rigidbody.velocity = (new Vector3(moveDirection.z * moveSpeed, networkRigidbody.Rigidbody.velocity.y, moveDirection.x * moveSpeed));
 
     }
     public void OnPlayerJump()
@@ -134,17 +156,29 @@ public class CharacterMovementHandler : NetworkBehaviour
 
     void RotateTowards(float _dir)
     {
+        if (myDir == 0)
+        {
+            myDir = -1f;
+        }
+        if (HasInputAuthority)
+        {
+            Debug.Log("HasInputAuthority myDir = " + myDir);
+        }
+        if (HasStateAuthority)
+        {
+            Debug.Log("HasStateAuthority myDir = " + myDir);
+        }
 
         Vector3 direction;
         Quaternion targetRotation;
         if (_dir > 0)
         {
-            direction = Vector3.right;
+            direction = Vector3.left;
             targetRotation = Quaternion.LookRotation(direction, Vector3.up);
         }
         else if (_dir < 0)
         {
-            direction = Vector3.left;
+            direction = Vector3.right;
             targetRotation = Quaternion.LookRotation(direction, Vector3.up);
         }
         else
@@ -152,6 +186,8 @@ public class CharacterMovementHandler : NetworkBehaviour
             return;
         }
         networkRigidbody.transform.forward = direction;
+        playerActionEvents?.TriggerPlyaerTurn(-networkRigidbody.transform.rotation.y);
+
         //characterRoot.GetComponent<NetworkObject>().transform.rotation = targetRotation;
 
     }
@@ -170,13 +206,13 @@ public class CharacterMovementHandler : NetworkBehaviour
         _attackVec.z = 0;
         _attackVec = _attackVec.normalized;
         //Debug.Log("전 HitDir = " + _attackVec.x + "Target AngleY = " + characterRoot.transform.rotation.y + "Power = " + _force);
-        if (characterRoot.transform.rotation.y < 0)
-        {
-            _attackVec.x *= -1;
-        }
+        //if (characterRoot.transform.rotation.y < 0)
+        //{
+        //    _attackVec.x *= -1;
+        //}
         //Debug.Log("후 HitDir = " + _attackVec.x + "Target AngleY = " + characterRoot.transform.rotation.y + "Power = " + _force);
 
-        _attackVec = _attackVec * _force;
+        _attackVec = _attackVec * _force * myDir;
         StartCoroutine(HitAddForce(_attackVec));
     }
 

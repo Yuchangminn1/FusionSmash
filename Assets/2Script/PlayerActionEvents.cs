@@ -14,7 +14,10 @@ public class PlayerActionEvents : MonoBehaviour
     public event Action OnPlyaerDeath;
     public event Action OnPlyaerInit;
 
+
+
     public event Action<float> OnPlayerMove;
+    public event Action<float> OnPlyaerTurn;
 
     public void TriggerJump()
     {
@@ -43,6 +46,11 @@ public class PlayerActionEvents : MonoBehaviour
     public void TriggerMove(float direction)
     {
         OnPlayerMove?.Invoke(direction);
+    }
+    public void TriggerPlyaerTurn(float _pitch)
+    {
+        OnPlyaerTurn?.Invoke(_pitch);
+        //Debug.Log("_pitch = " + _pitch);
     }
 }
 public interface IPlayerActionListener

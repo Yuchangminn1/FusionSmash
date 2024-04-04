@@ -56,8 +56,9 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
     //Jump
     [Networked(OnChanged = nameof(ChangeJumpCount))] //
     public int jumpCount { get; set; } = 0;
+
     public float jumpTime = 0f;
-    public float jumpClearTime = 0.1f;
+    public float jumpCoolTime = 0.5f;
 
     public int maxJumpCount { get; private set; } = 2;
     //Attack
@@ -107,11 +108,9 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
         {
             Debug.LogError("stateMachine is null after initialization.");
         }
-        if (HasStateAuthority)
-        {
-            nextState = moveState;
-            ChangeState();
-        }
+
+        nextState = moveState;
+        ChangeState();
         weapon = weaponHandler.equipWeapon._weaponNum;
     }
     public void SubscribeToPlayerActionEvents(PlayerActionEvents _playerActionEvents)
@@ -125,11 +124,9 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
     }
     public void OnPlyaerRespawn()
     {
-        if (HasStateAuthority)
-        {
-            AnimationTrigger = false;
-            stateMachine.ChangeState(nextState);
-        }
+
+        AnimationTrigger = false;
+        stateMachine.ChangeState(nextState);
     }
     public void OnPlayerMove(float _dirVector2)
     {
@@ -137,10 +134,7 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
     }
     public void SetInputVec(float vector2)
     {
-        if (HasStateAuthority || HasInputAuthority)
-        {
-            moveDir = vector2 == 0 ? 0 : 1;
-        }
+        moveDir = vector2 == 0 ? 0 : 1;
     }
     void OnPlayerUpdate()
     {
@@ -155,17 +149,11 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
     {
         if (stateMachine == null)
         {
-            if (HasStateAuthority)
-            {
-                Debug.Log("stateMachine is Null");
-            }
+            Debug.Log("stateMachine is Null");
             return;
         }
-        if (HasStateAuthority)
-        {
-            stateMachine.Update();
-            stateMachine.LateUpdate();
-        }
+        stateMachine.Update();
+        stateMachine.LateUpdate();
     }
     public void ResetCondition()
     {
@@ -176,20 +164,7 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
             //_dodgeCount = 0;
         }
     }
-    void Update()
-    {
-        if (HasStateAuthority)
-        {
-            //stateMachine.Update();
-        }
-    }
-    void FixedUpdate()
-    {
-        if (HasStateAuthority)
-        {
-            //stateMachine.FixedUpdate();
-        }
-    }
+
     private void LateUpdate()
     {
         if (canMove)
@@ -226,19 +201,15 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
     }
     public void SetState(int num)
     {
-        if (HasStateAuthority)
-        {
-            state = num;
-            SetInt("State", num);
-        }
+
+        state = num;
+        SetInt("State", num);
     }
     public void SetState2(int num)
     {
-        if (HasStateAuthority)
-        {
-            state2 = num;
-            SetInt("State2", num);
-        }
+
+        state2 = num;
+        SetInt("State2", num);
     }
     public bool Isvisi()
     {
@@ -246,10 +217,8 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
     }
     public void ChangeState()
     {
-        if (HasStateAuthority)
-        {
-            stateMachine.ChangeState(nextState);
-        }
+
+        stateMachine.ChangeState(nextState);
     }
     #endregion
     #region NetworkProperty
@@ -381,6 +350,9 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
     #region Jump
     public bool JumpAble()
     {
+        Debug.Log($"jumpTime  = {jumpTime} / jumpCoolTime = {jumpCoolTime} / Time.deltaTime = {Time.time}");
+        if (jumpTime + jumpCoolTime > Time.time)
+            return false;
         if (stateMachine.GetState() == null) return false;
         if (!stateMachine.GetState().isAbleJump)
         {
@@ -401,11 +373,8 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
 
     public void ResetJumpCount()
     {
-        if (HasStateAuthority)
-        {
-            if (jumpTime + jumpClearTime < Time.time)
-                jumpCount = 0;
-        }
+        if (jumpTime + jumpCoolTime < Time.time)
+            jumpCount = 0;
     }
     #endregion
     #region Attack
@@ -470,7 +439,7 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
                 attackCount = 0;
             }
         }
-        
+
     }
     public bool AbleFire()
     {

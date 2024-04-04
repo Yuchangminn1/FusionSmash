@@ -42,7 +42,7 @@ public class ChatSystem : NetworkBehaviour
     {
         if (HasInputAuthority)
         {
-            mainInputField = GameObject.Find("InputField").GetComponent<InputField>();
+            mainInputField = GameObject.Find("ChatInputField").GetComponent<InputField>();
             playerControls = new PlayerInputAction();
             chatLog = GameObject.Find("Chat_Display").GetComponentInChildren<TMP_Text>();
             scrollV = GameObject.Find("ScrollbarVertical").GetComponent<Scrollbar>();
