@@ -14,7 +14,7 @@ public class AttackState : PlayerState
     {
         endMotionChange = true;
         isAbleFly = true;
-        isAbleAttack = false;
+        //isAbleAttack = false;
         isAbleJump = false;
         isState2 = true;
     }
@@ -23,25 +23,28 @@ public class AttackState : PlayerState
     {
         base.Enter();
         player.AttackEnter();
-        Debug.Log("Enter Time" + Time.time);
+        //Debug.Log("Enter Time" + Time.time);
     }
     public override bool Update()
     {
         if (player.attackCount == player.maxAttackCount)
         {
-            attackDelay = 0.9f;
+            attackDelay = 0.6f;
+
         }
         else
         {
-            attackDelay = 0.5f;
+            attackDelay = 0.3f;
         }
         if (startTime + attackDelay > Time.time)
         {
             return false;
         }
-        if (!player.Isvisi()&& player.isFireButtonPressed)
+        if (player.attackstack > 0)
         {
+            player.nextState = player.attackState;
             player.ChangeState();
+            return true;
         }
         return base.Update();
         
@@ -57,7 +60,7 @@ public class AttackState : PlayerState
     public override void Exit()
     {
         base.Exit();
-        Debug.Log("Exit Time" + Time.time);
+        //Debug.Log("Exit Time" + Time.time);
 
         player.AttackExit();
 

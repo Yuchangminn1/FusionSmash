@@ -14,7 +14,7 @@ public class CMCameraTest : MonoBehaviour
         if (plyaerTransform)
         {
             if(Math.Abs(plyaerTransform.position.y) < 12)
-                transform.position = Vector3.Lerp(transform.position, plyaerTransform.position + DisVector, 0.01f);
+                transform.position = Vector3.Lerp(transform.position, plyaerTransform.position + DisVector, 0.05f);
         }
     }
 }

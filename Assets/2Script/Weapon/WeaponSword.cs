@@ -54,7 +54,7 @@ public class WeaponSword : PlayerWeapon
     public override void SetCollistion(bool _tf)
     {
         meshCollider.enabled = _tf;
-        Debug.Log("Collistion " + _tf);
+        //Debug.Log("Collistion " + _tf);
 
 
     }
@@ -69,11 +69,11 @@ public class WeaponSword : PlayerWeapon
         HPHandler hitHP = other.GetComponent<HPHandler>();
         if (hitHP != null && hitHP != _hPHandler)
         {
-            Vector3 tmp = other.transform.position - transform.position;
-            if (tmp.x < 0.03)
-            {//너무 가까우면 무기 기준으로 해서 반대로 날아감 
-                tmp *= -1;
-            }
+            Vector3 tmp = other.transform.position - playerInfo.transform.position;
+            //if (tmp.x < 0.03)
+            //{//너무 가까우면 무기 기준으로 해서 반대로 날아감 
+            //    tmp *= -1;
+            //}
             if ((int)Type < 0 || (int)Type > 3)
             {
                 Debug.Log("Type Error");

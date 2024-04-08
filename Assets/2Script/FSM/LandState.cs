@@ -16,6 +16,7 @@ public class LandState : PlayerState
         isAbleDodge = false;
         isAbleJump = false;
         isState2 = true;
+        isCancel = true;
 
     }
 

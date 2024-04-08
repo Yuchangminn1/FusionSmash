@@ -13,11 +13,17 @@ public class PlayerActionEvents : MonoBehaviour
     public event Action OnPlyaerRespawn;
     public event Action OnPlyaerDeath;
     public event Action OnPlyaerInit;
+    public event Action OnPlyaerFixedUpdate;
 
 
 
     public event Action<float> OnPlayerMove;
     public event Action<float> OnPlyaerTurn;
+
+    public void TrigerFixedUpdate()
+    {
+        OnPlyaerFixedUpdate?.Invoke();
+    }
 
     public void TriggerJump()
     {

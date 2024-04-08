@@ -33,12 +33,12 @@ public class PlayerState : EntityState
         base.Enter();
         startTime = Time.time;
         player.SetState(currentStateNum);
+
         if (!isState2)
         {
             player.SetState2(0);
         }
-        player.AttackCountReset();
-        Debug.Log(currentStateNum);
+        //Debug.Log(currentStateNum);
     }
     public override bool Update()
     {
@@ -47,7 +47,7 @@ public class PlayerState : EntityState
 
         if (player.nextState != this)
         {
-            Debug.Log(player.nextState + "넥스트 있어서 종료");
+            //Debug.Log(player.nextState + "넥스트 있어서 종료");
             return true;
         }
         if (player.isdead)

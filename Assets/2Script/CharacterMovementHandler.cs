@@ -14,12 +14,12 @@ public class CharacterMovementHandler : NetworkBehaviour
     public Transform characterRoot;
 
 
-    float moveSpeed = 150f;
+    float moveSpeed = 5f;
     float dampener = 4f;
     //float jumpTime = 0f;
     //float jumpCooldown = 0f;
     float jumpForce = 6f;
-    float maxGravity = -8f;
+    float maxGravity = -20f;
 
 
     [Networked(OnChanged = nameof(ChangeDir))]
@@ -36,6 +36,7 @@ public class CharacterMovementHandler : NetworkBehaviour
 
 
     float dir;
+
     static void ChangeDir(Changed<CharacterMovementHandler> changed)
     {
         float newS = changed.Behaviour.myDir;
@@ -48,25 +49,33 @@ public class CharacterMovementHandler : NetworkBehaviour
     }
     public override void Spawned()
     {
-        //Component
-        networkRigidbody = GetComponent<NetworkRigidbody>();
-        capsuleCollider = GetComponent<CapsuleCollider>();
-        //Script
-        playerStateHandler = GetComponent<PlayerStateHandler>();
+        if (HasStateAuthority || HasInputAuthority)
+        {
+            networkRigidbody = GetComponent<NetworkRigidbody>();
+            capsuleCollider = GetComponent<CapsuleCollider>();
+            playerStateHandler = GetComponent<PlayerStateHandler>();
 
-        RotateTowards(1);
-        myDir = 1;
-        GameObject VirtualCamera = GameObject.Find("PlayerVirtualCamera");
-        if (VirtualCamera && HasInputAuthority)
-            VirtualCamera.GetComponent<CinemachineVirtualCamera>().Follow = this.transform;
+            RotateTowards(1);
+            myDir = 1;
+        }
+
+
+
+    }
+    private void Start()
+    {
+        //networkRigidbody = GetComponent<NetworkRigidbody>();
+        //capsuleCollider = GetComponent<CapsuleCollider>();
+        //playerStateHandler = GetComponent<PlayerStateHandler>();
+
+        //RotateTowards(1);
+        //myDir = 1;
+
         if (HasInputAuthority)
         {
             GameObject CameraCC = GameObject.Find("CameraCC");
             CameraCC.GetComponent<CMCameraTest>().plyaerTransform = transform;
         }
-
-
-
     }
 
     #region Event
@@ -85,7 +94,7 @@ public class CharacterMovementHandler : NetworkBehaviour
         _playerActionEvents.OnPlyaerDeath += OnPlyaerDeath;
         //Move 
         _playerActionEvents.OnPlayerMove += OnPlayerMove;
-        Debug.Log("등록");
+        //Debug.Log("등록");
         //Jump 
         _playerActionEvents.OnPlayerJump += OnPlayerJump;
         //Respawn 
@@ -95,14 +104,22 @@ public class CharacterMovementHandler : NetworkBehaviour
     //Death
     void OnPlyaerDeath()
     {
-        SetCharacterControllerEnabled(false);
+        if (HasStateAuthority)
+        {
+            SetCharacterControllerEnabled(false);
+        }
     }
 
     //Respawn
     void OnPlyaerRespawn()
     {
-        SetCharacterControllerEnabled(true);
-        networkRigidbody.TeleportToPosition(Utils.GetRandomSpawnPoint());
+        if (HasStateAuthority)
+        {
+            SetCharacterControllerEnabled(true);
+            networkRigidbody.TeleportToPosition(Utils.GetRandomSpawnPoint());
+        }
+        
+        Debug.Log("Respawn Teleport");
     }
     public void OnPlayerMove(float _dir)
     {
@@ -114,16 +131,10 @@ public class CharacterMovementHandler : NetworkBehaviour
         if (_dir == 0)
         {
 
-            //if (Math.Abs(currentVelocity.x) < 0.1f)
-            //{
-            //    networkRigidbody.Rigidbody.velocity = new Vector3(0f, networkRigidbody.ReadVelocity().y, 0);
-            //    return;
-            //}
-            Vector3 targetVelocity = currentVelocity;
-            targetVelocity.x = 0; targetVelocity.z = 0;
-            // networkRigidbody.Rigidbody.velocity = new Vector3(0f, networkRigidbody.ReadVelocity().y, 0);
+            Vector3 targetVelocity = Vector3.zero;
+            currentVelocity.y = 0;
+
             networkRigidbody.Rigidbody.AddForce(targetVelocity - currentVelocity * networkRigidbody.ReadMass() * dampener, ForceMode.Force);
-            return;
         }
         else
         {
@@ -135,12 +146,13 @@ public class CharacterMovementHandler : NetworkBehaviour
             {
                 myDir = 1;
             }
-        }
-        Vector3 moveDirection = transform.right * -Math.Abs(_dir);
-        moveDirection.Normalize();
+            Vector3 moveDirection = transform.right * -Math.Abs(_dir);
+            moveDirection.Normalize();
 
-        networkRigidbody.Rigidbody.velocity = new Vector3(0f, networkRigidbody.ReadVelocity().y, 0f);
-        networkRigidbody.Rigidbody.AddForce((new Vector3(moveDirection.z * moveSpeed, 0f, moveDirection.x * moveSpeed)), ForceMode.Force);
+            //networkRigidbody.Rigidbody.velocity = new Vector3(0f, networkRigidbody.ReadVelocity().y, 0f);
+            networkRigidbody.Rigidbody.AddForce((new Vector3(moveDirection.z * moveSpeed, 0f, moveDirection.x * moveSpeed)), ForceMode.Force);
+
+        }
 
 
     }
@@ -156,39 +168,47 @@ public class CharacterMovementHandler : NetworkBehaviour
 
     void RotateTowards(float _dir)
     {
-        if (myDir == 0)
+        if (HasStateAuthority || HasInputAuthority)
         {
-            myDir = -1f;
-        }
-        if (HasInputAuthority)
-        {
-            Debug.Log("HasInputAuthority myDir = " + myDir);
-        }
-        if (HasStateAuthority)
-        {
-            Debug.Log("HasStateAuthority myDir = " + myDir);
+            if (myDir == 0)
+            {
+                myDir = -1f;
+            }
+            if (HasStateAuthority)
+            {
+                Vector3 targetVelocity = Vector3.zero;
+                Vector3 currentVelocity = networkRigidbody.ReadVelocity();
+                currentVelocity.y = 0;
+
+                networkRigidbody.Rigidbody.AddForce(targetVelocity - currentVelocity * networkRigidbody.ReadMass() * dampener, ForceMode.Force);
+            }
+
+
+            Vector3 direction;
+            Quaternion targetRotation;
+            if (_dir > 0)
+            {
+                direction = Vector3.left;
+                targetRotation = Quaternion.LookRotation(direction, Vector3.up);
+            }
+            else if (_dir < 0)
+            {
+                direction = Vector3.right;
+                targetRotation = Quaternion.LookRotation(direction, Vector3.up);
+            }
+            else
+            {
+                return;
+            }
+            networkRigidbody.transform.forward = direction;
+            playerActionEvents?.TriggerPlyaerTurn(-networkRigidbody.transform.rotation.y);
+
+            //characterRoot.GetComponent<NetworkObject>().transform.rotation = targetRotation;
+
+
         }
 
-        Vector3 direction;
-        Quaternion targetRotation;
-        if (_dir > 0)
-        {
-            direction = Vector3.left;
-            targetRotation = Quaternion.LookRotation(direction, Vector3.up);
-        }
-        else if (_dir < 0)
-        {
-            direction = Vector3.right;
-            targetRotation = Quaternion.LookRotation(direction, Vector3.up);
-        }
-        else
-        {
-            return;
-        }
-        networkRigidbody.transform.forward = direction;
-        playerActionEvents?.TriggerPlyaerTurn(-networkRigidbody.transform.rotation.y);
 
-        //characterRoot.GetComponent<NetworkObject>().transform.rotation = targetRotation;
 
     }
 
@@ -205,29 +225,36 @@ public class CharacterMovementHandler : NetworkBehaviour
     {
         _attackVec.z = 0;
         _attackVec = _attackVec.normalized;
-        //Debug.Log("전 HitDir = " + _attackVec.x + "Target AngleY = " + characterRoot.transform.rotation.y + "Power = " + _force);
-        //if (characterRoot.transform.rotation.y < 0)
-        //{
-        //    _attackVec.x *= -1;
-        //}
-        //Debug.Log("후 HitDir = " + _attackVec.x + "Target AngleY = " + characterRoot.transform.rotation.y + "Power = " + _force);
+        Debug.Log("어택 방향 " + _attackVec);
 
-        _attackVec = _attackVec * _force * myDir;
-        StartCoroutine(HitAddForce(_attackVec));
+        _attackVec = _attackVec * _force;
+        Debug.Log("어택 방향 2" + _attackVec);
+        if (HasStateAuthority)
+        {
+            StartCoroutine(HitAddForce(_attackVec));
+        }
     }
 
     IEnumerator HitAddForce(Vector3 _attackVec)
     {
-        float DivForce = 10f;
-        float UpperForce = DivForce;
-        _attackVec = _attackVec / DivForce;
-        _attackVec.y = _attackVec.x > 0 ? _attackVec.x / UpperForce : -_attackVec.x / UpperForce;
-        int maxC = 12;
-        for (int i = 1; i < maxC; i++)
+        if (networkRigidbody)
         {
-            networkRigidbody.Rigidbody.AddForce((maxC - i) * _attackVec, ForceMode.Impulse);
-            yield return new WaitForFixedUpdate();
+            float DivForce = 10f;
+            float UpperForce = DivForce;
+            _attackVec = _attackVec / DivForce;
+            _attackVec.y = _attackVec.x > 0 ? _attackVec.x / UpperForce : -_attackVec.x / UpperForce;
+            int maxC = 12;
+            for (int i = 1; i < maxC; i++)
+            {
+                networkRigidbody.Rigidbody.AddForce((maxC - i) * _attackVec, ForceMode.Impulse);
+                yield return new WaitForFixedUpdate();
+            }
         }
+        else
+        {
+            yield return null;
+        }
+
 
     }
 

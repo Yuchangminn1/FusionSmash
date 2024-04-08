@@ -42,7 +42,7 @@ public class WeaponHandler : NetworkBehaviour, IPlayerActionListener
     {
         if (equipWeapon != null)
         {
-            Debug.Log("Attack Event");
+            //Debug.Log("Attack Event");
             equipWeapon.Fire(firePosition, fireDirection);
         }
     }

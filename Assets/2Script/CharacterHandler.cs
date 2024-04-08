@@ -24,6 +24,40 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
     void Start()
     {
 
+
+    }
+    private void FixedUpdate()
+    {
+        if(eventHandler)
+            eventHandler.TrigerFixedUpdate();
+    }
+    public override void Spawned()
+    {
+        
+        if (HasStateAuthority || HasInputAuthority)
+        {
+            //Input
+            inputHandler = GetComponent<CharacterInputhandler>();
+            movementHandler = GetComponent<CharacterMovementHandler>();
+
+            playerStateHandler = GetComponent<PlayerStateHandler>();
+            weaponHandler = GetComponent<WeaponHandler>();
+            hpHandler = GetComponent<HPHandler>();
+            chatSystem = GetComponent<ChatSystem>();
+            characterUIHandler = GetComponent<PlayerCharacterUIHandler>();
+            //Event
+            eventHandler = GetComponent<PlayerActionEvents>();
+            if (eventHandler == null)
+            {
+                Debug.LogError("PlayerActionEvents component is missing!");
+                return;
+            }
+            movementHandler.SubscribeToPlayerActionEvents(eventHandler);
+            playerStateHandler.SubscribeToPlayerActionEvents(eventHandler);
+            hpHandler.SubscribeToPlayerActionEvents(eventHandler);
+            characterUIHandler.SubscribeToPlayerActionEvents(eventHandler);
+            weaponHandler.SubscribeToPlayerActionEvents(eventHandler);
+        }
         if (HasInputAuthority)
         {
             if (Runner.IsServer)
@@ -31,47 +65,9 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
                 return;
             }
             chatSystem = GetComponent<ChatSystem>();
+
         }
-    }
-    public override void Spawned()
-    {
-        //Input
-        inputHandler = GetComponent<CharacterInputhandler>();
-        movementHandler = GetComponent<CharacterMovementHandler>();
-        playerStateHandler = GetComponent<PlayerStateHandler>();
-        weaponHandler = GetComponent<WeaponHandler>();
-        hpHandler = GetComponent<HPHandler>();
-        chatSystem = GetComponent<ChatSystem>();
-        characterUIHandler = GetComponent<PlayerCharacterUIHandler>();
-        //Event
-        eventHandler = GetComponent<PlayerActionEvents>();
-        if (eventHandler == null)
-        {
-            Debug.LogError("PlayerActionEvents component is missing!");
-            return;
-        }
-        //if (HasStateAuthority)
-        //{
-        movementHandler.SubscribeToPlayerActionEvents(eventHandler);
-        playerStateHandler.SubscribeToPlayerActionEvents(eventHandler);
-        characterUIHandler.SubscribeToPlayerActionEvents(eventHandler);
-        //if (HasStateAuthority)
-        //{
-        weaponHandler.SubscribeToPlayerActionEvents(eventHandler);
-        hpHandler.SubscribeToPlayerActionEvents(eventHandler);
-        //}
-
-        //}
-        //if (!HasInputAuthority)
-        //{
-        //    virtualCamera.SetActive(false);
-        //}
-
-
-        eventHandler.TriggerInit();
-
-
-
+        
     }
 
     public void SubscribeToPlayerActionEvents(PlayerActionEvents _playerActionEvents)
@@ -80,30 +76,53 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
     }
     public override void FixedUpdateNetwork()
     {
-
-
-        if (PlayerAble())
+        
+        if (HasStateAuthority ||HasInputAuthority)
         {
-
-
-            if (GetInput(out NetworkInputData networkInputData))
+            if (PlayerAble())
             {
-                //Debug.Log("networkInputData");
-
-                //ShowBoard(networkInputData);
-                Chat(networkInputData);
-                if (playerStateHandler.canMove)
+                if (GetInput(out NetworkInputData networkInputData))
                 {
-                    ActionMove(networkInputData);
-                    ActionCase(networkInputData);
+                    //Debug.Log("networkInputData");
+
+                    //ShowBoard(networkInputData);
+                    Chat(networkInputData);
+                    if (playerStateHandler.canMove)
+                    {
+                        ActionMove(networkInputData);
+                        ActionCase(networkInputData);
+                    }
                 }
             }
+                
             eventHandler.TriggerCharacterUpdate();
+            //if (PlayerAble())
+            //{
+
+
+            //    if (GetInput(out NetworkInputData networkInputData))
+            //    {
+            //        //Debug.Log("networkInputData");
+
+            //        //ShowBoard(networkInputData);
+            //        Chat(networkInputData);
+            //        if (playerStateHandler.canMove)
+            //        {
+            //            ActionMove(networkInputData);
+            //            ActionCase(networkInputData);
+            //        }
+            //    }
+            //    eventHandler.TriggerCharacterUpdate();
+            //}
         }
+
+        
     }
 
     private void ActionCase(NetworkInputData networkInputData)
     {
+
+
 
         if (networkInputData.isJumpButtonPressed)
         {
@@ -120,7 +139,7 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
 
         if (networkInputData.isFireButtonPressed)
         {
-            if (weaponHandler.AbleFire() && playerStateHandler.AbleFire())
+            if (playerStateHandler.AbleFire()&&weaponHandler.AbleFire() )
             {
                 eventHandler.TriggerAttack();
                 return;
@@ -170,20 +189,26 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
     }
     bool PlayerAble()
     {
-        if (hpHandler.isRespawnRequsted)
+        if(hpHandler == null)
         {
-            eventHandler.TriggerRespawn();
-            return false;
+            Debug.Log("hpHandler is Null");
         }
-        if (hpHandler.isDead)
-            return false;
-        //if (HasInputAuthority)
-        //{
-        //    if (hpHandler.isRespawnRequsted)
-        //        return false;
-        //    if (hpHandler.isDead)
-        //        return false;
-        //}
+        if (eventHandler == null)
+        {
+            Debug.Log("eventHandler is Null");
+        }
+
+        
+        if (HasInputAuthority || HasStateAuthority)
+        {
+            if (hpHandler.isRespawnRequsted)
+            {
+                eventHandler.TriggerRespawn();
+                return false;
+            }
+            if (hpHandler.isDead)
+                return false;
+        }
         return true;
     }
 }

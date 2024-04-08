@@ -22,12 +22,14 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
     PlayerStateHandler playerStateHandler;
 
     public TMP_Text nickNameText;
-
-    [Header("Respawn")]
-    public bool isRespawnRequsted = false;
+    [Networked]
+    public NetworkBool isRespawnRequsted { get; set; } = false;
 
     float lastHitTime = 0f;
-    float damageDelay = 0.4f;
+    float damageDelay = 0.1f;
+
+    
+    
 
     public void CheckFallRespawn()
     {
@@ -105,13 +107,17 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
     }
     public void KillSelf()
     {
-        Debug.Log($"{transform.name} isDead");
-        StartCoroutine(ServerReviveCO());
-        //if (HasStateAuthority)
-        //{
-        //    playerInfo.enemyinfo.kill += 1;
-        //}
-        isDead = true;
+        if (!isDead)
+        {
+            Debug.Log($"{transform.name} isDead");
+            StartCoroutine(ServerReviveCO());
+            //if (HasStateAuthority)
+            //{
+            //    playerInfo.enemyinfo.kill += 1;
+            //}
+            isDead = true;
+        }
+        
     }
     void OnDeath()
     {
@@ -128,7 +134,7 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
 
         if (lastHitTime + damageDelay > Time.time && playerInfo.GetEnemyName() == enemyname)
         {
-            Debug.Log("버그로 타격판정");
+            //Debug.Log("버그로 타격판정");
             lastHitTime = Time.time;
             return;
         }

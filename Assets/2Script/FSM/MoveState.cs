@@ -41,6 +41,8 @@ public class MoveState : PlayerState
     public override void FixedUpdate()
     {
         base.FixedUpdate();
+        player.AttackCountReset();
+
     }
 
     public override void LateUpdate()
