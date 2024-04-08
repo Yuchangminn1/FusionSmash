@@ -11,6 +11,7 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
 {
 
     //Handler
+    PlayerInfo playerInfo;
     PlayerActionEvents eventHandler;
     CharacterInputhandler inputHandler;
     CharacterMovementHandler movementHandler;
@@ -37,6 +38,7 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
         if (HasStateAuthority || HasInputAuthority)
         {
             //Input
+            playerInfo = GetComponent<PlayerInfo>();
             inputHandler = GetComponent<CharacterInputhandler>();
             movementHandler = GetComponent<CharacterMovementHandler>();
 
@@ -76,47 +78,31 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
     }
     public override void FixedUpdateNetwork()
     {
-        
-        if (HasStateAuthority ||HasInputAuthority)
+        playerInfo.playingState = GameManager.Instance.GetPlaying();
+        if (playerInfo.playingState != (int)PlayingState.Stop)
         {
-            if (PlayerAble())
+            if (HasStateAuthority || HasInputAuthority)
             {
-                if (GetInput(out NetworkInputData networkInputData))
+                if (PlayerAble())
                 {
-                    //Debug.Log("networkInputData");
-
-                    //ShowBoard(networkInputData);
-                    Chat(networkInputData);
-                    if (playerStateHandler.canMove)
+                    if (GetInput(out NetworkInputData networkInputData))
                     {
-                        ActionMove(networkInputData);
-                        ActionCase(networkInputData);
+                        //Debug.Log("networkInputData");
+
+                        //ShowBoard(networkInputData);
+                        Chat(networkInputData);
+                        if (playerStateHandler.canMove)
+                        {
+                            ActionMove(networkInputData);
+                            ActionCase(networkInputData);
+                        }
                     }
                 }
-            }
+                eventHandler.TriggerCharacterUpdate();
                 
-            eventHandler.TriggerCharacterUpdate();
-            //if (PlayerAble())
-            //{
-
-
-            //    if (GetInput(out NetworkInputData networkInputData))
-            //    {
-            //        //Debug.Log("networkInputData");
-
-            //        //ShowBoard(networkInputData);
-            //        Chat(networkInputData);
-            //        if (playerStateHandler.canMove)
-            //        {
-            //            ActionMove(networkInputData);
-            //            ActionCase(networkInputData);
-            //        }
-            //    }
-            //    eventHandler.TriggerCharacterUpdate();
-            //}
+            }
         }
 
-        
     }
 
     private void ActionCase(NetworkInputData networkInputData)

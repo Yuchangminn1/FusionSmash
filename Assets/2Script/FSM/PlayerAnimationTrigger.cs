@@ -10,11 +10,13 @@ public class PlayerAnimationTrigger : NetworkBehaviour
     PlayerStateHandler player;
     Animator animator;
     TestWeapon testweapon;
-
+    WeaponHandler weaponHandler;
     // Start is called before the first frame update
     private void Awake()
     {
         player = GetComponentInParent<PlayerStateHandler>();
+        weaponHandler = GetComponentInParent<WeaponHandler>();
+
         animator = transform.GetComponent<Animator>();
     }
     void Start()
@@ -45,6 +47,15 @@ public class PlayerAnimationTrigger : NetworkBehaviour
         {
             player.AnimationTrigger = true;
         }
+    }
+
+    void AttackColOn()
+    {
+        weaponHandler.GetEquipWeapon().SetCollistion(true);
+    }
+    void AttackColOff()
+    {
+        weaponHandler.GetEquipWeapon().SetCollistion(false);
     }
     //void AttackColOn()
     //{

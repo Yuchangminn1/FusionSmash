@@ -449,7 +449,7 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
         }
         if (weapon == 1)
         {
-            weaponHandler.GetEquipWeapon().SetCollistion(true);
+            
             if (attackCount == maxAttackCount)
             {
                 weaponHandler.GetEquipWeapon().SetAttackType(EAttackType.Knockback);
@@ -469,7 +469,7 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
 
         if (weapon == 1)
         {
-            weaponHandler.GetEquipWeapon().SetCollistion(false);
+            //weaponHandler.GetEquipWeapon().SetCollistion(false);
         }
         if (nextState.currentStateNum != (int)StateType.Attack)
         {

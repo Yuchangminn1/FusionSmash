@@ -127,6 +127,7 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
     #endregion
     public void OnTakeDamage(string enemyname, int weaponNum, Vector3 _attackDir, EAttackType eAttackType = EAttackType.Knockback, int _addForce = 2, int _attackDamage = 1)
     {
+        
         if (!HasStateAuthority && HasInputAuthority)
         {
             return;

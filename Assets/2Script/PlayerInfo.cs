@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class PlayerInfo : NetworkBehaviour
 {
+    
     [Networked(OnChanged = nameof(NickNameChanged))]
     public NetworkString<_16> playerName { get; set; }
     [Networked(OnChanged = nameof(EnemyNameChanged))]
@@ -19,6 +20,8 @@ public class PlayerInfo : NetworkBehaviour
     public int playerNumber { get; set; }
     PlayerInfoUIManager playerInfoUIManager;
 
+    [Networked]
+    public int playingState { get; set; }
     //public PlayerInfo enemyinfo;
     public override void Spawned()
     {
@@ -31,7 +34,7 @@ public class PlayerInfo : NetworkBehaviour
         //    playerInfoUIManager.AddPlayerInfo(playerNumber, Name);
         //}
     }
-    
+
     static void NickNameChanged(Changed<PlayerInfo> changed)
     {
         changed.Behaviour.SetName(changed.Behaviour.playerName.ToString());
@@ -40,7 +43,7 @@ public class PlayerInfo : NetworkBehaviour
     {
         changed.Behaviour.SetEnemyName(changed.Behaviour.enemyName.ToString());
     }
-    
+
     static void ChangeKill(Changed<PlayerInfo> changed)
     {
         int newS = changed.Behaviour.kill;
@@ -90,8 +93,11 @@ public class PlayerInfo : NetworkBehaviour
 
     public void OnRespawned()
     {
-        ++death;
         SetEnemyName("");
+
+        if (playingState == (int)PlayingState.Stop || playingState == (int)PlayingState.Waiting)
+            return;
+        ++death;
     }
 
 
