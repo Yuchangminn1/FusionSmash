@@ -9,6 +9,8 @@ using System;
 
 public class HPHandler : NetworkBehaviour, IPlayerActionListener
 {
+    PlayerActionEvents playerActionEvents;
+
     public PlayerInfo playerInfo;
     public PlayerInfo enemyInfo;
 
@@ -28,8 +30,8 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
     float lastHitTime = 0f;
     float damageDelay = 0.1f;
 
-    
-    
+
+
 
     public void CheckFallRespawn()
     {
@@ -43,7 +45,7 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
     }
     public void RequestRespawn() => isRespawnRequsted = true;
 
-   
+
     IEnumerator ServerReviveCO()
     {
         yield return new WaitForSeconds(2.0f);
@@ -62,10 +64,11 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
             nickNameText.color = new Color(0, 0, 0, 0);
         }
     }
-    
+
     #region Event
     public void SubscribeToPlayerActionEvents(PlayerActionEvents _playerActionEvents)
     {
+        playerActionEvents = _playerActionEvents;
         //Update
         _playerActionEvents.OnPlayerUpdate += OnPlayerUpdate;
 
@@ -117,22 +120,24 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
             //}
             isDead = true;
         }
-        
+
     }
     void OnDeath()
     {
-        PlayerActionEvents eventHandler = GetComponent<PlayerActionEvents>();
-        eventHandler.TriggerDeath();
+        if(HasStateAuthority)
+            playerActionEvents.TriggerDeath();
     }
     #endregion
     public void OnTakeDamage(string enemyname, int weaponNum, Vector3 _attackDir, EAttackType eAttackType = EAttackType.Knockback, int _addForce = 2, int _attackDamage = 1)
     {
-        
-        if (!HasStateAuthority && HasInputAuthority)
+        //if (!HasStateAuthority && HasInputAuthority)
+        //{
+        //    return;
+        //}
+        if (!HasStateAuthority )
         {
             return;
         }
-
         if (lastHitTime + damageDelay > Time.time && playerInfo.GetEnemyName() == enemyname)
         {
             //Debug.Log("버그로 타격판정");
@@ -146,6 +151,14 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
         if (isDead && !Object.HasStateAuthority)
         {
             return;
+        }
+        if (eAttackType == EAttackType.Knockback)
+        {
+            playerActionEvents.TriggerPlayerOnTakeDamage(_addForce, true);
+        }
+        else
+        {
+            playerActionEvents.TriggerPlayerOnTakeDamage(_addForce, false);
         }
         //playerInfo.enemyinfo =_enemyInfo;
         AddForce += _addForce;

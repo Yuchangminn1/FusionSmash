@@ -29,47 +29,53 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
     }
     private void FixedUpdate()
     {
-        if(eventHandler)
+        if (eventHandler)
             eventHandler.TrigerFixedUpdate();
     }
     public override void Spawned()
     {
         
+        
+        //Input
+        playerInfo = GetComponent<PlayerInfo>();
+        eventHandler = GetComponent<PlayerActionEvents>();
+        inputHandler = GetComponent<CharacterInputhandler>();
+        movementHandler = GetComponent<CharacterMovementHandler>();
+        characterUIHandler = GetComponent<PlayerCharacterUIHandler>();
+        playerStateHandler = GetComponent<PlayerStateHandler>();
+        weaponHandler = GetComponent<WeaponHandler>();
+        hpHandler = GetComponent<HPHandler>();
+        chatSystem = GetComponent<ChatSystem>();
         if (HasStateAuthority || HasInputAuthority)
         {
-            //Input
-            playerInfo = GetComponent<PlayerInfo>();
-            inputHandler = GetComponent<CharacterInputhandler>();
-            movementHandler = GetComponent<CharacterMovementHandler>();
-
-            playerStateHandler = GetComponent<PlayerStateHandler>();
-            weaponHandler = GetComponent<WeaponHandler>();
-            hpHandler = GetComponent<HPHandler>();
-            chatSystem = GetComponent<ChatSystem>();
-            characterUIHandler = GetComponent<PlayerCharacterUIHandler>();
-            //Event
-            eventHandler = GetComponent<PlayerActionEvents>();
-            if (eventHandler == null)
-            {
-                Debug.LogError("PlayerActionEvents component is missing!");
-                return;
-            }
-            movementHandler.SubscribeToPlayerActionEvents(eventHandler);
-            playerStateHandler.SubscribeToPlayerActionEvents(eventHandler);
-            hpHandler.SubscribeToPlayerActionEvents(eventHandler);
-            characterUIHandler.SubscribeToPlayerActionEvents(eventHandler);
-            weaponHandler.SubscribeToPlayerActionEvents(eventHandler);
+            //chatSystem = GetComponent<ChatSystem>();
         }
-        if (HasInputAuthority)
+        if (eventHandler == null)
         {
-            if (Runner.IsServer)
-            {
-                return;
-            }
-            chatSystem = GetComponent<ChatSystem>();
-
+            Debug.LogError("PlayerActionEvents component is missing!");
+            return;
         }
+        //Event
+        chatSystem.SubscribeToPlayerActionEvents(eventHandler);
+        movementHandler.SubscribeToPlayerActionEvents(eventHandler);
+        playerStateHandler.SubscribeToPlayerActionEvents(eventHandler);
+        hpHandler.SubscribeToPlayerActionEvents(eventHandler);
+        weaponHandler.SubscribeToPlayerActionEvents(eventHandler);
+        characterUIHandler.SubscribeToPlayerActionEvents(eventHandler);
+        playerInfo.SubscribeToPlayerActionEvents(eventHandler);
+
         
+
+
+        //if (HasInputAuthority)
+        //{
+        //    if (Runner.IsServer)
+        //    {
+        //        return;
+        //    }
+        //    chatSystem = GetComponent<ChatSystem>();
+        //}
+
     }
 
     public void SubscribeToPlayerActionEvents(PlayerActionEvents _playerActionEvents)
@@ -78,7 +84,14 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
     }
     public override void FixedUpdateNetwork()
     {
+        if (playerInfo == null)
+        {
+            playerInfo = GetComponent<PlayerInfo>();
+            //Debug.Log("playerInfo == null");
+            return;
+        }
         playerInfo.playingState = GameManager.Instance.GetPlaying();
+        // Debug.Log($"playerInfo.playingState = {playerInfo.playingState} , {GameManager.Instance.GetPlaying()}");
         if (playerInfo.playingState != (int)PlayingState.Stop)
         {
             if (HasStateAuthority || HasInputAuthority)
@@ -98,8 +111,9 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
                         }
                     }
                 }
-                eventHandler.TriggerCharacterUpdate();
-                
+                if(eventHandler != null)
+                    eventHandler.TriggerCharacterUpdate();
+
             }
         }
 
@@ -107,9 +121,6 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
 
     private void ActionCase(NetworkInputData networkInputData)
     {
-
-
-
         if (networkInputData.isJumpButtonPressed)
         {
             if (playerStateHandler.JumpAble())
@@ -125,7 +136,7 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
 
         if (networkInputData.isFireButtonPressed)
         {
-            if (playerStateHandler.AbleFire()&&weaponHandler.AbleFire() )
+            if (playerStateHandler.AbleFire() && weaponHandler.AbleFire())
             {
                 eventHandler.TriggerAttack();
                 return;
@@ -175,16 +186,18 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
     }
     bool PlayerAble()
     {
-        if(hpHandler == null)
+        if (hpHandler == null)
         {
             Debug.Log("hpHandler is Null");
+            return false;
         }
         if (eventHandler == null)
         {
             Debug.Log("eventHandler is Null");
+            return false;
         }
 
-        
+
         if (HasInputAuthority || HasStateAuthority)
         {
             if (hpHandler.isRespawnRequsted)

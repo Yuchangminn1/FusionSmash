@@ -16,11 +16,11 @@ public class ChatSystem : NetworkBehaviour
     public NetworkString<_16> myChat { get; set; }
 
     [Networked(OnChanged = nameof(OnChangeChatLog))]
-    public string sendName { get; set; }
+    public NetworkString<_16> sendName { get; set; }
 
-    public TMP_Text myNameText;
-
-    public string _nickName;
+    //public TMP_Text myNameText;
+    [Networked]
+    public NetworkString<_16> _nickName { get; set; } = "";
 
     [SerializeField] InputField mainInputField;
 
@@ -49,7 +49,19 @@ public class ChatSystem : NetworkBehaviour
             mainInputField.characterLimit = 1024;
         }
 
+        
+
     }
+    public void SubscribeToPlayerActionEvents(PlayerActionEvents _playerActionEvents)
+    {
+        _playerActionEvents.OnPlayerNameChange += OnPlayerNameChange;
+    }
+
+    public void OnPlayerNameChange(string _name)
+    {
+        _nickName = _name;
+    }
+
     public override void Spawned()
     {
 
@@ -57,9 +69,10 @@ public class ChatSystem : NetworkBehaviour
 
     private void FixedUpdate()
     {
+        
         if (HasInputAuthority)
         {
-            if(scrollV)
+            if (scrollV)
                 scrollV.value = 0;
         }
     }
@@ -94,16 +107,17 @@ public class ChatSystem : NetworkBehaviour
     }
     public void IsChatChange()
     {
-        if(HasStateAuthority)
+        if (HasStateAuthority)
             ischating = !ischating;
     }
 
     private void SendMassage()
     {
         myChat = mainInputField.text;
-        chatLog.text += $"\n {_nickName} : {myChat}";
-        if(HasInputAuthority && !Runner.IsServer)
-            RPC_SetChat(myChat.ToString(), _nickName);
+        chatLog.text += $"\n {_nickName.ToString()} : {myChat}";
+        
+        if (HasInputAuthority)
+            RPC_SetChat(myChat.ToString(), _nickName.ToString());
         mainInputField.text = "";
         mainInputField.interactable = false;
         ischating = false;
@@ -124,7 +138,7 @@ public class ChatSystem : NetworkBehaviour
 
     public void PushMessage()
     {
-        
+
         string nullcheck = null;
         foreach (var chatSystem in myChat)
         {
@@ -144,7 +158,7 @@ public class ChatSystem : NetworkBehaviour
 
         chatLog.text += $"\n {sendName} : {myChat}";
         myChat = "";
-        
+
 
     }
 
@@ -154,7 +168,7 @@ public class ChatSystem : NetworkBehaviour
         sendName = _sendName;
         this.myChat = mychat;
     }
-    
+
     //private void Sumit(InputAction.CallbackContext context)
     //{
     //    Debug.Log("chatDown change true ");

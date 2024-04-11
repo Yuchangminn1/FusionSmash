@@ -9,7 +9,7 @@ using System;
 
 public class PlayerCharacterUIHandler : MonoBehaviour
 {
-    public PlayerActionEvents actionEvents;
+    //public PlayerActionEvents actionEvents;
 
     public TMP_Text name_Text;
     //public Sprite playerNum_Sprite;
@@ -24,9 +24,13 @@ public class PlayerCharacterUIHandler : MonoBehaviour
         }
         //Death 
         _playerActionEvents.OnPlyaerTurn += NickNameRotation;
-        
+        _playerActionEvents.OnPlayerNameChange += OnPlayerNameChange;
     }
-    
+    public void OnPlayerNameChange(string _name)
+    {
+        name_Text.text = _name;
+        Debug.Log("NickName Change");
+    }
     //public void SetCharacterImage(int _imageNum)
     //{
     //    playerNum_Sprite = spirte[_imageNum];

@@ -3,6 +3,7 @@ using UnityEngine;
 using TMPro;
 using System.Collections;
 using UnityEngine.UI;
+using System.Collections.Generic;
 enum PlayingState
 {
     Stop,
@@ -13,7 +14,13 @@ enum PlayingState
 }
 public class GameManager : NetworkBehaviour
 {
-    
+
+    float starttime = 0f;
+    public float gamePlayTime = 100f;
+    public float fadeInTime = 1f;
+    public float fadeOutTime = 1f;
+    public List<PlayerInfo> playersInfo;
+
     public Image fadeImage; // 오브젝트의 Renderer 컴포넌트에 대한 참조
     public static GameManager Instance { get; private set; }
     public TMP_Text timerText;
@@ -21,47 +28,92 @@ public class GameManager : NetworkBehaviour
     //[Networked] private TickTimer gameTimer { get; set; }
     [Networked]
     public TickTimer countdownTimer { get; set; }
-    [Networked] public int playingState { get; set; }
+    [Networked(OnChanged = nameof(ChangeplayingState))]
+    public int playingState { get; set; }
     private bool CMISSpawn = false;
 
+    [Networked]
+    public int playTime { get; set; } = 0;
+    static void ChangeplayingState(Changed<GameManager> changed)
+    {
+        int newS = changed.Behaviour.playingState;
+        changed.LoadOld();
+        int oldS = changed.Behaviour.playingState;
+        if (newS != oldS)
+        {
+            //Debug.Log("AttackCount = " + newS);
+            changed.Behaviour.SetPlayingState(newS);
+        }
+    }
+
+    void SetPlayingState(int _num)
+    {
+        FadeIn_Out(3f);
+
+        if (_num == (int)PlayingState.Waiting)
+        {
+            UIManager.Instance.OnGameWait();
+            FadeIn_Out(1f);
+        }
+        else if (_num == (int)PlayingState.Playing)
+        {
+            UIManager.Instance.OnGameStart();
+        }
+        else if (_num == (int)PlayingState.Stop)
+        {
+            UIManager.Instance.OnGameEnd();
+        }
+    }
     private void Awake()
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
     }
 
-    //public bool IsGamePlaying
-    //{
-    //    get
-    //    {
-    //        if (Object != null)
-    //        {
-    //            return isGamePlaying;
-    //        }
-    //        return false;
-    //    }
-    //}
+    public void SetPlayer(PlayerInfo _playerinfo)
+    {
+        playersInfo.Add(_playerinfo);
+        //playersInfo[_playerinfo.playerNumber-1] = _playerinfo;
+    }
+
 
     public override void Spawned()
     {
-        if (Object.HasStateAuthority)
+        if (HasStateAuthority)
         {
-            StartGame();
+            playingState = (int)PlayingState.Waiting;
+            Debug.Log($"playingState = {playingState}");
+            //StartGame();
         }
-        CMISSpawn = true;
-        FadeOut(1f);
+        UIManager.Instance.OnGameWait();
 
+        CMISSpawn = true;
+        FadeIn_Out(3f);
     }
 
     // 게임 시작을 처리하는 메서드
     public void StartGame()
     {
-        if (Object.HasStateAuthority)
+        UIManager.Instance.OnGameStart();
+        playingState = (int)PlayingState.Playing;
+        Debug.Log($"playingState = {playingState}");
+        if (HasInputAuthority)
+            FadeIn_Out(1f);
+        Debug.Log("STARTTTT");
+    }
+    public void OnClickStartGame()
+    {
+        if (HasStateAuthority)
         {
-            countdownTimer = TickTimer.CreateFromSeconds(Runner, 8f); // 예시로 60초 게임 타임 설정
-            playingState = (int)PlayingState.Waiting;
+            countdownTimer = TickTimer.CreateFromSeconds(Runner, gamePlayTime); // 예시로 60초 게임 타임 설정
+            Debug.Log($"countdownTimer = {countdownTimer}");
+            foreach (var player in playersInfo)
+            {
+                if (player != null)
+                    player.TriggerGameStart();
+            }
+            starttime = Time.time;
         }
-
     }
 
     public int GetPlaying() { return playingState; }
@@ -69,28 +121,43 @@ public class GameManager : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
-        if ((int)PlayingState.Stop != playingState && countdownTimer.ExpiredOrNotRunning(Runner))
-        {
-            // 타이머가 만료되면 게임 종료 처리
-            playingState = (int)PlayingState.Stop;
-            EndGame();
-        }
-    }
-
-    private void Update()
-    {
-
         if (CMISSpawn)
         {
-            if (timerText && playingState != (int)PlayingState.Stop)
+            if (HasStateAuthority)
             {
-                // 게임 시간을 표시합니다. 실제 게임에서는 TickTimer의 남은 시간을 계산하여 표시해야 합니다.
-                timerText.text = $"{FormatTime((int)countdownTimer.RemainingTime(Runner))}";
+                if (playingState == (int)PlayingState.Playing)
+                {
+                    if (countdownTimer.ExpiredOrNotRunning(Runner))
+                    {
+                        // 타이머가 만료되면 게임 종료 처리
+                        Debug.Log("타이머 끝");
+                        playingState = (int)PlayingState.Stop;
+                        //Debug.Log($"playingState = {playingState}");
+
+                        EndGame();
+                    }
+                    playTime = (int)countdownTimer.RemainingTime(Runner);
+
+                }
             }
         }
 
     }
-    string FormatTime(float time)
+
+    private void Update()
+    {
+        //Debug.Log("Update");
+
+        if (CMISSpawn)
+        {
+            if (timerText && playingState == (int)PlayingState.Playing)
+            {
+                timerText.text = FormatTime(playTime);
+                //Debug.Log("시간 가능중 ");
+            }
+        }
+    }
+    string FormatTime(int time)
     {
         int minutes = (int)time / 60;
         int seconds = (int)time % 60;
@@ -100,21 +167,38 @@ public class GameManager : NetworkBehaviour
     void EndGame()
     {
         // 게임 종료 로직 구현
-        FadeIn(1f);
+        FadeIn_Out(1f);
+        UIManager.Instance.OnGameEnd();
+
+        foreach (var player in playersInfo)
+        {
+            if (player != null)
+                player.TriggerGameEnd();
+        }
+
+        //playingState = (int)PlayingState.Waiting;
 
     }
 
     public void FadeIn(float duration)
     {
-        StartCoroutine(FadeMaterialToFullAlpha(duration));
+        StartCoroutine(FadelToFullAlpha(duration));
     }
 
     public void FadeOut(float duration)
     {
-        StartCoroutine(FadeMaterialToZeroAlpha(duration));
+        StartCoroutine(FadeToZeroAlpha(duration));
     }
-
-    private IEnumerator FadeMaterialToFullAlpha(float duration)
+    public void FadeIn_Out(float duration)
+    {
+        FadeIn_OutStop();
+        StartCoroutine(CFadelIn_Out(duration));
+    }
+    public void FadeIn_OutStop()
+    {
+        StopCoroutine("CFadelIn_Out");
+    }
+    private IEnumerator FadelToFullAlpha(float duration)
     {
         // Material의 Color의 Alpha 값을 0으로 설정합니다.
         fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, 0);
@@ -126,7 +210,7 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    private IEnumerator FadeMaterialToZeroAlpha(float duration)
+    private IEnumerator FadeToZeroAlpha(float duration)
     {
         // Material의 Color의 Alpha 값을 1로 설정합니다.
         fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, 1);
@@ -136,5 +220,28 @@ public class GameManager : NetworkBehaviour
             fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, fadeImage.color.a - (Time.deltaTime / duration));
             yield return null;
         }
+    }
+
+    private IEnumerator CFadelIn_Out(float duration)
+    {
+        // Material의 Color의 Alpha 값을 0으로 설정합니다.
+        //fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, 0);
+        //while (fadeImage.color.a < 1.0f)
+        //{
+        //    // Alpha 값을 점진적으로 증가시킵니다.
+        //    fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, fadeImage.color.a + (Time.deltaTime));
+        //    yield return null;
+        //}
+        fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, 1);
+        // Material의 Color의 Alpha 값을 1로 설정합니다.
+        while (fadeImage.color.a > 0.0f)
+        {
+            // Alpha 값을 점진적으로 감소시킵니다.
+            fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, fadeImage.color.a - (Time.deltaTime/ duration));
+            yield return null;
+        }
+        Debug.Log("End");
+        yield return null;
+
     }
 }

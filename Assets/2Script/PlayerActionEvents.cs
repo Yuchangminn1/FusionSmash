@@ -16,9 +16,18 @@ public class PlayerActionEvents : MonoBehaviour
     public event Action OnPlyaerFixedUpdate;
 
 
+    public event Action OnGameStart;
+    public event Action OnGameEnd;
+
+
 
     public event Action<float> OnPlayerMove;
     public event Action<float> OnPlyaerTurn;
+    public event Action<int,bool> OnTakeDamage;
+    public event Action<string> OnPlayerNameChange;
+
+
+
 
     public void TrigerFixedUpdate()
     {
@@ -58,6 +67,26 @@ public class PlayerActionEvents : MonoBehaviour
         OnPlyaerTurn?.Invoke(_pitch);
         //Debug.Log("_pitch = " + _pitch);
     }
+    public void TriggerPlayerNameChange(string _name)
+    {
+        OnPlayerNameChange?.Invoke(_name);
+
+    }
+    public void TriggerPlayerOnTakeDamage(int _force,bool _isSmash)
+    {
+        OnTakeDamage?.Invoke(_force, _isSmash);
+    }
+
+    public void TriggerGameStart()
+    {
+        OnGameStart?.Invoke();
+    }
+    public void TriggerGameEnd()
+    {
+        OnGameEnd?.Invoke();
+    }
+
+
 }
 public interface IPlayerActionListener
 {

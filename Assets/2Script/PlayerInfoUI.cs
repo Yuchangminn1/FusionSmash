@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Fusion;
-public class PlayerInfoUI : NetworkBehaviour
+public class PlayerInfoUIPrefab : NetworkBehaviour
 {
     public TMP_Text playerName;
     public TMP_Text playerForce;

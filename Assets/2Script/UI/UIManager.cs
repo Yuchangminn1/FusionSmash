@@ -6,18 +6,13 @@ using UnityEngine.SocialPlatforms.Impl;
 
 public class UIManager : MonoBehaviour
 {
-    
+    public Canvas canvasBG;
+    public Canvas canvasPlaying;
+    public Canvas canvasWaiting;
+
+
+
     private static UIManager _instance;
-
-    public List<GameObject> UIScore = new List<GameObject>();
-    public List<GameObject> UIChat = new List<GameObject>();
-
-
-    Vector2 screenSize;
-    public delegate void UISizeChange(Vector2 _screenSize);
-    public UISizeChange uISizeChange;
-    public TMP_Text textKDA;
-    
 
     public static UIManager Instance
     {
@@ -44,34 +39,22 @@ public class UIManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
-        uISizeChange = new UISizeChange(ScerrenSizeChange);
     }
 
-    private void Start()
+    public void OnGameStart()
     {
-        UIScore.Add(GameObject.Find("KDA"));
-        UIChat.Add(GameObject.Find("Chat_Display"));
-        UIChat.Add(GameObject.Find("InputField"));
+        canvasPlaying.enabled = true;
+        canvasWaiting.enabled = false;
     }
-
-    public void PlayerKDAScoreUI(int kill,int death)
+    public void OnGameEnd()
     {
-        textKDA.text = $"{kill}     /    {death}";
+        canvasPlaying.enabled = false;
+        canvasWaiting.enabled = true;
     }
 
-
-    private void FixedUpdate()
+    public void OnGameWait()
     {
-        
-        //UI Size Change
-        if (screenSize.x != Screen.width*1f || screenSize.y != Screen.height * 1f)
-        {
-            uISizeChange(new Vector2(Screen.width * 1f, Screen.height * 1f));
-        }
+        canvasPlaying.enabled = false;
+        canvasWaiting.enabled = true;
     }
-
-    public void ScerrenSizeChange(Vector2 _screenSize) => screenSize = _screenSize;
-
-    
-    
 }

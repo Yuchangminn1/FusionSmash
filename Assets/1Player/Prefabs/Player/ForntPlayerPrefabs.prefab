@@ -6993,6 +6993,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  playerInfoPrefab: {fileID: 1254908218334325982, guid: e8c9a3f8b7c0ecf4585b0aaf3e0e9906, type: 3}
+  playerInfoUI: {fileID: 0}
   _playerName:
     _length: 0
     _data:
@@ -7003,7 +7005,9 @@ MonoBehaviour:
       Data: 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   _kill: 0
   _death: 0
+  _force: 0
   _playerNumber: 0
+  _playingState: 0
 --- !u!114 &561013010353250634
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -64,13 +64,7 @@ public class CharacterMovementHandler : NetworkBehaviour
     }
     private void Start()
     {
-        //networkRigidbody = GetComponent<NetworkRigidbody>();
-        //capsuleCollider = GetComponent<CapsuleCollider>();
-        //playerStateHandler = GetComponent<PlayerStateHandler>();
-
-        //RotateTowards(1);
-        //myDir = 1;
-
+        
         if (HasInputAuthority)
         {
             GameObject CameraCC = GameObject.Find("CameraCC");
@@ -150,7 +144,7 @@ public class CharacterMovementHandler : NetworkBehaviour
             moveDirection.Normalize();
 
             //networkRigidbody.Rigidbody.velocity = new Vector3(0f, networkRigidbody.ReadVelocity().y, 0f);
-            networkRigidbody.Rigidbody.AddForce((new Vector3(moveDirection.z * moveSpeed, 0f, moveDirection.x * moveSpeed)), ForceMode.Force);
+            networkRigidbody.Rigidbody.AddForce((new Vector3(moveDirection.z * moveSpeed, 0f, moveDirection.x * moveSpeed)) / 15f, ForceMode.VelocityChange);
 
         }
 
@@ -205,11 +199,7 @@ public class CharacterMovementHandler : NetworkBehaviour
 
             //characterRoot.GetComponent<NetworkObject>().transform.rotation = targetRotation;
 
-
         }
-
-
-
     }
 
 
@@ -246,7 +236,7 @@ public class CharacterMovementHandler : NetworkBehaviour
             int maxC = 12;
             for (int i = 1; i < maxC; i++)
             {
-                networkRigidbody.Rigidbody.AddForce((maxC - i) * _attackVec, ForceMode.Impulse);
+                networkRigidbody.Rigidbody.AddForce((maxC - i) * _attackVec *10f, ForceMode.Force);
                 yield return new WaitForFixedUpdate();
             }
         }
