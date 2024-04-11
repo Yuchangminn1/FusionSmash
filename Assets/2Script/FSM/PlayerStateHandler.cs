@@ -151,12 +151,17 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
         _playerActionEvents.OnPlayerAttack += OnPlayerAttck;
         //Death
         _playerActionEvents.OnPlyaerDeath += OnPlyaerDeath;
-
+        //FixedUpdate
         _playerActionEvents.OnPlyaerFixedUpdate += OnPlayerFixedUpdate;
+        //TakeDamage
+        _playerActionEvents.OnTakeDamage += OnTakeDamage;
 
 
     }
-
+    public void OnTakeDamage(int _force, bool _tf)
+    {
+        SetCanMove(false);
+    }
     public void OnPlyaerDeath()
     {
         canMove = false;

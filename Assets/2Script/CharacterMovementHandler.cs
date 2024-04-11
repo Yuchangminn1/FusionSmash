@@ -95,6 +95,7 @@ public class CharacterMovementHandler : NetworkBehaviour
         _playerActionEvents.OnPlyaerRespawn += OnPlyaerRespawn;
 
     }
+    
     //Death
     void OnPlyaerDeath()
     {
@@ -227,17 +228,21 @@ public class CharacterMovementHandler : NetworkBehaviour
 
     IEnumerator HitAddForce(Vector3 _attackVec)
     {
+
         if (networkRigidbody)
         {
             float DivForce = 10f;
-            float UpperForce = DivForce;
+            //float UpperForce = DivForce*5f;
+            float UpperForce = UnityEngine.Random.Range(1.5f, 4f);
+
             _attackVec = _attackVec / DivForce;
             _attackVec.y = _attackVec.x > 0 ? _attackVec.x / UpperForce : -_attackVec.x / UpperForce;
+            Debug.Log($"_attackVec.x =  {_attackVec.x} ");
             int maxC = 12;
             for (int i = 1; i < maxC; i++)
             {
                 networkRigidbody.Rigidbody.AddForce((maxC - i) * _attackVec *10f, ForceMode.Force);
-                yield return new WaitForFixedUpdate();
+                yield return null;
             }
         }
         else

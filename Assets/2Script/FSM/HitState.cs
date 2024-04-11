@@ -46,6 +46,7 @@ public class HitState : PlayerState
     public override void Exit()
     {
         base.Exit();
+        player.SetCanMove(true);
 
     }
 }
