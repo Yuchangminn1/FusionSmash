@@ -4,6 +4,7 @@ using TMPro;
 using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 enum PlayingState
 {
     Stop,
@@ -16,7 +17,7 @@ public class GameManager : NetworkBehaviour
 {
 
     float starttime = 0f;
-    public float gamePlayTime = 100f;
+    public float gamePlayTime = 20f;
     public float fadeInTime = 1f;
     public float fadeOutTime = 1f;
     public List<PlayerInfo> playersInfo;
@@ -34,6 +35,8 @@ public class GameManager : NetworkBehaviour
 
     [Networked]
     public int playTime { get; set; } = 0;
+    LateUpdate lateUpdate = new LateUpdate();
+
     static void ChangeplayingState(Changed<GameManager> changed)
     {
         int newS = changed.Behaviour.playingState;
@@ -48,12 +51,12 @@ public class GameManager : NetworkBehaviour
 
     void SetPlayingState(int _num)
     {
-        FadeIn_Out(3f);
+        //FadeIn_Out(3f);
 
         if (_num == (int)PlayingState.Waiting)
         {
             UIManager.Instance.OnGameWait();
-            FadeIn_Out(1f);
+            //FadeIn_Out(1f);
         }
         else if (_num == (int)PlayingState.Playing)
         {
@@ -88,30 +91,19 @@ public class GameManager : NetworkBehaviour
         UIManager.Instance.OnGameWait();
 
         CMISSpawn = true;
-        FadeIn_Out(3f);
+        //FadeIn_Out(3f);
     }
 
-    // 게임 시작을 처리하는 메서드
-    public void StartGame()
-    {
-        UIManager.Instance.OnGameStart();
-        playingState = (int)PlayingState.Playing;
-        Debug.Log($"playingState = {playingState}");
-        if (HasInputAuthority)
-            FadeIn_Out(1f);
-        Debug.Log("STARTTTT");
-    }
+    
     public void OnClickStartGame()
     {
+
         if (HasStateAuthority)
         {
+
             countdownTimer = TickTimer.CreateFromSeconds(Runner, gamePlayTime); // 예시로 60초 게임 타임 설정
             Debug.Log($"countdownTimer = {countdownTimer}");
-            foreach (var player in playersInfo)
-            {
-                if (player != null)
-                    player.TriggerGameStart();
-            }
+            StartGame();
             starttime = Time.time;
         }
     }
@@ -163,35 +155,54 @@ public class GameManager : NetworkBehaviour
         int seconds = (int)time % 60;
         return string.Format("{0:00}:{1:00}", minutes, seconds);
     }
+    // 게임 시작을 처리하는 메서드
+
+    public void StartGame()
+    {
+        UIManager.Instance.OnGameStart();
+
+        
+        playingState = (int)PlayingState.Playing;
+        
+        Debug.Log("STARTTTT");
+    }
     // 게임 종료를 처리하는 메서드
+
     void EndGame()
     {
         // 게임 종료 로직 구현
-        FadeIn_Out(1f);
+        //FadeIn_Out(2f);
+        Debug.Log("EndGame FadeInOut");
+
         UIManager.Instance.OnGameEnd();
+        
+        //foreach (var player in playersInfo)
+        //{
+        //    if (player != null)
+        //        player.TriggerGameEnd();
+        //}
 
-        foreach (var player in playersInfo)
-        {
-            if (player != null)
-                player.TriggerGameEnd();
-        }
-
-        //playingState = (int)PlayingState.Waiting;
+        playingState = (int)PlayingState.Waiting;
 
     }
 
     public void FadeIn(float duration)
     {
+        
+        fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, 0);
+
         StartCoroutine(FadelToFullAlpha(duration));
     }
 
     public void FadeOut(float duration)
     {
+        fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, 1);
+
         StartCoroutine(FadeToZeroAlpha(duration));
     }
     public void FadeIn_Out(float duration)
     {
-        FadeIn_OutStop();
+        
         StartCoroutine(CFadelIn_Out(duration));
     }
     public void FadeIn_OutStop()
@@ -201,46 +212,51 @@ public class GameManager : NetworkBehaviour
     private IEnumerator FadelToFullAlpha(float duration)
     {
         // Material의 Color의 Alpha 값을 0으로 설정합니다.
-        fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, 0);
-        while (fadeImage.color.a < 1.0f)
+        
+        while (fadeImage.color.a < 0.9f)
         {
             // Alpha 값을 점진적으로 증가시킵니다.
+
             fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, fadeImage.color.a + (Time.deltaTime / duration));
-            yield return null;
+            yield return lateUpdate;
         }
+        fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, 1);
+
     }
 
     private IEnumerator FadeToZeroAlpha(float duration)
     {
         // Material의 Color의 Alpha 값을 1로 설정합니다.
-        fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, 1);
         while (fadeImage.color.a > 0.0f)
         {
             // Alpha 값을 점진적으로 감소시킵니다.
             fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, fadeImage.color.a - (Time.deltaTime / duration));
-            yield return null;
+            yield return lateUpdate;
         }
+        fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, 0);
+
     }
 
     private IEnumerator CFadelIn_Out(float duration)
     {
         // Material의 Color의 Alpha 값을 0으로 설정합니다.
-        //fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, 0);
-        //while (fadeImage.color.a < 1.0f)
-        //{
-        //    // Alpha 값을 점진적으로 증가시킵니다.
-        //    fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, fadeImage.color.a + (Time.deltaTime));
-        //    yield return null;
-        //}
-        fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, 1);
-        // Material의 Color의 Alpha 값을 1로 설정합니다.
-        while (fadeImage.color.a > 0.0f)
+        fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, 0);
+        while (fadeImage.color.a < 0.9f)
         {
-            // Alpha 값을 점진적으로 감소시킵니다.
-            fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, fadeImage.color.a - (Time.deltaTime/ duration));
+            // Alpha 값을 점진적으로 증가시킵니다.
+            fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, fadeImage.color.a + (Time.deltaTime / 0.1f));
             yield return null;
         }
-        Debug.Log("End");
+        fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, 1);
+
+        while (fadeImage.color.a > 0.1f)
+        {
+            // Alpha 값을 점진적으로 감소시킵니다.
+            fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, fadeImage.color.a - (Time.deltaTime / 2f));
+            yield return null;
+        }
+        fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, 0);
+
         yield return null;
 
     }

@@ -11,6 +11,8 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
 {
 
     //Handler
+
+
     PlayerInfo playerInfo;
     PlayerActionEvents eventHandler;
     CharacterInputhandler inputHandler;
@@ -34,8 +36,8 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
     }
     public override void Spawned()
     {
-        
-        
+
+
         //Input
         playerInfo = GetComponent<PlayerInfo>();
         eventHandler = GetComponent<PlayerActionEvents>();
@@ -46,10 +48,10 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
         weaponHandler = GetComponent<WeaponHandler>();
         hpHandler = GetComponent<HPHandler>();
         chatSystem = GetComponent<ChatSystem>();
-        if (HasStateAuthority || HasInputAuthority)
-        {
-            //chatSystem = GetComponent<ChatSystem>();
-        }
+        //if (HasStateAuthority || HasInputAuthority)
+        //{
+        //    //chatSystem = GetComponent<ChatSystem>();
+        //}
         if (eventHandler == null)
         {
             Debug.LogError("PlayerActionEvents component is missing!");
@@ -63,8 +65,8 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
         weaponHandler.SubscribeToPlayerActionEvents(eventHandler);
         characterUIHandler.SubscribeToPlayerActionEvents(eventHandler);
         playerInfo.SubscribeToPlayerActionEvents(eventHandler);
+        SubscribeToPlayerActionEvents(eventHandler);
 
-        
 
 
         //if (HasInputAuthority)
@@ -80,7 +82,21 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
 
     public void SubscribeToPlayerActionEvents(PlayerActionEvents _playerActionEvents)
     {
-        ;
+        _playerActionEvents.OnGameEnd += OnGameEnd;
+        _playerActionEvents.OnGameStart += OnGameStart;
+
+    }
+
+    void OnGameStart()
+    {
+        if (HasInputAuthority)
+            GameManager.Instance.FadeIn_Out(1f);
+    }
+
+    void OnGameEnd()
+    {
+        if (HasInputAuthority)
+            GameManager.Instance.FadeIn_Out(1f);
     }
     public override void FixedUpdateNetwork()
     {
@@ -90,31 +106,27 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
             //Debug.Log("playerInfo == null");
             return;
         }
-        playerInfo.playingState = GameManager.Instance.GetPlaying();
-        // Debug.Log($"playerInfo.playingState = {playerInfo.playingState} , {GameManager.Instance.GetPlaying()}");
-        if (playerInfo.playingState != (int)PlayingState.Stop)
-        {
-            if (HasStateAuthority || HasInputAuthority)
-            {
-                if (PlayerAble())
-                {
-                    if (GetInput(out NetworkInputData networkInputData))
-                    {
-                        //Debug.Log("networkInputData");
 
-                        //ShowBoard(networkInputData);
-                        Chat(networkInputData);
-                        if (playerStateHandler.canMove)
-                        {
-                            ActionMove(networkInputData);
-                            ActionCase(networkInputData);
-                        }
+        if (HasStateAuthority || HasInputAuthority)
+        {
+            if (PlayAble())
+            {
+                if (GetInput(out NetworkInputData networkInputData))
+                {
+                    //Debug.Log("networkInputData");
+
+                    //ShowBoard(networkInputData);
+                    Chat(networkInputData);
+                    if (playerStateHandler.canMove)
+                    {
+                        ActionMove(networkInputData);
+                        ActionCase(networkInputData);
                     }
                 }
-                if(eventHandler != null)
-                    eventHandler.TriggerCharacterUpdate();
-
             }
+            if (eventHandler != null)
+                eventHandler.TriggerCharacterUpdate();
+
         }
 
     }
@@ -184,7 +196,7 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
 
         }
     }
-    bool PlayerAble()
+    bool PlayAble()
     {
         if (hpHandler == null)
         {
@@ -203,11 +215,20 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
             if (hpHandler.isRespawnRequsted)
             {
                 eventHandler.TriggerRespawn();
+
                 return false;
             }
             if (hpHandler.isDead)
                 return false;
         }
-        return true;
+        playerInfo.playingState = GameManager.Instance.GetPlaying();
+        if (playerInfo.playingState != (int)PlayingState.Stop)
+        {
+            return true;
+        }
+        return false;
     }
+
+
+
 }

@@ -15,7 +15,7 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
     public PlayerInfo enemyInfo;
 
     [Networked]
-    public int AddForce { get; private set; }
+    public int addForce { get; private set; }
 
     [Networked(OnChanged = nameof(OnStateChanged))]
     public bool isDead { get; set; }
@@ -30,16 +30,22 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
     float lastHitTime = 0f;
     float damageDelay = 0.1f;
 
+    const int addforceDefault = 1;
 
-
+    
 
     public void CheckFallRespawn()
     {
-        if (transform.position.y < -12)
+        if (transform.position.y < -12 && !isDead)
         {
-            if (Object.HasStateAuthority)
+            
+            if (HasStateAuthority)
             {
                 KillSelf();
+            }
+            if (HasInputAuthority)
+            {
+                GameManager.Instance.FadeIn(0.2f);
             }
         }
     }
@@ -77,6 +83,15 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
 
         //Respawn
         _playerActionEvents.OnPlyaerDeath += OnPlyaerDeath;
+
+        _playerActionEvents.OnPlyaerInit += OnPlyaerInit;
+
+
+
+    }
+    void OnPlyaerInit()
+    {
+        addForce = addforceDefault;
     }
     void OnPlyaerDeath()
     {
@@ -94,8 +109,13 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
     }
     void OnPlyaerRespawn()
     {
-        OnRespawned();
-        isRespawnRequsted = false;
+        if (isDead)
+        {
+            OnRespawned();
+            isRespawnRequsted = false;
+            
+        }
+
     }
     #endregion
     #region Respawn
@@ -106,7 +126,8 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
             playerInfo.OnRespawned();
         }
         isDead = false;
-        AddForce = 1;
+        addForce = addforceDefault;
+        
     }
     public void KillSelf()
     {
@@ -114,19 +135,12 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
         {
             Debug.Log($"{transform.name} isDead");
             StartCoroutine(ServerReviveCO());
-            //if (HasStateAuthority)
-            //{
-            //    playerInfo.enemyinfo.kill += 1;
-            //}
+            
             isDead = true;
         }
 
     }
-    void OnDeath()
-    {
-        if(HasStateAuthority)
-            playerActionEvents.TriggerDeath();
-    }
+    
     #endregion
     public void OnTakeDamage(string enemyname, int weaponNum, Vector3 _attackDir, EAttackType eAttackType = EAttackType.Knockback, int _addForce = 2, int _attackDamage = 1)
     {
@@ -152,22 +166,28 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
         {
             return;
         }
+        
+        //playerInfo.enemyinfo =_enemyInfo;
+        addForce += _addForce;
+        //playerInfo.SetEnemyName(_enemyInfo.GetName());
+        playerInfo.enemyName = enemyname;
         if (eAttackType == EAttackType.Knockback)
         {
             playerActionEvents.TriggerPlayerOnTakeDamage(_addForce, true);
+            characterMovementHandler.HitAddForce(_attackDir, addForce);
+            playerStateHandler.isKnockBack = true;
+            Debug.Log("KnockBack");
+            playerStateHandler.isHit = false;
         }
         else
         {
             playerActionEvents.TriggerPlayerOnTakeDamage(_addForce, false);
+            if(!playerStateHandler.isKnockBack)
+                playerStateHandler.isHit = true;
         }
-        //playerInfo.enemyinfo =_enemyInfo;
-        AddForce += _addForce;
-        //playerInfo.SetEnemyName(_enemyInfo.GetName());
-        playerInfo.enemyName = enemyname;
-        playerStateHandler.isHit = true;
 
-        if (eAttackType == EAttackType.Knockback)
-            characterMovementHandler.HitAddForce(_attackDir, AddForce);
+        //if (eAttackType == EAttackType.Knockback)
+        //    characterMovementHandler.HitAddForce(_attackDir, AddForce);
 
     }
     static void OnStateChanged(Changed<HPHandler> changed)
@@ -179,8 +199,24 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
         {
             changed.Behaviour.OnDeath();
         }
+        else
+        {
+            changed.Behaviour.RespawnFade();
+        }
     }
-
+    void OnDeath()
+    {
+        if (HasStateAuthority)
+            playerActionEvents.TriggerDeath();
+    }
+    void RespawnFade()
+    {
+        if (HasInputAuthority)
+        {
+            GameManager.Instance.FadeOut(1f);
+        }
+    }
+    
     #region Non
     //public void KillLogUpdate()
     //{

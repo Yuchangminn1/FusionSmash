@@ -9,11 +9,9 @@ using System;
 
 public class PlayerCharacterUIHandler : MonoBehaviour
 {
-    //public PlayerActionEvents actionEvents;
 
     public TMP_Text name_Text;
-    //public Sprite playerNum_Sprite;
-    //public Sprite[] spirte;
+    
 
     public void SubscribeToPlayerActionEvents(PlayerActionEvents _playerActionEvents)
     {
@@ -31,10 +29,7 @@ public class PlayerCharacterUIHandler : MonoBehaviour
         name_Text.text = _name;
         Debug.Log("NickName Change");
     }
-    //public void SetCharacterImage(int _imageNum)
-    //{
-    //    playerNum_Sprite = spirte[_imageNum];
-    //}
+    
 
     public void NickNameRotation(float _pitch)
     {
@@ -42,19 +37,13 @@ public class PlayerCharacterUIHandler : MonoBehaviour
         {
             name_Text.rectTransform.localRotation = Quaternion.Euler(0f, 90f, 0f);
 
-            //Debug.Log("_pitch =" + _pitch);
         }
         else if (_pitch < 0)
         {
             name_Text.rectTransform.localRotation = Quaternion.Euler(0f, -90f, 0f);
-            //Debug.Log("_pitch =" + _pitch);
 
         }
-        //Quaternion targetRotation = Quaternion.identity;
-        //targetRotation.y = -_pitch;
-        //_pitch *= Mathf.Rad2Deg;
-        //Debug.Log("targetRotation.y = -_pitch;" + _pitch);
-        //name_Text.rectTransform.rotation = targetRotation;
+        
     }
 
 }

@@ -50,6 +50,13 @@ public class PlayerState : EntityState
             //Debug.Log(player.nextState + "넥스트 있어서 종료");
             return true;
         }
+        if (player.isKnockBack)
+        {
+            player.AnimationTrigger = false;
+            player.nextState = player.knockBackState;
+            Debug.Log("Player넉백 들어갔음");
+            return true;
+        }
         if (player.isdead)
         {
             player.AnimationTrigger = false;
@@ -105,12 +112,12 @@ public class PlayerState : EntityState
             player.nextState = player.attackState;
             return true;
         }
-        if (player.isDodgeButtonPressed && isAbleDodge)
-        {
-            player.nextState = player.dodgeState;
+        //if (player.isDodgeButtonPressed && isAbleDodge)
+        //{
+        //    player.nextState = player.dodgeState;
 
-            return true;
-        }
+        //    return true;
+        //}
         if (player.IsGround())
         {
             player.nextState = player.moveState;

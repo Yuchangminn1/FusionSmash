@@ -20,7 +20,7 @@ public class DodgeState : PlayerState
         base.Enter();
         Debug.Log("Dodge Enter");
         //++player.dodgeCount;
-        player.isDodgeButtonPressed = false;
+        //player.isDodgeButtonPressed = false;
 
     }
     public override bool Update()

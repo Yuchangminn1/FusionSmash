@@ -6,6 +6,7 @@ using System;
 using Cinemachine;
 public class CharacterMovementHandler : NetworkBehaviour
 {
+
     [Header("NickName")]
     public string _nickName;
 
@@ -49,6 +50,8 @@ public class CharacterMovementHandler : NetworkBehaviour
     }
     public override void Spawned()
     {
+        
+
         if (HasStateAuthority || HasInputAuthority)
         {
             networkRigidbody = GetComponent<NetworkRigidbody>();
@@ -64,7 +67,7 @@ public class CharacterMovementHandler : NetworkBehaviour
     }
     private void Start()
     {
-        
+
         if (HasInputAuthority)
         {
             GameObject CameraCC = GameObject.Find("CameraCC");
@@ -93,9 +96,20 @@ public class CharacterMovementHandler : NetworkBehaviour
         _playerActionEvents.OnPlayerJump += OnPlayerJump;
         //Respawn 
         _playerActionEvents.OnPlyaerRespawn += OnPlyaerRespawn;
+        //Init
+        _playerActionEvents.OnPlyaerInit += OnPlyaerInit;
 
     }
-    
+    //Init
+    void OnPlyaerInit()
+    {
+        if (HasStateAuthority)
+        {
+            SetCharacterControllerEnabled(true);
+            networkRigidbody.TeleportToPosition(Utils.GetRandomSpawnPoint());
+        }
+    }
+
     //Death
     void OnPlyaerDeath()
     {
@@ -113,7 +127,7 @@ public class CharacterMovementHandler : NetworkBehaviour
             SetCharacterControllerEnabled(true);
             networkRigidbody.TeleportToPosition(Utils.GetRandomSpawnPoint());
         }
-        
+
         Debug.Log("Respawn Teleport");
     }
     public void OnPlayerMove(float _dir)
@@ -228,7 +242,7 @@ public class CharacterMovementHandler : NetworkBehaviour
 
     IEnumerator HitAddForce(Vector3 _attackVec)
     {
-
+        
         if (networkRigidbody)
         {
             float DivForce = 10f;
@@ -241,7 +255,7 @@ public class CharacterMovementHandler : NetworkBehaviour
             int maxC = 12;
             for (int i = 1; i < maxC; i++)
             {
-                networkRigidbody.Rigidbody.AddForce((maxC - i) * _attackVec *10f, ForceMode.Force);
+                networkRigidbody.Rigidbody.AddForce((maxC - i) * _attackVec * 10f, ForceMode.Force);
                 yield return null;
             }
         }
@@ -249,10 +263,10 @@ public class CharacterMovementHandler : NetworkBehaviour
         {
             yield return null;
         }
-
-
+        
+        yield return null;
     }
-
+    
 
 
 }

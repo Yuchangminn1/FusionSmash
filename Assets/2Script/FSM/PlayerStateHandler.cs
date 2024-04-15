@@ -19,6 +19,7 @@ enum StateType
     Land,
     Attack,
     Hit,
+    KnockBack,
     Dodge,
     Death,
     Heal,
@@ -44,6 +45,9 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
     public bool isStop = false;
     public bool isHeal = false;
     public bool isHit = false;
+    [Networked(OnChanged = nameof(ChangeKnockBack))]
+    public NetworkBool isKnockBack { get; set; } = false;
+
 
     public int fHpHeal = 40;
     public int healNum;
@@ -78,7 +82,9 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
     public LandState landState { get; private set; }
     public AttackState attackState { get; private set; }
     public HitState hitState { get; private set; }
-    public DodgeState dodgeState { get; private set; }
+    public KnockBackState knockBackState { get; private set; }
+
+    //public DodgeState dodgeState { get; private set; }
     public DeathState deathState { get; private set; }
     public HealState healState { get; private set; }
 
@@ -89,7 +95,7 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
 
     public bool isFireButtonPressed = false;
 
-    public bool isDodgeButtonPressed = false;
+    //public bool isDodgeButtonPressed = false;
     [Networked]
     public int moveDir { get; set; } = 0;
 
@@ -102,6 +108,7 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
     [Header("Weapon ")]
     WeaponHandler weaponHandler;
     private Dictionary<string, int> animationHashes = new Dictionary<string, int>();
+    PlayerEffectHandler playerEffectHandler;
 
     void Start()
     {
@@ -113,6 +120,7 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
     }
     public override void Spawned()
     {
+        playerEffectHandler = GetComponent<PlayerEffectHandler>();
 
 
         base.Spawned();
@@ -252,7 +260,8 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
         landState = new LandState(this, 3);
         attackState = new AttackState(this, 4);
         hitState = new HitState(this, 5);
-        dodgeState = new DodgeState(this, 6);
+        knockBackState = new KnockBackState(this, 6);
+        //dodgeState = new DodgeState(this, 6);
         deathState = new DeathState(this, 7);
         healState = new HealState(this, 8);
     }
@@ -371,6 +380,29 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
             changed.Behaviour.SetStopMove(newS);
         }
     }
+    
+    static void ChangeKnockBack(Changed<PlayerStateHandler> changed)
+    {
+        NetworkBool newS = changed.Behaviour.isKnockBack;
+        changed.LoadOld();
+        NetworkBool oldS = changed.Behaviour.isKnockBack;
+        if (newS != oldS)
+        {
+            changed.Behaviour.QQQQ(newS);
+        }
+    }
+    public void QQQQ(bool _tf)
+    {
+        if (_tf)
+        {
+            QQQQPlay();
+        }
+        else
+        {
+            QQQQStop();
+        }
+    }
+
     #endregion
     #region Animator
     public void SetBool(string _parameters, bool _tf) => anima.SetBool(_parameters, _tf);
@@ -617,5 +649,16 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
 
     }
     #endregion
+
+
+
+    public void QQQQPlay()
+    {
+        playerEffectHandler.PlayParticle();
+    }
+    public void QQQQStop()
+    {
+        playerEffectHandler.StopParticle();
+    }
 
 }

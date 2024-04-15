@@ -7,6 +7,8 @@ using UnityEngine;
 
 public class PlayerInfo : NetworkBehaviour
 {
+    HPHandler hPHandler;
+
     PlayerActionEvents playerActionEvents;
 
     public GameObject playerInfoPrefab;
@@ -28,7 +30,7 @@ public class PlayerInfo : NetworkBehaviour
     public int playerNumber { get; set; }
     //PlayerInfoUIManager playerInfoUIManager;
 
-    [Networked]
+    [Networked(OnChanged = nameof(ChangePlayingState))]
     public int playingState { get; set; }
     //public PlayerInfo enemyinfo;
     public void SubscribeToPlayerActionEvents(PlayerActionEvents _playerActionEvents)
@@ -52,6 +54,10 @@ public class PlayerInfo : NetworkBehaviour
 
 
     }
+    void Start()
+    {
+        CreatePlayerInfoUI();
+    }
     public void OnGameStart()
     {
         GameManager.Instance.StartGame();
@@ -62,7 +68,7 @@ public class PlayerInfo : NetworkBehaviour
     }
     public void TriggerGameStart()
     {
-        if(playerActionEvents != null)
+        if (playerActionEvents != null)
         {
             playerActionEvents.TriggerGameStart();
 
@@ -74,11 +80,12 @@ public class PlayerInfo : NetworkBehaviour
         if (playerActionEvents != null)
         {
             playerActionEvents.TriggerGameEnd();
+
         }
-        
+
     }
 
-    void OnTakeDamage(int _force,bool _isSmash)
+    void OnTakeDamage(int _force, bool _isSmash)
     {
         force += _force;
         Debug.Log("OnTakeDamage");
@@ -87,7 +94,8 @@ public class PlayerInfo : NetworkBehaviour
     {
         PlayerInfo[] players = FindObjectsOfType<PlayerInfo>();
         playerNumber = players.Length;
-
+        GameManager.Instance.SetPlayer(this);
+        hPHandler = GetComponent<HPHandler>();
         //playerInfoUIManager = GameObject.Find("PlayersInfos").GetComponent<PlayerInfoUIManager>();
         //if (playerInfoUIManager != null)
         //{
@@ -124,6 +132,29 @@ public class PlayerInfo : NetworkBehaviour
             changed.Behaviour.SetDeath(newS);
         }
     }
+    static void ChangePlayingState(Changed<PlayerInfo> changed)
+    {
+        int newS = changed.Behaviour.playingState;
+        changed.LoadOld();
+        int oldS = changed.Behaviour.playingState;
+
+        if (newS == (int)PlayingState.Playing || newS == (int)PlayingState.Waiting)
+        {
+            changed.Behaviour.Init();
+        }
+    }
+
+    void Init()
+    {
+        if (HasStateAuthority)
+        {
+            playerActionEvents.TriggerInit();
+        }
+        if (HasInputAuthority)
+        {
+            GameManager.Instance.FadeIn_Out(1f);
+        }
+    }
 
     static void ChangeForce(Changed<PlayerInfo> changed)
     {
@@ -135,24 +166,21 @@ public class PlayerInfo : NetworkBehaviour
             changed.Behaviour.SetForce(newS);
         }
     }
-    public void Start()
-    {
-        CreatePlayerInfoUI();
-    }
+
     public void SetName(string _nickName)
     {
 
-        if(playerName != _nickName)
+        if (playerName != _nickName)
         {
             playerName = _nickName;
             HPHandler hp = GetComponent<HPHandler>();
             hp.nickNameText.text = _nickName;
-            
-            GameManager.Instance.SetPlayer(this);
+
+
         }
-        if(playerInfoUI != null)
+        if (playerInfoUI != null)
             playerInfoUI.SetPlayerName(_nickName);
-        if(playerActionEvents != null)
+        if (playerActionEvents != null)
             playerActionEvents.TriggerPlayerNameChange(playerName.ToString());
     }
     public void SetEnemyName(string _enemyName)
@@ -178,7 +206,7 @@ public class PlayerInfo : NetworkBehaviour
     public void SetForce(int _force)
     {
         force = _force;
-        if(playerInfoUI != null)
+        if (playerInfoUI != null)
         {
             playerInfoUI.SetPlayerForce(force * 10);
         }
