@@ -182,14 +182,12 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
     public void SubscribeToPlayerActionEvents(ref PlayerActionEvents _playerActionEvents)
     {
 
-        //_playerActionEvents.OnPlyaerInit += OnPlyaerInit;
-        //_playerActionEvents.OnGameEnd += OnGameEnd;
-        //_playerActionEvents.OnPlyaerRespawn += OnPlyaerRespawn;
-
-        //_playerActionEvents.OnGameOver += OnGameOver;
-        ;
+        //_playerActionEvents.OnPlayerJump += OnPlayerJump;
     }
-    
+    void OnPlayerJump()
+    {
+        
+    }
     //void OnGameEnd()
     //{
     //    SetTraceCamera(true);

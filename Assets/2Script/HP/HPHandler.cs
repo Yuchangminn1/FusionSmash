@@ -115,7 +115,7 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
     IEnumerator ServerReviveCO()
     {
         yield return new WaitForSeconds(2.0f);
-        if (playerInfo.PlayingState != (int)EPlayingState.Death)
+        if (playerInfo.PlayingState != (int)EPlayingState.Death && playerInfo.PlayingState != (int)EPlayingState.Stop)
         {
             playerActionEvents.TriggerRespawn();
         }
@@ -205,17 +205,21 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
     }
     void OnGameStart()
     {
-        if (HasInputAuthority)
-            GameManager.Instance.FadeIn_Out(1f);
+        //if (HasInputAuthority)
+        //{
+        //    GameManager.Instance.FadeIn_Out(1f);
+        //    Debug.Log("FadeIn_Out");
+        //}
     }
 
     void OnGameEnd()
     {
-        if (HasInputAuthority)
-        {
-            GameManager.Instance.FadeIn_Out(1f);
-            //SetTraceCamera(true);
-        }
+        //if (HasInputAuthority)
+        //{
+        //    GameManager.Instance.FadeIn_Out(1f);
+        //    Debug.Log("FadeIn_Out");
+        //    //SetTraceCamera(true);
+        //}
     }
     void OnPlayerUpdate()
     {

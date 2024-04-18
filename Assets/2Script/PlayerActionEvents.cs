@@ -14,6 +14,7 @@ public class PlayerActionEvents : MonoBehaviour
     public event Action OnPlyaerDeath;
     public event Action OnPlyaerInit;
     public event Action OnPlyaerFixedUpdate;
+    public event Action OnVictory;
 
 
     public event Action OnGameStart;
@@ -55,6 +56,10 @@ public class PlayerActionEvents : MonoBehaviour
         OnPlayerUpdate?.Invoke();
         //Debug.Log("TriggerCharacterUpdate");
 
+    }
+    public void TriggerVictory()
+    {
+        OnVictory?.Invoke();
     }
     public void TriggerRespawn()
     {

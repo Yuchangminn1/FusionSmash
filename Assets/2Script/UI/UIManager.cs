@@ -9,7 +9,7 @@ public class UIManager : MonoBehaviour
     public Canvas canvasBG;
     public Canvas canvasPlaying;
     public Canvas canvasWaiting;
-
+    public TMP_Text winnerText;
     public GameObject[] playerInfoObjects;
     public PlayerInfoUI[] playerInfoUIs;
 
@@ -58,17 +58,20 @@ public class UIManager : MonoBehaviour
     }
     public void OnGameStart()
     {
+        winnerText.enabled = false;
         canvasPlaying.enabled = true;
         canvasWaiting.enabled = false;
     }
     public void OnGameEnd()
     {
+        winnerText.enabled = true;
         canvasPlaying.enabled = false;
-        canvasWaiting.enabled = true;
+        canvasWaiting.enabled = false;
     }
 
     public void OnGameWait()
     {
+        winnerText.enabled = false;
         canvasPlaying.enabled = false;
         canvasWaiting.enabled = true;
     }

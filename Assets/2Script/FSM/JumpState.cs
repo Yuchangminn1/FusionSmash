@@ -17,6 +17,7 @@ public class JumpState : PlayerState
     {
         base.Enter();
         player.isJumpButtonPressed = false;
+        
     }
     public override bool Update()
     {

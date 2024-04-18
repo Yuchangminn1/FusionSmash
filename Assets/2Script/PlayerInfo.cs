@@ -38,10 +38,13 @@ public class PlayerInfo : NetworkBehaviour, IPlayerActionListener
     public int life { get; private set; } = 0;
     [Networked]
     [SerializeField]
-    private int playerNumber { get;  set; }
-    public int PlayerNumber { get { return playerNumber; } set {  playerNumber = value; } }
-    int defaultForce = 1;
+    private int playerNumber { get; set; }
+    public int PlayerNumber { get { return playerNumber; } set { playerNumber = value; } }
+    int defaultForce = 0;
     int defaultLife = 3;
+
+    [Networked(OnChanged = nameof(FadeInChanged))]
+    public NetworkBool FadeIN { get; set; } = false;
     void ResetLife()
     {
         life = defaultLife;
@@ -99,7 +102,7 @@ public class PlayerInfo : NetworkBehaviour, IPlayerActionListener
         {
 
             playerActionEvents.TriggerGameStart();
-            TriggerInit();
+            
         }
     }
 
@@ -122,6 +125,11 @@ public class PlayerInfo : NetworkBehaviour, IPlayerActionListener
 
     public override void Spawned()
     {
+        if (HasInputAuthority)
+        {
+            GameManager.Instance.FadeOut(1f, 0.5f);
+        }
+
         PlayerInfo[] players = FindObjectsOfType<PlayerInfo>();
         playerNumber = players.Length;
         hPHandler = GetComponent<HPHandler>();
@@ -130,13 +138,14 @@ public class PlayerInfo : NetworkBehaviour, IPlayerActionListener
 
         if (GameManager.Instance.roomState == (int)ERoomState.Playing)
         {
+            GameManager.Instance.playingPlayerNum += 1;
             playingState = (int)EPlayingState.Death;
         }
         else
         {
             playingState = (int)EPlayingState.Waiting;
         }
-        
+
         GameManager.Instance.SetPlayer(this);
     }
 
@@ -158,6 +167,25 @@ public class PlayerInfo : NetworkBehaviour, IPlayerActionListener
             changed.Behaviour.StateChanged(newS);
         }
     }
+    static void FadeInChanged(Changed<PlayerInfo> changed)
+    {
+        bool newS = changed.Behaviour.FadeIN;
+        changed.LoadOld();
+        bool oldS = changed.Behaviour.FadeIN;
+        if (newS)
+        {
+            changed.Behaviour.FadeIn();
+        }
+    }
+    void FadeIn()
+    {
+        FadeIN = false;
+        if (HasInputAuthority)
+        {
+            GameManager.Instance.FadeIn(0.2f);
+            Debug.Log("Fade IN");
+        }
+    }
     static void ForceChanged(Changed<PlayerInfo> changed)
     {
         int newS = changed.Behaviour.force;
@@ -170,7 +198,7 @@ public class PlayerInfo : NetworkBehaviour, IPlayerActionListener
     }
     void ForceChange(int _force)
     {
-        if(playingState == (int)EPlayingState.Playing)
+        if (playingState == (int)EPlayingState.Playing)
             UIManager.Instance.GetUIObject(playerNumber).SetPlayerForce(_force);
     }
     void StateChanged(int _playingState)
@@ -189,17 +217,44 @@ public class PlayerInfo : NetworkBehaviour, IPlayerActionListener
         else if (_playingState == (int)EPlayingState.Waiting)
         {
             hPHandler.SetTraceCamera(true);
-
             Debug.Log("SetTraceCamera");
+            UIManager.Instance.OnGameWait();
+
         }
 
-        else if(_playingState == (int)EPlayingState.Playing)
+        else if (_playingState == (int)EPlayingState.Playing)
         {
-            ResetForce();
+            if (HasInputAuthority)
+            {
+                GameManager.Instance.FadeOut(1f,0.5f);
+                Debug.Log("FadeInOut");
+                SoundManager.Instance.StopSound((int)EAudio.audioSourceBGM);
+                SoundManager.Instance.PlaySound((int)EAudio.audioSourceBGM, (int)ESound.BGM2);
+                SoundManager.Instance.PlaySound((int)EAudio.audioSourceGameSet, (int)ESound.GameStart);
+                Debug.Log("Sound Start");
+                
+            }
+            TriggerGameStart();
             UIManager.Instance.SetUIObject(playerNumber, true);
             UIManager.Instance.GetUIObject(playerNumber).InitialPlayerInfo(playerName.ToString(), force);
+            UIManager.Instance.OnGameStart();
+
+            //ResetForce();
+        }
+        else if (_playingState == (int)EPlayingState.Stop)
+        {
+            UIManager.Instance.winnerText.text = "승자  : " + GameManager.Instance.winnerName.ToString();
+            if (HasInputAuthority)
+            {
+                SoundManager.Instance.StopSound((int)EAudio.audioSourceBGM);
+                SoundManager.Instance.PlaySound((int)EAudio.audioSourceGameSet, (int)ESound.GameEnd);
+                Debug.Log("Sound End");
+                UIManager.Instance.OnGameEnd();
+
+            }
         }
     }
+    
     static void KillChanged(Changed<PlayerInfo> changed)
     {
         int newS = changed.Behaviour.kill;
@@ -253,16 +308,7 @@ public class PlayerInfo : NetworkBehaviour, IPlayerActionListener
             return;
     }
 
-    public void CreatePlayerInfoUI()
-    {
-        if (playerInfoUI == null)
-        {
-            playerInfoUI = Instantiate(playerInfoPrefab).GetComponent<PlayerInfoUI>();
-            UIManager.Instance.GetUIObject(playerNumber).InitialPlayerInfo(playerName.ToString(), force);
-
-        }
-        playerInfoUI.InitialPlayerInfo(playerName.ToString(), force);
-    }
+    
     void Start()
     {
         //CreatePlayerInfoUI();
@@ -270,13 +316,13 @@ public class PlayerInfo : NetworkBehaviour, IPlayerActionListener
 
     public void SubscribeToPlayerActionEvents(ref PlayerActionEvents _playerActionEvents)
     {
+        playerActionEvents = _playerActionEvents;
 
         if (_playerActionEvents == null)
         {
             Debug.LogError("PlayerActionEvents component is missing!");
             return;
         }
-
         //OnTakeDamage
         _playerActionEvents.OnTakeDamage += OnTakeDamage;
         _playerActionEvents.OnPlyaerInit += OnPlyaerInit;
@@ -286,8 +332,7 @@ public class PlayerInfo : NetworkBehaviour, IPlayerActionListener
         _playerActionEvents.OnGameStart += OnGameStart;
         _playerActionEvents.OnPlyaerRespawn += OnPlyaerRespawn;
         _playerActionEvents.OnGameOver += OnGameOver;
-        playerActionEvents = _playerActionEvents;
-        
+
 
     }
     void OnTakeDamage(int _force, bool _isSmash)
@@ -297,8 +342,14 @@ public class PlayerInfo : NetworkBehaviour, IPlayerActionListener
     }
     public void OnPlyaerInit()
     {
-        ResetForce();
-        ResetLife();
+        if(HasInputAuthority)
+            Debug.Log("OnInit");
+        if (HasStateAuthority)
+        {
+            ResetForce();
+            ResetLife();
+        }
+        
     }
     public void OnPlyaerDeath()
     {
@@ -321,6 +372,26 @@ public class PlayerInfo : NetworkBehaviour, IPlayerActionListener
     }
     void OnGameOver()
     {
+        GameManager.Instance.playingPlayerNum -= 1;
+        Debug.Log($"playingPlayerNum = {GameManager.Instance.playingPlayerNum}");
+    }
+    public void GameEndToWaiting(float duration)
+    {
+        Debug.Log("GameEndToWaiting");
+        if(playingState == (int)EPlayingState.Playing )
+        {
+            GameManager.Instance.winnerName = playerName.ToString();
+            playerActionEvents.TriggerVictory();
+        }
+        
+        playingState = (int)EPlayingState.Stop;
+        StartCoroutine(CGameEndToWaiting(duration));
+    }
+    private IEnumerator CGameEndToWaiting(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+        playingState = (int)EPlayingState.Waiting;
+        TriggerGameEnd();
 
     }
 }

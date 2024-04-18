@@ -45,8 +45,24 @@ public class GameManager : NetworkBehaviour
     LateUpdate lateUpdate = new LateUpdate();
 
     public List<PlayerInfo> playerInfos = new List<PlayerInfo>();
+    [Networked]
 
+    public int playingPlayerNum { get; set; } = 0;
 
+    float endingTime = 10f;
+
+    [Networked(OnChanged = nameof(RoomStateChanged))]
+    public NetworkString<_16> winnerName { get; set; } = "";
+
+    static void WinnerNameChanged(Changed<GameManager> changed)
+    {
+        string newS = changed.Behaviour.winnerName.ToString();
+        changed.Behaviour.SetWinnerText(newS);
+    }
+    void SetWinnerText(string _winnerName)
+    {
+        UIManager.Instance.winnerText.text = _winnerName;
+    }
     static void RoomStateChanged(Changed<GameManager> changed)
     {
         int newS = changed.Behaviour.roomState;
@@ -63,19 +79,20 @@ public class GameManager : NetworkBehaviour
     {
         //FadeIn_Out(3f);
 
-        if (_num == (int)ERoomState.Waiting)
-        {
-            UIManager.Instance.OnGameWait();
-            //FadeIn_Out(1f);
-        }
-        else if (_num == (int)ERoomState.Playing)
-        {
-            UIManager.Instance.OnGameStart();
-        }
-        else if (_num == (int)ERoomState.End)
-        {
-            UIManager.Instance.OnGameEnd();
-        }
+        //if (_num == (int)ERoomState.Waiting)
+        //{
+        //    UIManager.Instance.OnGameWait();
+        //    //FadeIn_Out(1f);
+        //}
+        //else if (_num == (int)ERoomState.Playing)
+        //{
+        //    UIManager.Instance.OnGameStart();
+        //}
+        //else if (_num == (int)ERoomState.End)
+        //{
+        //    UIManager.Instance.OnGameEnd();
+        //}
+
     }
     private void Awake()
     {
@@ -98,7 +115,7 @@ public class GameManager : NetworkBehaviour
 
         if (HasStateAuthority)
         {
-            
+
             if (roomState == (int)ERoomState.Playing)
             {
                 ;
@@ -109,25 +126,35 @@ public class GameManager : NetworkBehaviour
                 Debug.Log($"playingState = {roomState}");
             }
         }
-        UIManager.Instance.OnGameWait();
+        //UIManager.Instance.OnGameWait();
 
         CMISSpawn = true;
         //FadeIn_Out(3f);
 
-        
+
     }
 
-    
+
     public void OnClickStartGame()
     {
 
         if (HasStateAuthority)
         {
-
             countdownTimer = TickTimer.CreateFromSeconds(Runner, gamePlayTime); // 예시로 60초 게임 타임 설정
             Debug.Log($"countdownTimer = {countdownTimer}");
-            StartGame();
-            starttime = Time.time;
+            playerInfos.AddRange(FindObjectsOfType<PlayerInfo>());
+            playingPlayerNum = playerInfos.Count;
+            Debug.Log($"playingPlayerNum = {playingPlayerNum}");
+            foreach (PlayerInfo playerinfo in playerInfos)
+            {
+                if (playerinfo.isSpawned)
+                {
+                    playerinfo.FadeIN = true;
+                }
+
+            }
+            Invoke("StartGame", 0.5f);
+            //StartGame();
         }
     }
 
@@ -138,17 +165,17 @@ public class GameManager : NetworkBehaviour
     {
         if (CMISSpawn)
         {
-            if (HasStateAuthority||HasInputAuthority)
+            if (HasStateAuthority || HasInputAuthority)
             {
                 if (roomState == (int)ERoomState.Playing)
                 {
-                    if (countdownTimer.ExpiredOrNotRunning(Runner))
+
+                    if (countdownTimer.ExpiredOrNotRunning(Runner) || playingPlayerNum == 1)
                     {
                         // 타이머가 만료되면 게임 종료 처리
                         Debug.Log("타이머 끝");
                         roomState = (int)ERoomState.End;
                         //Debug.Log($"playingState = {playingState}");
-
                         EndGame();
                     }
                     playTime = (int)countdownTimer.RemainingTime(Runner);
@@ -182,30 +209,23 @@ public class GameManager : NetworkBehaviour
 
     public void StartGame()
     {
-        playerInfos.AddRange(FindObjectsOfType<PlayerInfo>());
-        SoundManager.Instance.StopSound();
-        SoundManager.Instance.PlaySound(1);
-
-
         int i = 1;
+
         foreach (PlayerInfo playerinfo in playerInfos)
         {
-            if (playerinfo.isSpawned)
-            {
-                playerinfo.PlayerNumber = i;
-                ++i;
-                playerinfo.PlayingState = (int)EPlayingState.Playing;
-                playerinfo.TriggerGameStart();
-            }
-            
+            playerinfo.PlayerNumber = i;
+            ++i;
+            playerinfo.PlayingState = (int)EPlayingState.Playing;
+            playerinfo.TriggerInit();
         }
-        UIManager.Instance.OnGameStart();
-
 
         roomState = (int)ERoomState.Playing;
-        
+        starttime = Time.time;
+
         Debug.Log("STARTTTT");
+
     }
+    
     // 게임 종료를 처리하는 메서드
 
     void EndGame()
@@ -215,30 +235,21 @@ public class GameManager : NetworkBehaviour
         {
             if (playerinfo.isSpawned)
             {
-                playerinfo.PlayingState = (int)EPlayingState.Waiting;
-                
-                playerinfo.TriggerGameEnd();
+                playerinfo.GameEndToWaiting(endingTime);
             }
         }
-        //FadeIn_Out(2f);
-        Debug.Log("EndGame FadeInOut");
-
-        UIManager.Instance.OnGameEnd();
-
-        //foreach (var player in playersInfo)
-        //{
-        //    if (player != null)
-        //        player.TriggerGameEnd();
-        //}
-
+        //UIManager.Instance.OnGameEnd();
         roomState = (int)ERoomState.Waiting;
         playerInfos.Clear();
 
     }
+    void QWEQWE()
+    {
 
+    }
     public void FadeIn(float duration)
     {
-        
+
         fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, 0);
 
         StartCoroutine(FadelToFullAlpha(duration));
@@ -250,10 +261,10 @@ public class GameManager : NetworkBehaviour
 
         StartCoroutine(FadeToZeroAlpha(duration, _waitTime));
     }
-    public void FadeIn_Out(float duration)
+    public void FadeIn_Out(float duration, float _waitTime = 0f)
     {
-        
-        StartCoroutine(CFadelIn_Out(duration));
+
+        StartCoroutine(CFadelIn_Out(duration, _waitTime));
     }
     public void FadeIn_OutStop()
     {
@@ -262,7 +273,7 @@ public class GameManager : NetworkBehaviour
     private IEnumerator FadelToFullAlpha(float duration)
     {
         // Material의 Color의 Alpha 값을 0으로 설정합니다.
-        
+
         while (fadeImage.color.a < 0.9f)
         {
             // Alpha 값을 점진적으로 증가시킵니다.
@@ -274,7 +285,7 @@ public class GameManager : NetworkBehaviour
 
     }
 
-    private IEnumerator FadeToZeroAlpha(float duration ,float _waitTime)
+    private IEnumerator FadeToZeroAlpha(float duration, float _waitTime)
     {
         if (_waitTime > 0.01f)
         {
@@ -291,7 +302,7 @@ public class GameManager : NetworkBehaviour
 
     }
 
-    private IEnumerator CFadelIn_Out(float duration)
+    private IEnumerator CFadelIn_Out(float duration, float _waitTime)
     {
         // Material의 Color의 Alpha 값을 0으로 설정합니다.
         fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, 0);
@@ -302,7 +313,10 @@ public class GameManager : NetworkBehaviour
             yield return null;
         }
         fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, 1);
-
+        if (_waitTime > 0.01f)
+        {
+            yield return new WaitForSeconds(_waitTime);
+        }
         while (fadeImage.color.a > 0.1f)
         {
             // Alpha 값을 점진적으로 감소시킵니다.

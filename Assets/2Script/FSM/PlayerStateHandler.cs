@@ -11,7 +11,7 @@ using UnityEngine.Rendering;
 using UnityEngine.UI;
 using static UnityEngine.Video.VideoPlayer;
 //using static UnityEditorInternal.VersionControl.ListControl;
-enum StateType
+enum EStateType
 {
     Move,
     Jump,
@@ -23,6 +23,7 @@ enum StateType
     Dodge,
     Death,
     Heal,
+    Victory,
 }
 
 
@@ -70,7 +71,7 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
     //Attack
     [Networked(OnChanged = nameof(ChangeAttackCount))] //
     public int attackCount { get; set; } = 0;
-    public int maxAttackCount { get; private set; } = 2;
+    public int maxAttackCount { get; private set; } = 3;
     public float lastAttackTime { get; set; } = 0f;
     float attackComboTime = 0.3f;
     #region State
@@ -124,7 +125,7 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
 
 
         base.Spawned();
-        
+
         animationHashes.Add("State", Animator.StringToHash("State"));
         animationHashes.Add("State2", Animator.StringToHash("State2"));
         animationHashes.Add("AttackCount", Animator.StringToHash("AttackCount"));
@@ -145,7 +146,7 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
         //어택카운트 변경 추가 
     }
 
-    
+
     public void StatechangeUpdate()
     {
         if (stateMachine == null)
@@ -217,11 +218,9 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
     }
     public void SetAttackCount(int num)
     {
-        if (num <= maxAttackCount && num >= 0)
-        {
-            attackCount = num;
-        }
+
         anima.SetInteger(animationHashes["AttackCount"], num);
+        Debug.Log($"Attack Count = {num}");
     }
     public bool Isvisi()
     {
@@ -233,6 +232,34 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
             stateMachine.ChangeState(nextState);
     }
     #endregion
+    void JumpCountSound(int _jumpCount)
+    {
+        if (_jumpCount == 1)
+        {
+            SoundManager.Instance.PlaySound((int)EAudio.audioSourceCharacter, (int)ESound.Jump1);
+        }
+        else if (_jumpCount == 2)
+        {
+            SoundManager.Instance.PlaySound((int)EAudio.audioSourceCharacter, (int)ESound.Jump2);
+        }
+    }
+
+    void AttackCountSound(int _attackCount)
+    {
+        //Debug.Log($"_attackCount = {_attackCount}");
+        if (_attackCount > 0)
+        {
+            if (_attackCount == maxAttackCount)
+            {
+                SoundManager.Instance.PlaySound((int)EAudio.audioSourceCharacter, (int)ESound.SmashAttack);
+            }
+            else
+            {
+                SoundManager.Instance.PlaySound((int)EAudio.audioSourceCharacter, (int)ESound.NomalAttack);
+            }
+        }
+    }
+
     #region NetworkProperty
     static void ChangeState(Changed<PlayerStateHandler> changed)
     {
@@ -283,6 +310,8 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
         if (newS != oldS)
         {
             changed.Behaviour.SetState2(newS);
+            changed.Behaviour.JumpCountSound(newS);
+
         }
     }
     static void ChangeAttackCount(Changed<PlayerStateHandler> changed)
@@ -294,6 +323,8 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
         {
             //Debug.Log("AttackCount = " + newS);
             changed.Behaviour.SetAttackCount(newS);
+            changed.Behaviour.AttackCountSound(newS);
+
         }
     }
     static void ChangeCanMove(Changed<PlayerStateHandler> changed)
@@ -317,7 +348,7 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
             changed.Behaviour.SetStopMove(newS);
         }
     }
-    
+
     static void ChangeKnockBack(Changed<PlayerStateHandler> changed)
     {
         NetworkBool newS = changed.Behaviour.isKnockBack;
@@ -325,10 +356,10 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
         NetworkBool oldS = changed.Behaviour.isKnockBack;
         if (newS != oldS)
         {
-            changed.Behaviour.QQQQ(newS);
+            changed.Behaviour.KnockBackParticle(newS);
         }
     }
-    public void QQQQ(bool _tf)
+    public void KnockBackParticle(bool _tf)
     {
         if (_tf)
         {
@@ -395,9 +426,9 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
         if (jumpCount < maxJumpCount)
         {
             isJumpButtonPressed = true;
-            jumpCount++;
 
-            //Debug.Log("JumpCount = " + jumpCount);
+            ++jumpCount;
+
             jumpTime = Time.time;
 
             return true;
@@ -416,14 +447,14 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
     public void AttackEnter()
     {
         SetStopMove(true);
-        --attackstack;
+        AddAttackCount();
         if (attackCount == maxAttackCount)
         {
             attackstack = 0;
         }
         if (weapon == 1)
         {
-            
+
             if (attackCount == maxAttackCount)
             {
                 weaponHandler.GetEquipWeapon().SetAttackType(EAttackType.Knockback);
@@ -445,41 +476,46 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
         {
             //weaponHandler.GetEquipWeapon().SetCollistion(false);
         }
-        if (nextState.currentStateNum != (int)StateType.Attack)
+        if (nextState.currentStateNum != (int)EStateType.Attack)
         {
             SetStopMove(false);
         }
         lastAttackTime = Time.time;
-        AddAttackCount();
+
         //GetEquipWeapon().SetCollistion(false);
         //이거 고민중
     }
     public void AddAttackCount()
     {
         Debug.Log("Add AttackCount");
-        attackCount++;
+        if (attackCount < maxAttackCount)
+        {
+            attackCount++;
+        }
+        --attackstack;
+
     }
 
     public void AttackCountReset()
     {
         //Debug.Log("AttackCountReset");
-        if(attackCount != 0)
+        if (attackCount != 0)
         {
             //Debug.Log("AttackCountReset IsGround attackCount != 0");
 
             if (IsGround())
             {
-               // Debug.Log("AttackCountReset IsGround");
+                // Debug.Log("AttackCountReset IsGround");
 
                 if (lastAttackTime + attackComboTime < Time.time)
                 {
-                  //  Debug.Log("Reset AttackCount");
+                    //  Debug.Log("Reset AttackCount");
 
                     attackCount = 0;
                 }
                 if (attackCount > maxAttackCount)
                 {
-                 //   Debug.Log("Reset AttackCount");
+                    //   Debug.Log("Reset AttackCount");
 
                     attackCount = 0;
                     return;
@@ -487,7 +523,7 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
             }
         }
 
-        
+
 
     }
     public bool AbleFire()
@@ -540,9 +576,9 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
                     return true;
                 }
             }
-            else 
+            else
             {
-                
+
 
                 if (weapon == 0)
                 {
@@ -563,7 +599,7 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
                     return true;
                 }
             }
-            
+
         }
         Debug.Log("return 5");
 
@@ -618,6 +654,8 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
         //TakeDamage
         _playerActionEvents.OnPlyaerInit += OnPlyaerInit;
 
+        _playerActionEvents.OnVictory += OnVictory;
+
     }
     void OnPlyaerInit()
     {
@@ -669,4 +707,13 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
     {
 
     }
+
+    void OnVictory()
+    {
+        state = (int)EStateType.Victory;
+        state2 = UnityEngine.Random.Range(0, 4);
+    }
+
+
+
 }

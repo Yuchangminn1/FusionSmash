@@ -1,11 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 enum ESound
 {
-    BGM1,
-    BGM2,
+    BGM1, BGM2,
+    Hit1, Hit2,
+    Jump1, Jump2,
+    NomalAttack, SmashAttack,
+    GameStart, GameEnd,
+}
+enum EAudio
+{
+    audioSourceBGM,
+    audioSourceGameSet,
+    audioSourceHit,
+    audioSourceCharacter,
 
 }
 public class SoundManager : MonoBehaviour
@@ -13,7 +24,8 @@ public class SoundManager : MonoBehaviour
     public static SoundManager Instance { get; private set; }
 
     public AudioClip[] audioClips; // 오디오 클립을 저장할 배열
-    private AudioSource audioSource; // 오디오 소스 컴포넌트
+    private AudioSource[] audioSource;
+
 
     private void Awake()
     {
@@ -21,7 +33,13 @@ public class SoundManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject); // 씬이 변경되어도 파괴되지 않도록 설정
-            audioSource = gameObject.AddComponent<AudioSource>(); // AudioSource 컴포넌트 추가
+            audioSource = new AudioSource[4];
+
+            audioSource[0] = gameObject.AddComponent<AudioSource>();
+            audioSource[1] = gameObject.AddComponent<AudioSource>();
+            audioSource[2] = gameObject.AddComponent<AudioSource>();
+            audioSource[3] = gameObject.AddComponent<AudioSource>();
+
         }
         else
         {
@@ -30,28 +48,22 @@ public class SoundManager : MonoBehaviour
     }
     private void Start()
     {
-        PlaySound(0);
+        //PlaySound(0);
     }
-    public void StopSound()
+    public void StopSound(int _audioSource)
     {
-        audioSource.Stop();
+        audioSource[_audioSource].Stop();
     }
 
     // 오디오 클립 재생 메소드. 오디오 클립 ID를 매개변수로 받습니다.
-    public void PlaySound(int clipId)
+    public void PlaySound(int _audioSource, int clipId)
     {
-        if (audioClips[clipId])
+        if (audioClips[clipId] && audioSource[_audioSource])
         {
-            if (clipId >= 0 && clipId < audioClips.Length)
-            {
-                audioSource.clip = audioClips[clipId]; // 지정된 오디오 클립으로 설정
-                audioSource.Play(); // 재생
-            }
-            else
-            {
-                Debug.LogWarning("PlaySound: clipId out of range");
-            }
+            audioSource[_audioSource].Stop();
+            audioSource[_audioSource].clip = audioClips[clipId]; // 지정된 오디오 클립으로 설정
+            audioSource[_audioSource].Play(); // 재생
         }
-        
+
     }
 }

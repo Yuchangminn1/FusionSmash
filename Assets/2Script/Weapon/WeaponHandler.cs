@@ -12,6 +12,9 @@ using System.IO;
 
 public class WeaponHandler : NetworkBehaviour, IPlayerActionListener
 {
+
+    [Networked(OnChanged = nameof(ChangedHideWeapon))]
+    public NetworkBool hideWeapon { get; set; } = false;
     public List<NetworkObject> playerWeaponPrefab;
     public PlayerWeapon equipWeapon { get; private set; }
 
@@ -25,7 +28,16 @@ public class WeaponHandler : NetworkBehaviour, IPlayerActionListener
     bool justPressed;
 
     //float lastTimeFire = 0;
+    static void ChangedHideWeapon(Changed<WeaponHandler> changed)
+    {
+        bool newS = changed.Behaviour.hideWeapon;
+        changed.Behaviour.SetEquipWeapon(newS);
+    }
 
+    void SetEquipWeapon(bool _tf)
+    {
+        equipWeapon.gameObject.SetActive(!_tf);
+    }
     public override void Spawned()
     {
         SetEq();
@@ -87,7 +99,14 @@ public class WeaponHandler : NetworkBehaviour, IPlayerActionListener
     {
         _playerActionEvents.OnPlayerAttack += OnPlayerAttack;
         _playerActionEvents.OnPlyaerRespawn += OnPlyaerRespawn;
-
+        _playerActionEvents.OnVictory += OnVictory;
+    }
+    void OnVictory()
+    {
+        if (equipWeapon != null)
+        {
+            hideWeapon = true;
+        }
     }
     public void OnPlayerAttack()
     {
@@ -99,6 +118,7 @@ public class WeaponHandler : NetworkBehaviour, IPlayerActionListener
     }
     void OnPlyaerRespawn()
     {
+        hideWeapon = false;
         equipWeapon.OnRespawn();
     }
     #endregion

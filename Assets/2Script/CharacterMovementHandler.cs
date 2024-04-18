@@ -74,7 +74,7 @@ public class CharacterMovementHandler : NetworkBehaviour
             CameraCC.GetComponent<CMCameraTest>().plyaerTransform = transform;
         }
     }
-
+    
 
 
     void RotateTowards(float _dir)
@@ -187,6 +187,8 @@ public class CharacterMovementHandler : NetworkBehaviour
         //GameOver
         _playerActionEvents.OnGameOver += OnGameOver;
 
+        _playerActionEvents.OnVictory += OnVictory;
+
     }
 
     public void OnGameOver()
@@ -275,6 +277,17 @@ public class CharacterMovementHandler : NetworkBehaviour
         tmp.z = networkRigidbody.Rigidbody.velocity.z;
         networkRigidbody.Rigidbody.velocity = tmp;
         networkRigidbody.Rigidbody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+
+    }
+    public void OnVictory()
+    {
+
+        RotateTowards(1f);
+        if (HasStateAuthority)
+        {
+            //SetCharacterControllerEnabled(true);
+            networkRigidbody.TeleportToPosition(Vector3.zero);
+        }
     }
     #endregion
 

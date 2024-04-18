@@ -26,8 +26,8 @@ public class HitState : PlayerState
     {
         if (player.isHit)
         {
+            player.nextState = player.hitState;
             player.AnimationTrigger = false;
-
             player.ChangeState();
 
             return true;

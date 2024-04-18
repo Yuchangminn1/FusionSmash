@@ -2523,11 +2523,9 @@ MonoBehaviour:
   _interpolationDataSource: 0
   playerInfo: {fileID: 0}
   enemyInfo: {fileID: 0}
-  _AddForce: 0
+  _addForce: 0
   _isDead: 0
   nickNameText: {fileID: 0}
-  _isRespawnRequsted:
-    _value: 0
 --- !u!114 &957258057995368713
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2792,6 +2790,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  eventHandler: {fileID: 0}
 --- !u!114 &948556574187872953
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2816,10 +2815,12 @@ MonoBehaviour:
     _data:
       Data: 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   _kill: 0
-  _death: 0
-  _force: 0
-  _playerNumber: 0
   _playingState: 0
+  _force: 0
+  _life: 0
+  _playerNumber: 0
+  _FadeIN:
+    _value: 0
 --- !u!114 &5042637903604442311
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8605,6 +8606,10 @@ PrefabInstance:
       propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3711028640050875946, guid: 484e5da217bd6e242934b2db4d7136cc, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5900230239729461423, guid: 484e5da217bd6e242934b2db4d7136cc, type: 3}
       propertyPath: m_RootOrder
       value: -1
@@ -8652,6 +8657,10 @@ PrefabInstance:
     - target: {fileID: 6723741104738109779, guid: 484e5da217bd6e242934b2db4d7136cc, type: 3}
       propertyPath: _weaponNum
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6723741104738109779, guid: 484e5da217bd6e242934b2db4d7136cc, type: 3}
+      propertyPath: IsAutomatic
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
