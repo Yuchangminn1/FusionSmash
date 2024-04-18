@@ -31,25 +31,8 @@ public class WeaponHandler : NetworkBehaviour, IPlayerActionListener
         SetEq();
         ChangeWeapon((int)EWeaponType.Sword);
     }
-    #region Event
-    public void SubscribeToPlayerActionEvents(PlayerActionEvents _playerActionEvents)
-    {
-        _playerActionEvents.OnPlayerAttack += OnPlayerAttack;
-        _playerActionEvents.OnPlyaerRespawn += OnPlyaerRespawn;
+    
 
-    }
-    public void OnPlayerAttack()
-    {
-        if (equipWeapon != null)
-        {
-            //Debug.Log("Attack Event");
-            equipWeapon.Fire(firePosition, fireDirection);
-        }
-    }
-    void OnPlyaerRespawn()
-    {
-        equipWeapon.OnRespawn();
-    }
     public void SetFire(Vector3 _firePosition, Vector3 _fireDirection,bool _justPressed)
     {
         firePosition = _firePosition;
@@ -57,7 +40,6 @@ public class WeaponHandler : NetworkBehaviour, IPlayerActionListener
         justPressed = _justPressed;
     }
 
-    #endregion
 
 
     public bool AbleFire()
@@ -99,4 +81,25 @@ public class WeaponHandler : NetworkBehaviour, IPlayerActionListener
     {
         return equipWeapon;
     }
+
+    #region Event
+    public void SubscribeToPlayerActionEvents(ref PlayerActionEvents _playerActionEvents)
+    {
+        _playerActionEvents.OnPlayerAttack += OnPlayerAttack;
+        _playerActionEvents.OnPlyaerRespawn += OnPlyaerRespawn;
+
+    }
+    public void OnPlayerAttack()
+    {
+        if (equipWeapon != null)
+        {
+            //Debug.Log("Attack Event");
+            equipWeapon.Fire(firePosition, fireDirection);
+        }
+    }
+    void OnPlyaerRespawn()
+    {
+        equipWeapon.OnRespawn();
+    }
+    #endregion
 }

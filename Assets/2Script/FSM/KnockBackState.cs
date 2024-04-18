@@ -15,7 +15,7 @@ public class KnockBackState : PlayerState
     public override void Enter()
     {
         base.Enter();
-        player.QQQQPlay();
+        player.PlayKnockBackParticle();
     }
     public override bool Update()
     {
@@ -41,7 +41,7 @@ public class KnockBackState : PlayerState
     {
         base.Exit();
         player.SetCanMove(true);
-        player.QQQQStop();
+        player.StopKnockBackParticle();
 
     }
 }

@@ -50,7 +50,7 @@ public class CharacterMovementHandler : NetworkBehaviour
     }
     public override void Spawned()
     {
-        
+
 
         if (HasStateAuthority || HasInputAuthority)
         {
@@ -70,42 +70,144 @@ public class CharacterMovementHandler : NetworkBehaviour
 
         if (HasInputAuthority)
         {
-            GameObject CameraCC = GameObject.Find("CameraCC");
+            GameObject CameraCC = GameObject.Find("TraceCamera");
             CameraCC.GetComponent<CMCameraTest>().plyaerTransform = transform;
         }
     }
 
-    #region Event
-    public void SubscribeToPlayerActionEvents(PlayerActionEvents _playerActionEvents)
+
+
+    void RotateTowards(float _dir)
     {
-        if (_playerActionEvents == null)
+        if (HasStateAuthority || HasInputAuthority)
         {
-            Debug.LogError("PlayerActionEvents component is missing!");
-            return;
+            if (myDir == 0)
+            {
+                myDir = -1f;
+            }
+            if (HasStateAuthority)
+            {
+                Vector3 targetVelocity = Vector3.zero;
+                Vector3 currentVelocity = networkRigidbody.ReadVelocity();
+                currentVelocity.y = 0;
+
+                networkRigidbody.Rigidbody.AddForce(targetVelocity - currentVelocity * networkRigidbody.ReadMass() * dampener, ForceMode.Force);
+            }
+
+
+            Vector3 direction;
+            Quaternion targetRotation;
+            if (_dir > 0)
+            {
+                direction = Vector3.left;
+                targetRotation = Quaternion.LookRotation(direction, Vector3.up);
+            }
+            else if (_dir < 0)
+            {
+                direction = Vector3.right;
+                targetRotation = Quaternion.LookRotation(direction, Vector3.up);
+            }
+            else
+            {
+                return;
+            }
+            networkRigidbody.transform.forward = direction;
+            playerActionEvents?.TriggerPlyaerTurn(-networkRigidbody.transform.rotation.y);
+
+            //characterRoot.GetComponent<NetworkObject>().transform.rotation = targetRotation;
+
+        }
+    }
+
+
+
+    //Rule
+    public void SetCharacterControllerEnabled(bool isEnabled)
+    {
+        //if (networkRigidbody != null)
+        //    networkRigidbody.enabled = isEnabled;
+    }
+
+    //Hit
+    public void HitAddForce(Vector3 _attackVec, int _force)
+    {
+        _attackVec.z = 0;
+        _attackVec = _attackVec.normalized;
+        Debug.Log("어택 방향 " + _attackVec);
+
+        _attackVec = _attackVec * _force;
+        Debug.Log("어택 방향 2" + _attackVec);
+        if (HasStateAuthority)
+        {
+            StartCoroutine(HitAddForce(_attackVec));
+        }
+    }
+
+    IEnumerator HitAddForce(Vector3 _attackVec)
+    {
+
+        if (networkRigidbody)
+        {
+            float DivForce = 10f;
+            //float UpperForce = DivForce*5f;
+            float UpperForce = UnityEngine.Random.Range(1.2f, 1.8f);
+
+            _attackVec = _attackVec / DivForce;
+            _attackVec.y = _attackVec.x > 0 ? _attackVec.x / UpperForce : -_attackVec.x / UpperForce;
+            Debug.Log($"_attackVec.x =  {_attackVec.x} ");
+            int maxC = 12;
+            for (int i = 1; i < maxC; i++)
+            {
+                networkRigidbody.Rigidbody.AddForce((maxC - i) * _attackVec * 10f, ForceMode.Force);
+                yield return null;
+            }
         }
         else
         {
-            playerActionEvents = _playerActionEvents;
+            yield return null;
         }
+
+        yield return null;
+    }
+
+    #region Event
+    public void SubscribeToPlayerActionEvents(ref PlayerActionEvents _playerActionEvents)
+    {
+        playerActionEvents = _playerActionEvents;
         //Death 
         _playerActionEvents.OnPlyaerDeath += OnPlyaerDeath;
         //Move 
         _playerActionEvents.OnPlayerMove += OnPlayerMove;
-        //Debug.Log("등록");
         //Jump 
         _playerActionEvents.OnPlayerJump += OnPlayerJump;
         //Respawn 
         _playerActionEvents.OnPlyaerRespawn += OnPlyaerRespawn;
         //Init
         _playerActionEvents.OnPlyaerInit += OnPlyaerInit;
+        //GameOver
+        _playerActionEvents.OnGameOver += OnGameOver;
 
+    }
+
+    public void OnGameOver()
+    {
+        if (HasStateAuthority)
+        {
+            networkRigidbody.Rigidbody.useGravity = false;
+            networkRigidbody.TeleportToPosition(Utils.GameOverPoint());
+            //SetCharacterControllerEnabled(false);
+        }
+
+
+        Debug.Log("Movement OnGameOver");
     }
     //Init
     void OnPlyaerInit()
     {
         if (HasStateAuthority)
         {
-            SetCharacterControllerEnabled(true);
+            //SetCharacterControllerEnabled(true);
+            networkRigidbody.Rigidbody.useGravity = true;
             networkRigidbody.TeleportToPosition(Utils.GetRandomSpawnPoint());
         }
     }
@@ -115,7 +217,8 @@ public class CharacterMovementHandler : NetworkBehaviour
     {
         if (HasStateAuthority)
         {
-            SetCharacterControllerEnabled(false);
+            //SetCharacterControllerEnabled(false);
+
         }
     }
 
@@ -124,7 +227,7 @@ public class CharacterMovementHandler : NetworkBehaviour
     {
         if (HasStateAuthority)
         {
-            SetCharacterControllerEnabled(true);
+            //SetCharacterControllerEnabled(true);
             networkRigidbody.TeleportToPosition(Utils.GetRandomSpawnPoint());
         }
 
@@ -174,99 +277,6 @@ public class CharacterMovementHandler : NetworkBehaviour
         networkRigidbody.Rigidbody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
     }
     #endregion
-
-    void RotateTowards(float _dir)
-    {
-        if (HasStateAuthority || HasInputAuthority)
-        {
-            if (myDir == 0)
-            {
-                myDir = -1f;
-            }
-            if (HasStateAuthority)
-            {
-                Vector3 targetVelocity = Vector3.zero;
-                Vector3 currentVelocity = networkRigidbody.ReadVelocity();
-                currentVelocity.y = 0;
-
-                networkRigidbody.Rigidbody.AddForce(targetVelocity - currentVelocity * networkRigidbody.ReadMass() * dampener, ForceMode.Force);
-            }
-
-
-            Vector3 direction;
-            Quaternion targetRotation;
-            if (_dir > 0)
-            {
-                direction = Vector3.left;
-                targetRotation = Quaternion.LookRotation(direction, Vector3.up);
-            }
-            else if (_dir < 0)
-            {
-                direction = Vector3.right;
-                targetRotation = Quaternion.LookRotation(direction, Vector3.up);
-            }
-            else
-            {
-                return;
-            }
-            networkRigidbody.transform.forward = direction;
-            playerActionEvents?.TriggerPlyaerTurn(-networkRigidbody.transform.rotation.y);
-
-            //characterRoot.GetComponent<NetworkObject>().transform.rotation = targetRotation;
-
-        }
-    }
-
-
-
-    //Rule
-    public void SetCharacterControllerEnabled(bool isEnabled)
-    {
-        networkRigidbody.enabled = isEnabled;
-    }
-
-    //Hit
-    public void HitAddForce(Vector3 _attackVec, int _force)
-    {
-        _attackVec.z = 0;
-        _attackVec = _attackVec.normalized;
-        Debug.Log("어택 방향 " + _attackVec);
-
-        _attackVec = _attackVec * _force;
-        Debug.Log("어택 방향 2" + _attackVec);
-        if (HasStateAuthority)
-        {
-            StartCoroutine(HitAddForce(_attackVec));
-        }
-    }
-
-    IEnumerator HitAddForce(Vector3 _attackVec)
-    {
-        
-        if (networkRigidbody)
-        {
-            float DivForce = 10f;
-            //float UpperForce = DivForce*5f;
-            float UpperForce = UnityEngine.Random.Range(1.5f, 4f);
-
-            _attackVec = _attackVec / DivForce;
-            _attackVec.y = _attackVec.x > 0 ? _attackVec.x / UpperForce : -_attackVec.x / UpperForce;
-            Debug.Log($"_attackVec.x =  {_attackVec.x} ");
-            int maxC = 12;
-            for (int i = 1; i < maxC; i++)
-            {
-                networkRigidbody.Rigidbody.AddForce((maxC - i) * _attackVec * 10f, ForceMode.Force);
-                yield return null;
-            }
-        }
-        else
-        {
-            yield return null;
-        }
-        
-        yield return null;
-    }
-    
 
 
 }

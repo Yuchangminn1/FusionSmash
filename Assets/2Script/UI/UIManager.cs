@@ -10,7 +10,8 @@ public class UIManager : MonoBehaviour
     public Canvas canvasPlaying;
     public Canvas canvasWaiting;
 
-
+    public GameObject[] playerInfoObjects;
+    public PlayerInfoUI[] playerInfoUIs;
 
     private static UIManager _instance;
 
@@ -40,7 +41,21 @@ public class UIManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
-
+    private void Start()
+    {
+        foreach (GameObject playerInfoObject in playerInfoObjects)
+        {
+            playerInfoObject.SetActive(false);
+        }
+    }
+    public void SetUIObject(int _num, bool _OnOff)
+    {
+        playerInfoObjects[_num - 1].SetActive(_OnOff);
+    }
+    public PlayerInfoUI GetUIObject(int _num)
+    {
+        return playerInfoUIs[_num - 1];
+    }
     public void OnGameStart()
     {
         canvasPlaying.enabled = true;

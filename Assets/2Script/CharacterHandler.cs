@@ -2,6 +2,7 @@ using Fusion;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using Unity.VisualScripting;
 using UnityEngine;
 using static UnityEngine.Video.VideoPlayer;
@@ -9,12 +10,12 @@ using static UnityEngine.Video.VideoPlayer;
 
 public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
 {
+    public PlayerActionEvents eventHandler;
 
     //Handler
 
 
     PlayerInfo playerInfo;
-    PlayerActionEvents eventHandler;
     CharacterInputhandler inputHandler;
     CharacterMovementHandler movementHandler;
     PlayerStateHandler playerStateHandler;
@@ -24,6 +25,9 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
     PlayerCharacterUIHandler characterUIHandler;
     //Component
     //public GameObject virtualCamera;
+
+    
+
     void Start()
     {
 
@@ -36,11 +40,19 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
     }
     public override void Spawned()
     {
+        CharacterGetComponent();
+
+        EventSubscribe();
+
+        
+
+    }
 
 
-        //Input
+
+    private void CharacterGetComponent()
+    {
         playerInfo = GetComponent<PlayerInfo>();
-        eventHandler = GetComponent<PlayerActionEvents>();
         inputHandler = GetComponent<CharacterInputhandler>();
         movementHandler = GetComponent<CharacterMovementHandler>();
         characterUIHandler = GetComponent<PlayerCharacterUIHandler>();
@@ -48,85 +60,37 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
         weaponHandler = GetComponent<WeaponHandler>();
         hpHandler = GetComponent<HPHandler>();
         chatSystem = GetComponent<ChatSystem>();
-        //if (HasStateAuthority || HasInputAuthority)
-        //{
-        //    //chatSystem = GetComponent<ChatSystem>();
-        //}
-        if (eventHandler == null)
-        {
-            Debug.LogError("PlayerActionEvents component is missing!");
-            return;
-        }
-        //Event
-        chatSystem.SubscribeToPlayerActionEvents(eventHandler);
-        movementHandler.SubscribeToPlayerActionEvents(eventHandler);
-        playerStateHandler.SubscribeToPlayerActionEvents(eventHandler);
-        hpHandler.SubscribeToPlayerActionEvents(eventHandler);
-        weaponHandler.SubscribeToPlayerActionEvents(eventHandler);
-        characterUIHandler.SubscribeToPlayerActionEvents(eventHandler);
-        playerInfo.SubscribeToPlayerActionEvents(eventHandler);
-        SubscribeToPlayerActionEvents(eventHandler);
-
-
-
-        //if (HasInputAuthority)
-        //{
-        //    if (Runner.IsServer)
-        //    {
-        //        return;
-        //    }
-        //    chatSystem = GetComponent<ChatSystem>();
-        //}
-
     }
 
-    public void SubscribeToPlayerActionEvents(PlayerActionEvents _playerActionEvents)
-    {
-        _playerActionEvents.OnGameEnd += OnGameEnd;
-        _playerActionEvents.OnGameStart += OnGameStart;
+    
 
-    }
 
-    void OnGameStart()
-    {
-        if (HasInputAuthority)
-            GameManager.Instance.FadeIn_Out(1f);
-    }
-
-    void OnGameEnd()
-    {
-        if (HasInputAuthority)
-            GameManager.Instance.FadeIn_Out(1f);
-    }
     public override void FixedUpdateNetwork()
     {
         if (playerInfo == null)
         {
             playerInfo = GetComponent<PlayerInfo>();
-            //Debug.Log("playerInfo == null");
+            Debug.Log("playerInfo == null");
             return;
         }
 
         if (HasStateAuthority || HasInputAuthority)
         {
-            if (PlayAble())
+            if (GetInput(out NetworkInputData networkInputData))
             {
-                if (GetInput(out NetworkInputData networkInputData))
+                Chat(networkInputData);
+                if (PlayAble())
                 {
-                    //Debug.Log("networkInputData");
-
-                    //ShowBoard(networkInputData);
-                    Chat(networkInputData);
                     if (playerStateHandler.canMove)
                     {
                         ActionMove(networkInputData);
                         ActionCase(networkInputData);
                     }
                 }
+
             }
             if (eventHandler != null)
                 eventHandler.TriggerCharacterUpdate();
-
         }
 
     }
@@ -163,6 +127,7 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
 
 
     }
+
     private void ActionMove(NetworkInputData networkInputData)
     {
         if (playerStateHandler.canMove)
@@ -174,16 +139,6 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
         }
     }
 
-    //UI
-    //void ShowBoard(NetworkInputData networkInputData)
-    //{
-
-    //    if (networkInputData.isShowBoardButtonPressed)
-    //    {
-    //        //if(HasStateAuthority)
-    //        //    _showBoard = !_showBoard;
-    //    }
-    //}
     private void Chat(NetworkInputData networkInputData)
     {
         if (networkInputData.isChatButtonPressed)
@@ -198,6 +153,7 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
     }
     bool PlayAble()
     {
+        //Debug.Log("PlayAble");
         if (hpHandler == null)
         {
             Debug.Log("hpHandler is Null");
@@ -212,23 +168,50 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
 
         if (HasInputAuthority || HasStateAuthority)
         {
-            if (hpHandler.isRespawnRequsted)
-            {
-                eventHandler.TriggerRespawn();
 
-                return false;
-            }
             if (hpHandler.isDead)
                 return false;
         }
-        playerInfo.playingState = GameManager.Instance.GetPlaying();
-        if (playerInfo.playingState != (int)PlayingState.Stop)
+        if (playerInfo.PlayingState != (int)EPlayingState.Stop && playerInfo.PlayingState != (int)EPlayingState.Death)
         {
             return true;
         }
         return false;
     }
 
+    public void SubscribeToPlayerActionEvents(ref PlayerActionEvents _playerActionEvents)
+    {
 
+        //_playerActionEvents.OnPlyaerInit += OnPlyaerInit;
+        //_playerActionEvents.OnGameEnd += OnGameEnd;
+        //_playerActionEvents.OnPlyaerRespawn += OnPlyaerRespawn;
 
+        //_playerActionEvents.OnGameOver += OnGameOver;
+        ;
+    }
+    
+    //void OnGameEnd()
+    //{
+    //    SetTraceCamera(true);
+    //}
+    
+    //void OnPlyaerInit()
+    //{
+    //    SetTraceCamera(true);
+
+    //}
+
+    private void EventSubscribe()
+    {
+        eventHandler = GetComponent<PlayerActionEvents>();
+        //Event
+        SubscribeToPlayerActionEvents(ref eventHandler);
+        chatSystem.SubscribeToPlayerActionEvents(ref eventHandler);
+        movementHandler.SubscribeToPlayerActionEvents(ref eventHandler);
+        playerStateHandler.SubscribeToPlayerActionEvents(ref eventHandler);
+        hpHandler.SubscribeToPlayerActionEvents(ref eventHandler);
+        weaponHandler.SubscribeToPlayerActionEvents(ref eventHandler);
+        characterUIHandler.SubscribeToPlayerActionEvents(ref eventHandler);
+        playerInfo.SubscribeToPlayerActionEvents(ref eventHandler);
+    }
 }

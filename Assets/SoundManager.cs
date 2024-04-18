@@ -2,6 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+enum ESound
+{
+    BGM1,
+    BGM2,
+
+}
 public class SoundManager : MonoBehaviour
 {
     public static SoundManager Instance { get; private set; }
@@ -26,18 +32,26 @@ public class SoundManager : MonoBehaviour
     {
         PlaySound(0);
     }
+    public void StopSound()
+    {
+        audioSource.Stop();
+    }
 
     // 오디오 클립 재생 메소드. 오디오 클립 ID를 매개변수로 받습니다.
     public void PlaySound(int clipId)
     {
-        if (clipId >= 0 && clipId < audioClips.Length)
+        if (audioClips[clipId])
         {
-            audioSource.clip = audioClips[clipId]; // 지정된 오디오 클립으로 설정
-            audioSource.Play(); // 재생
+            if (clipId >= 0 && clipId < audioClips.Length)
+            {
+                audioSource.clip = audioClips[clipId]; // 지정된 오디오 클립으로 설정
+                audioSource.Play(); // 재생
+            }
+            else
+            {
+                Debug.LogWarning("PlaySound: clipId out of range");
+            }
         }
-        else
-        {
-            Debug.LogWarning("PlaySound: clipId out of range");
-        }
+        
     }
 }

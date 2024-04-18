@@ -145,70 +145,7 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
         //어택카운트 변경 추가 
     }
 
-    public void SubscribeToPlayerActionEvents(PlayerActionEvents _playerActionEvents)
-    {
-        //Move
-        _playerActionEvents.OnPlayerMove += OnPlayerMove;
-        //Update
-        _playerActionEvents.OnPlayerUpdate += OnPlayerUpdate;
-        //Respawn
-        _playerActionEvents.OnPlyaerRespawn += OnPlyaerRespawn;
-        //Jump
-        _playerActionEvents.OnPlayerJump += OnPlayerJump;
-        //Jump
-        _playerActionEvents.OnPlayerAttack += OnPlayerAttck;
-        //Death
-        _playerActionEvents.OnPlyaerDeath += OnPlyaerDeath;
-        //FixedUpdate
-        _playerActionEvents.OnPlyaerFixedUpdate += OnPlayerFixedUpdate;
-        //TakeDamage
-        _playerActionEvents.OnTakeDamage += OnTakeDamage;
-
-
-    }
-    public void OnTakeDamage(int _force, bool _tf)
-    {
-        SetCanMove(false);
-    }
-    public void OnPlyaerDeath()
-    {
-        canMove = false;
-        AnimationTrigger = false;
-    }
-    public void OnPlyaerRespawn()
-    {
-        canMove = true;
-        AnimationTrigger = false;
-        stateMachine.ChangeState(nextState);
-    }
-    public void OnPlayerMove(float _dirVector2)
-    {
-        SetInputVec(_dirVector2);
-    }
-    public void OnPlayerJump()
-    {
-    }
-    public void OnPlayerAttck()
-    {
-        //Debug.Log("attackstack = " + attackstack);
-    }
-    public void SetInputVec(float vector2)
-    {
-        moveDir = vector2 == 0 ? 0 : 1;
-    }
-    void OnPlayerUpdate()
-    {
-        StatechangeUpdate();
-        ResetCondition();
-    }
-    void OnPlayerFixedUpdate()
-    {
-        stateMachine.FixedUpdate();
-    }
-    void OnPlayerDeath()
-    {
-
-    }
+    
     public void StatechangeUpdate()
     {
         if (stateMachine == null)
@@ -395,11 +332,11 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
     {
         if (_tf)
         {
-            QQQQPlay();
+            PlayKnockBackParticle();
         }
         else
         {
-            QQQQStop();
+            StopKnockBackParticle();
         }
     }
 
@@ -652,13 +589,84 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
 
 
 
-    public void QQQQPlay()
+    public void PlayKnockBackParticle()
     {
         playerEffectHandler.PlayParticle();
     }
-    public void QQQQStop()
+    public void StopKnockBackParticle()
     {
         playerEffectHandler.StopParticle();
     }
+    public void SubscribeToPlayerActionEvents(ref PlayerActionEvents _playerActionEvents)
+    {
+        //Move
+        _playerActionEvents.OnPlayerMove += OnPlayerMove;
+        //Update
+        _playerActionEvents.OnPlayerUpdate += OnPlayerUpdate;
+        //Respawn
+        _playerActionEvents.OnPlyaerRespawn += OnPlyaerRespawn;
+        //Jump
+        _playerActionEvents.OnPlayerJump += OnPlayerJump;
+        //Jump
+        _playerActionEvents.OnPlayerAttack += OnPlayerAttck;
+        //Death
+        _playerActionEvents.OnPlyaerDeath += OnPlyaerDeath;
+        //FixedUpdate
+        _playerActionEvents.OnPlyaerFixedUpdate += OnPlayerFixedUpdate;
+        //TakeDamage
+        _playerActionEvents.OnTakeDamage += OnTakeDamage;
+        //TakeDamage
+        _playerActionEvents.OnPlyaerInit += OnPlyaerInit;
 
+    }
+    void OnPlyaerInit()
+    {
+        canMove = true;
+        AnimationTrigger = false;
+        stateMachine.ChangeState(moveState);
+
+    }
+    public void OnTakeDamage(int _force, bool _tf)
+    {
+        SetCanMove(false);
+    }
+    public void OnPlyaerDeath()
+    {
+        canMove = false;
+        AnimationTrigger = false;
+    }
+    public void OnPlyaerRespawn()
+    {
+        canMove = true;
+        AnimationTrigger = false;
+        stateMachine.ChangeState(nextState);
+    }
+    public void OnPlayerMove(float _dirVector2)
+    {
+        SetInputVec(_dirVector2);
+    }
+    public void OnPlayerJump()
+    {
+    }
+    public void OnPlayerAttck()
+    {
+        //Debug.Log("attackstack = " + attackstack);
+    }
+    public void SetInputVec(float vector2)
+    {
+        moveDir = vector2 == 0 ? 0 : 1;
+    }
+    void OnPlayerUpdate()
+    {
+        StatechangeUpdate();
+        ResetCondition();
+    }
+    void OnPlayerFixedUpdate()
+    {
+        stateMachine.FixedUpdate();
+    }
+    void OnPlayerDeath()
+    {
+
+    }
 }

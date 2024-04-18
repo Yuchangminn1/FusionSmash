@@ -6,9 +6,12 @@ public static class Utils
 {
     public static Vector3 GetRandomSpawnPoint()
     {
-        return new Vector3(Random.Range(-5, 5),4, 0);
+        return new Vector3(Random.Range(-5f, 5f),4, 0);
     }
-
+    public static Vector3 GameOverPoint()
+    {
+        return new Vector3(100f, -30f, 0f);
+    }
     public static void SetRenderLayerInChildren(Transform transform,int layerNumber)
     {
         foreach(Transform trans in transform.GetComponentsInChildren<Transform>(true)) 

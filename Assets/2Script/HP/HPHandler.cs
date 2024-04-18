@@ -16,7 +16,6 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
 
     [Networked]
     public int addForce { get; private set; }
-
     [Networked(OnChanged = nameof(OnStateChanged))]
     public bool isDead { get; set; }
 
@@ -24,39 +23,18 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
     PlayerStateHandler playerStateHandler;
 
     public TMP_Text nickNameText;
-    [Networked]
-    public NetworkBool isRespawnRequsted { get; set; } = false;
+    //[Networked]
+    //public NetworkBool isRespawnRequsted { get; set; } = false;
 
     float lastHitTime = 0f;
     float damageDelay = 0.1f;
 
-    const int addforceDefault = 1;
+    const int defaultforce = 1;
 
-    
+    Camera playerTraceCamera;
+    Camera observingCamera;
 
-    public void CheckFallRespawn()
-    {
-        if (transform.position.y < -12 && !isDead)
-        {
-            
-            if (HasStateAuthority)
-            {
-                KillSelf();
-            }
-            if (HasInputAuthority)
-            {
-                GameManager.Instance.FadeIn(0.2f);
-            }
-        }
-    }
-    public void RequestRespawn() => isRespawnRequsted = true;
-
-
-    IEnumerator ServerReviveCO()
-    {
-        yield return new WaitForSeconds(2.0f);
-        RequestRespawn();
-    }
+    float MYTIME = 0f;
 
     public override void Spawned()
     {
@@ -69,86 +47,22 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
         {
             nickNameText.color = new Color(0, 0, 0, 0);
         }
+        //Camera
+        playerTraceCamera = GameObject.Find("TraceCamera").GetComponent<Camera>();
+        observingCamera = GameObject.Find("ObservingCamera").GetComponent<Camera>();
     }
-
-    #region Event
-    public void SubscribeToPlayerActionEvents(PlayerActionEvents _playerActionEvents)
+    public void SetTraceCamera(bool _tf)
     {
-        playerActionEvents = _playerActionEvents;
-        //Update
-        _playerActionEvents.OnPlayerUpdate += OnPlayerUpdate;
-
-        //Respawn
-        _playerActionEvents.OnPlyaerRespawn += OnPlyaerRespawn;
-
-        //Respawn
-        _playerActionEvents.OnPlyaerDeath += OnPlyaerDeath;
-
-        _playerActionEvents.OnPlyaerInit += OnPlyaerInit;
-
-
-
+        playerTraceCamera.enabled = _tf;
+        observingCamera.enabled = !_tf;
+        Debug.Log("Trace Camera Set");
     }
-    void OnPlyaerInit()
-    {
-        addForce = addforceDefault;
-    }
-    void OnPlyaerDeath()
-    {
-        if (HasStateAuthority)
-        {
-            if (enemyInfo != null)
-            {
-                enemyInfo.kill += 1;
-            }
-        }
-    }
-    void OnPlayerUpdate()
-    {
-        CheckFallRespawn();
-    }
-    void OnPlyaerRespawn()
-    {
-        if (isDead)
-        {
-            OnRespawned();
-            isRespawnRequsted = false;
-            
-        }
 
-    }
-    #endregion
-    #region Respawn
-    public void OnRespawned()
-    {
-        if (HasStateAuthority)
-        {
-            playerInfo.OnRespawned();
-        }
-        isDead = false;
-        addForce = addforceDefault;
-        
-    }
-    public void KillSelf()
-    {
-        if (!isDead)
-        {
-            Debug.Log($"{transform.name} isDead");
-            StartCoroutine(ServerReviveCO());
-            
-            isDead = true;
-        }
-
-    }
     
-    #endregion
     public void OnTakeDamage(string enemyname, int weaponNum, Vector3 _attackDir, EAttackType eAttackType = EAttackType.Knockback, int _addForce = 2, int _attackDamage = 1)
     {
-        //if (!HasStateAuthority && HasInputAuthority)
-        //{
-        //    return;
-        //}
-        if (!HasStateAuthority )
+
+        if (!HasStateAuthority)
         {
             return;
         }
@@ -166,7 +80,7 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
         {
             return;
         }
-        
+
         //playerInfo.enemyinfo =_enemyInfo;
         addForce += _addForce;
         //playerInfo.SetEnemyName(_enemyInfo.GetName());
@@ -182,84 +96,152 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
         else
         {
             playerActionEvents.TriggerPlayerOnTakeDamage(_addForce, false);
-            if(!playerStateHandler.isKnockBack)
+            if (!playerStateHandler.isKnockBack)
                 playerStateHandler.isHit = true;
         }
 
-        //if (eAttackType == EAttackType.Knockback)
-        //    characterMovementHandler.HitAddForce(_attackDir, AddForce);
 
+    }
+    public void KillSelf()
+    {
+        if (!isDead)
+        {
+            Debug.Log($"{transform.name} isDead");
+            StartCoroutine(ServerReviveCO());
+            isDead = true;
+            MYTIME = Time.time;
+        }
+    }
+    IEnumerator ServerReviveCO()
+    {
+        yield return new WaitForSeconds(2.0f);
+        if (playerInfo.PlayingState != (int)EPlayingState.Death)
+        {
+            playerActionEvents.TriggerRespawn();
+        }
+
+    }
+    public void CheckFallRespawn()
+    {
+        if (transform.position.y < -12 && !isDead)
+        {
+            if (HasStateAuthority)
+            {
+                KillSelf();
+            }
+
+        }
     }
     static void OnStateChanged(Changed<HPHandler> changed)
     {
         bool isDeathCurrent = changed.Behaviour.isDead;
         changed.LoadOld();
         bool isDeadOld = changed.Behaviour.isDead;
-        if (isDeathCurrent)
+        changed.Behaviour.ChangedIsDead(isDeathCurrent);
+
+    }
+    void ChangedIsDead(bool _tf)
+    {
+        if (_tf)
         {
-            changed.Behaviour.OnDeath();
+            if (HasInputAuthority)
+            {
+                Debug.Log("HPHandler Fade In");
+
+                GameManager.Instance.FadeIn(0.2f);
+            }
+            playerActionEvents.TriggerDeath();
+            //Debug.Log("HPHandler TriggerDeath()");
         }
         else
         {
-            changed.Behaviour.RespawnFade();
+            if (HasInputAuthority)
+            {
+                Debug.Log("HPHandler Fade Out");
+                //SetTraceCamera(true);
+                GameManager.Instance.FadeOut(1f, 0.5f);
+            }
+
         }
     }
-    void OnDeath()
+
+    #region Event
+    public void SubscribeToPlayerActionEvents(ref PlayerActionEvents _playerActionEvents)
+    {
+        //Update
+        _playerActionEvents.OnPlayerUpdate += OnPlayerUpdate;
+
+        //Respawn
+        _playerActionEvents.OnPlyaerRespawn += OnPlyaerRespawn;
+
+        //Respawn
+        _playerActionEvents.OnPlyaerDeath += OnPlyaerDeath;
+
+        _playerActionEvents.OnPlyaerInit += OnPlyaerInit;
+
+        _playerActionEvents.OnGameStart += OnGameStart;
+
+        _playerActionEvents.OnGameEnd += OnGameEnd;
+
+        _playerActionEvents.OnGameOver += OnGameOver;
+
+        playerActionEvents = _playerActionEvents;
+
+    }
+    void OnPlyaerInit()
+    {
+        addForce = defaultforce;
+        isDead = false;
+    }
+    void OnPlyaerDeath()
     {
         if (HasStateAuthority)
-            playerActionEvents.TriggerDeath();
+        {
+            if (enemyInfo != null)
+            {
+                enemyInfo.kill += 1;
+            }
+        }
     }
-    void RespawnFade()
+    void OnGameStart()
+    {
+        if (HasInputAuthority)
+            GameManager.Instance.FadeIn_Out(1f);
+    }
+
+    void OnGameEnd()
     {
         if (HasInputAuthority)
         {
-            GameManager.Instance.FadeOut(1f);
+            GameManager.Instance.FadeIn_Out(1f);
+            //SetTraceCamera(true);
         }
     }
-    
-    #region Non
-    //public void KillLogUpdate()
-    //{
-    //    var Q = Instantiate(_killLogPrefab);
-    //    Q.transform.parent = _killLogPanel.transform;
-
-    //    if (playerInfo.GetEnemyName() == "")
-    //    {
-    //        Q.GetComponent<KillLog>().SetLog(playerInfo.GetName(), " ", _weaponSprite[((int)EWeaponType.Gravity)]);
-    //    }
-    //    else
-    //        Q.GetComponent<KillLog>().SetLog(playerInfo.GetEnemyName(), playerInfo.GetName(), _weaponSprite[_weaponSpriteNum]);
-    //}
-    //static void KillPlayer(Changed<HPHandler> changed)
-    //{
-    //    changed.Behaviour.KDAUpdate();
-
-    //}
-    //static void DeathPlayer(Changed<HPHandler> changed)
-    //{
-    //    changed.Behaviour.KDAUpdate();
-    //}
-
-    //public void KDAUpdate()
-    //{
-    //    if (HasInputAuthority)
-    //    {
-    //        UIManager.Instance.PlayerKDAScoreUI(playerInfo.kill, playerInfo.death);
-    //    }
-    //}
-
-    //static void ShowBoard(Changed<HPHandler> changed)
-    //{
-    //    changed.Behaviour.QQQQ();
-    //}
-    //public void QQQQ()
-    //{
-    //    if (HasInputAuthority)
-    //    {
-    //        _scoreBoard.SetActive(_showBoard);
-    //    }
-    //}
+    void OnPlayerUpdate()
+    {
+        CheckFallRespawn();
+    }
+    void OnPlyaerRespawn()
+    {
+        if (HasStateAuthority)
+        {
+            playerInfo.OnRespawned();
+        }
+        isDead = false;
+        addForce = defaultforce;
+        Debug.Log("HPHnadler OnPlyaerRespawn");
+    }
+    void OnGameOver()
+    {
+        if(HasInputAuthority)
+            SetTraceCamera(false);
+    }
     #endregion
+
+
+
+
+
 }
 
 

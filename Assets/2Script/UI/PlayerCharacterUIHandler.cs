@@ -13,7 +13,7 @@ public class PlayerCharacterUIHandler : MonoBehaviour
     public TMP_Text name_Text;
     
 
-    public void SubscribeToPlayerActionEvents(PlayerActionEvents _playerActionEvents)
+    public void SubscribeToPlayerActionEvents(ref PlayerActionEvents _playerActionEvents)
     {
         if (_playerActionEvents == null)
         {
@@ -21,7 +21,7 @@ public class PlayerCharacterUIHandler : MonoBehaviour
             return;
         }
         //Death 
-        _playerActionEvents.OnPlyaerTurn += NickNameRotation;
+        _playerActionEvents.OnPlyaerTurn += OnPlyaerTurn;
         _playerActionEvents.OnPlayerNameChange += OnPlayerNameChange;
     }
     public void OnPlayerNameChange(string _name)
@@ -31,7 +31,7 @@ public class PlayerCharacterUIHandler : MonoBehaviour
     }
     
 
-    public void NickNameRotation(float _pitch)
+    public void OnPlyaerTurn(float _pitch)
     {
         if (_pitch > 0)
         {

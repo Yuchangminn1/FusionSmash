@@ -52,15 +52,7 @@ public class ChatSystem : NetworkBehaviour
         
 
     }
-    public void SubscribeToPlayerActionEvents(PlayerActionEvents _playerActionEvents)
-    {
-        _playerActionEvents.OnPlayerNameChange += OnPlayerNameChange;
-    }
-
-    public void OnPlayerNameChange(string _name)
-    {
-        _nickName = _name;
-    }
+    
 
     public override void Spawned()
     {
@@ -178,5 +170,15 @@ public class ChatSystem : NetworkBehaviour
     {
         yield return new WaitForFixedUpdate();
         SendMassage();
+    }
+
+    public void SubscribeToPlayerActionEvents(ref PlayerActionEvents _playerActionEvents)
+    {
+        _playerActionEvents.OnPlayerNameChange += OnPlayerNameChange;
+    }
+
+    public void OnPlayerNameChange(string _name)
+    {
+        _nickName = _name;
     }
 }

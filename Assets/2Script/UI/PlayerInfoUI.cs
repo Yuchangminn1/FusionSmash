@@ -25,6 +25,7 @@ public class PlayerInfoUI : MonoBehaviour
     }
 
     // Update is called once per frame
+    
     public void SetPlayerName(string _name)
     {
         playerName.text = _name;
@@ -32,13 +33,13 @@ public class PlayerInfoUI : MonoBehaviour
 
     public void SetPlayerForce(int _force)
     {
-        playerCurrentForce.text = _force.ToString() + "%";
+        playerCurrentForce.text = _force*10+ "%";
     }
 
     public void InitialPlayerInfo(string _name, int _force)
     {
         playerName.text = _name;
-        playerCurrentForce.text = _force.ToString() + "%";
+        playerCurrentForce.text = _force * 10 + "%";
 
     }
 }
