@@ -38,6 +38,8 @@ public class CharacterMovementHandler : NetworkBehaviour
 
     float dir;
 
+    Vector3 victoryPos = new Vector3(3.5f, 0f, 0f);
+
     static void ChangeDir(Changed<CharacterMovementHandler> changed)
     {
         float newS = changed.Behaviour.myDir;
@@ -286,7 +288,7 @@ public class CharacterMovementHandler : NetworkBehaviour
         if (HasStateAuthority)
         {
             //SetCharacterControllerEnabled(true);
-            networkRigidbody.TeleportToPosition(Vector3.zero);
+            networkRigidbody.TeleportToPosition(victoryPos);
         }
     }
     #endregion

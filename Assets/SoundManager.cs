@@ -10,6 +10,7 @@ enum ESound
     Jump1, Jump2,
     NomalAttack, SmashAttack,
     GameStart, GameEnd,
+    Victoty1,
 }
 enum EAudio
 {
@@ -39,7 +40,6 @@ public class SoundManager : MonoBehaviour
             audioSource[1] = gameObject.AddComponent<AudioSource>();
             audioSource[2] = gameObject.AddComponent<AudioSource>();
             audioSource[3] = gameObject.AddComponent<AudioSource>();
-
         }
         else
         {
@@ -48,7 +48,7 @@ public class SoundManager : MonoBehaviour
     }
     private void Start()
     {
-        //PlaySound(0);
+        PlaySound((int)EAudio.audioSourceBGM,(int)ESound.BGM1);
     }
     public void StopSound(int _audioSource)
     {
@@ -56,14 +56,23 @@ public class SoundManager : MonoBehaviour
     }
 
     // 오디오 클립 재생 메소드. 오디오 클립 ID를 매개변수로 받습니다.
-    public void PlaySound(int _audioSource, int clipId)
+    public void PlaySound(int _audioSource, int clipId ,float delay = 0f)
     {
         if (audioClips[clipId] && audioSource[_audioSource])
         {
-            audioSource[_audioSource].Stop();
-            audioSource[_audioSource].clip = audioClips[clipId]; // 지정된 오디오 클립으로 설정
-            audioSource[_audioSource].Play(); // 재생
+            StartCoroutine(CPlaySound(_audioSource, clipId, delay));
         }
 
     }
+    IEnumerator CPlaySound(int _audioSource, int clipId, float delay)
+    {
+        if (delay > 0.1f)
+        {
+            yield return new WaitForSeconds(delay);
+        }
+        audioSource[_audioSource].Stop();
+        audioSource[_audioSource].clip = audioClips[clipId]; // 지정된 오디오 클립으로 설정
+        audioSource[_audioSource].Play(); // 재생
+    }
+    
 }

@@ -33,6 +33,8 @@ public class GameManager : NetworkBehaviour
     public Image fadeImage; // 오브젝트의 Renderer 컴포넌트에 대한 참조
     public TMP_Text timerText;
 
+    public GameObject startButton;
+
     //[Networked] private TickTimer gameTimer { get; set; }
     [Networked]
     public TickTimer countdownTimer { get; set; }
@@ -124,6 +126,13 @@ public class GameManager : NetworkBehaviour
             {
                 roomState = (int)ERoomState.Waiting;
                 Debug.Log($"playingState = {roomState}");
+            }
+        }
+        else
+        {
+            if (startButton)
+            {
+                startButton.SetActive(false);
             }
         }
         //UIManager.Instance.OnGameWait();

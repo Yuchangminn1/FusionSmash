@@ -35,6 +35,10 @@ public class ChatSystem : NetworkBehaviour
     [Networked(OnChanged = nameof(OnChangeSumit))]
     public NetworkBool ischating { get; set; }
 
+
+    string lastChatName = "";
+    float lastChatTime = 0f;
+
     //Ŭ���̾�Ʈ���� ���� onoffonoff�ݺ��ϴ°� ����
     //float inputTime = 0f;
     // Checks if there is anything entered into the input field.
@@ -130,7 +134,14 @@ public class ChatSystem : NetworkBehaviour
 
     public void PushMessage()
     {
-
+        if(lastChatName == sendName)
+        {
+            if (lastChatTime + 0.1f < Time.time)
+            {
+                Debug.Log("두번 보냈음");
+                return;
+            }
+        }
         string nullcheck = null;
         foreach (var chatSystem in myChat)
         {
@@ -147,6 +158,9 @@ public class ChatSystem : NetworkBehaviour
         {
             chatLog = GameObject.Find("Chat_Display").GetComponentInChildren<TMP_Text>();
         }
+
+        lastChatName = sendName.ToString();
+        lastChatTime = Time.time;
 
         chatLog.text += $"\n {sendName} : {myChat}";
         myChat = "";

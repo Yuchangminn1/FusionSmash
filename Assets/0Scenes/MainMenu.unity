@@ -653,8 +653,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4281479730
-  m_fontColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -671,10 +671,10 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 60
+  m_fontSize: 72
   m_fontSizeBase: 60
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
@@ -3519,6 +3519,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 6f8f87b9de467f443806f43eae054e28, type: 3}
   - {fileID: 8300000, guid: 7062e1929a373c4408ce47f8506ea5a8, type: 3}
   - {fileID: 8300000, guid: 6269fc07ca384994bba3b566ac93e2fd, type: 3}
+  - {fileID: 8300000, guid: f2a03e3aeaec5064c900638678783295, type: 3}
 --- !u!1 &1405291887
 GameObject:
   m_ObjectHideFlags: 0

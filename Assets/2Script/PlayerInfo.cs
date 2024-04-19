@@ -102,7 +102,8 @@ public class PlayerInfo : NetworkBehaviour, IPlayerActionListener
         {
 
             playerActionEvents.TriggerGameStart();
-            
+            playerActionEvents.TriggerRespawn();
+
         }
     }
 
@@ -216,6 +217,7 @@ public class PlayerInfo : NetworkBehaviour, IPlayerActionListener
 
         else if (_playingState == (int)EPlayingState.Waiting)
         {
+            SoundManager.Instance.StopSound((int)EAudio.audioSourceBGM);
             hPHandler.SetTraceCamera(true);
             Debug.Log("SetTraceCamera");
             UIManager.Instance.OnGameWait();
@@ -244,6 +246,8 @@ public class PlayerInfo : NetworkBehaviour, IPlayerActionListener
         else if (_playingState == (int)EPlayingState.Stop)
         {
             UIManager.Instance.winnerText.text = "승자  : " + GameManager.Instance.winnerName.ToString();
+            SoundManager.Instance.PlaySound((int)EAudio.audioSourceCharacter, (int)ESound.Victoty1, 2f);
+
             if (HasInputAuthority)
             {
                 SoundManager.Instance.StopSound((int)EAudio.audioSourceBGM);
@@ -386,6 +390,7 @@ public class PlayerInfo : NetworkBehaviour, IPlayerActionListener
         
         playingState = (int)EPlayingState.Stop;
         StartCoroutine(CGameEndToWaiting(duration));
+
     }
     private IEnumerator CGameEndToWaiting(float duration)
     {

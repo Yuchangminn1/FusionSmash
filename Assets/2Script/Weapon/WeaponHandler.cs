@@ -103,6 +103,7 @@ public class WeaponHandler : NetworkBehaviour, IPlayerActionListener
     }
     void OnVictory()
     {
+
         if (equipWeapon != null)
         {
             hideWeapon = true;
