@@ -70,11 +70,8 @@ public class PlayerInfo : NetworkBehaviour, IPlayerActionListener
                 {
                     playingState = (int)EPlayingState.Death;
                 }
-
             }
         }
-
-
     }
 
     public void TriggerGameOver()
@@ -93,17 +90,14 @@ public class PlayerInfo : NetworkBehaviour, IPlayerActionListener
         {
             playerActionEvents.TriggerInit();
         }
-
     }
 
     public void TriggerGameStart()
     {
         if (playerActionEvents != null)
         {
-
             playerActionEvents.TriggerGameStart();
             playerActionEvents.TriggerRespawn();
-
         }
     }
 
@@ -312,12 +306,6 @@ public class PlayerInfo : NetworkBehaviour, IPlayerActionListener
             return;
     }
 
-    
-    void Start()
-    {
-        //CreatePlayerInfoUI();
-    }
-
     public void SubscribeToPlayerActionEvents(ref PlayerActionEvents _playerActionEvents)
     {
         playerActionEvents = _playerActionEvents;
@@ -331,9 +319,6 @@ public class PlayerInfo : NetworkBehaviour, IPlayerActionListener
         _playerActionEvents.OnTakeDamage += OnTakeDamage;
         _playerActionEvents.OnPlyaerInit += OnPlyaerInit;
         _playerActionEvents.OnPlyaerDeath += OnPlyaerDeath;
-        //_playerActionEvents.OnPlayerUpdate += OnPlayerUpdate;
-        _playerActionEvents.OnPlyaerFixedUpdate += OnPlyaerFixedUpdate;
-        _playerActionEvents.OnGameStart += OnGameStart;
         _playerActionEvents.OnPlyaerRespawn += OnPlyaerRespawn;
         _playerActionEvents.OnGameOver += OnGameOver;
 
@@ -353,22 +338,13 @@ public class PlayerInfo : NetworkBehaviour, IPlayerActionListener
             ResetForce();
             ResetLife();
         }
-        
     }
     public void OnPlyaerDeath()
     {
         ReduceLife();
     }
-    public void OnPlyaerFixedUpdate()
-    {
-
-    }
-
-    public void OnGameStart()
-    {
-        //GameManager.Instance.StartGame();
-        //playerInfoUI.SetUIObject(playerNumber, true);
-    }
+    
+    
     public void OnPlyaerRespawn()
     {
         ResetForce();

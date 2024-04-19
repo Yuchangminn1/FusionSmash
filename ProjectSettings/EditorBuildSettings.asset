@@ -11,16 +11,4 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/0Scenes/MyS2.unity
     guid: d1441a6cfc6ac87499c7893c92dbfdbf
-  - enabled: 1
-    path: Assets/0Scenes/CodeTest.unity
-    guid: 08c44c0a6dcc4d84d8813bbdd521424e
-  - enabled: 0
-    path: Assets/0Scenes/NameSelect.unity
-    guid: 2671c24031c68ba448641f3447e33da9
-  - enabled: 0
-    path: Assets/0Scenes/MyS.unity
-    guid: a24ffce5bd34eb2489d9dd2bf651e094
-  - enabled: 0
-    path: Assets/0Scenes/MyS1.unity
-    guid: b7ac0019d1296a34292e90f73c573950
   m_configObjects: {}

@@ -24,7 +24,6 @@ public class NetworkRunnerHandler : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
             // 여기에 네트워크 초기화 및 설정 코드 추가
-
         }
         else if (Instance != this)
         {
@@ -34,8 +33,6 @@ public class NetworkRunnerHandler : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-        
-
         CMSpawnNetworkRunner();
     }
     public bool GetIsNew() => isNew;

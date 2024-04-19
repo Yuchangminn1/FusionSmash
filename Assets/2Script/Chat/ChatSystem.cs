@@ -18,34 +18,21 @@ public class ChatSystem : NetworkBehaviour
     [Networked(OnChanged = nameof(OnChangeChatLog))]
     public NetworkString<_16> sendName { get; set; }
 
-    //public TMP_Text myNameText;
     [Networked]
     public NetworkString<_16> _nickName { get; set; } = "";
 
-    [SerializeField] InputField mainInputField;
-
-    //bool isEnter = false;
-    //bool chatOnOff = false;
+    [SerializeField] 
+    InputField mainInputField;
 
     public TMP_Text chatLog;
     public Scrollbar scrollV;
 
-    //bool chatDown = false;
 
     [Networked(OnChanged = nameof(OnChangeSumit))]
     public NetworkBool ischating { get; set; }
 
-
     string lastChatName = "";
-    //[Networked]
-    //NetworkString<_16> lastChatName { get; set; } = "";
-    //[Networked]
-
     float lastChatTime { get; set; } = 0f;
-
-    //Ŭ���̾�Ʈ���� ���� onoffonoff�ݺ��ϴ°� ����
-    //float inputTime = 0f;
-    // Checks if there is anything entered into the input field.
     private void Start()
     {
         if (HasInputAuthority)
@@ -56,9 +43,6 @@ public class ChatSystem : NetworkBehaviour
             scrollV = GameObject.Find("ScrollbarVertical").GetComponent<Scrollbar>();
             mainInputField.characterLimit = 1024;
         }
-
-        
-
     }
     
 
@@ -66,16 +50,7 @@ public class ChatSystem : NetworkBehaviour
     {
 
     }
-
-    private void FixedUpdate()
-    {
-        
-        //if (HasInputAuthority)
-        //{
-        //    if (scrollV)
-        //        scrollV.value = 0;
-        //}
-    }
+    
     static void OnChangeSumit(Changed<ChatSystem> changed)
     {
         changed.Behaviour.Sumit(changed.Behaviour.ischating);
@@ -125,22 +100,18 @@ public class ChatSystem : NetworkBehaviour
 
     static void OnChangeChatLog(Changed<ChatSystem> changed)
     {
-        //Debug.Log("mychat = " + changed.Behaviour.myChat);
         if (changed.Behaviour.myChat == "")
         {
             return;
         }
         changed.Behaviour.PushMessage();
-
     }
-
-
 
     public void PushMessage()
     {
         if(lastChatName == sendName)
         {
-            if (lastChatTime + 0.1f > Time.time)
+            if (lastChatTime + 0.01f > Time.time)
             {
                 Debug.Log("두번 보냈음");
                 return;
@@ -150,8 +121,6 @@ public class ChatSystem : NetworkBehaviour
         foreach (var chatSystem in myChat)
         {
             nullcheck += chatSystem;
-
-            //Debug.Log($"�̰�{chatSystem}�̰�");
         }
         if (Object.HasInputAuthority)
         {
@@ -168,8 +137,6 @@ public class ChatSystem : NetworkBehaviour
 
         chatLog.text += $"\n {sendName} : {myChat}";
         myChat = "";
-
-
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
@@ -179,11 +146,6 @@ public class ChatSystem : NetworkBehaviour
         this.myChat = mychat;
     }
 
-    //private void Sumit(InputAction.CallbackContext context)
-    //{
-    //    Debug.Log("chatDown change true ");
-    //    chatDown = true;
-    //}
     IEnumerator SumitE()
     {
         yield return new WaitForFixedUpdate();

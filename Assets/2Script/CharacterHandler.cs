@@ -26,13 +26,6 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
     //Component
     //public GameObject virtualCamera;
 
-    
-
-    void Start()
-    {
-
-
-    }
     private void FixedUpdate()
     {
         if (eventHandler)
@@ -43,9 +36,6 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
         CharacterGetComponent();
 
         EventSubscribe();
-
-        
-
     }
 
 
@@ -188,17 +178,7 @@ public class CharacterHandler : NetworkBehaviour, IPlayerActionListener
     {
         
     }
-    //void OnGameEnd()
-    //{
-    //    SetTraceCamera(true);
-    //}
     
-    //void OnPlyaerInit()
-    //{
-    //    SetTraceCamera(true);
-
-    //}
-
     private void EventSubscribe()
     {
         eventHandler = GetComponent<PlayerActionEvents>();

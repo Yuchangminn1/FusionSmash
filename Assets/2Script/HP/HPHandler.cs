@@ -61,14 +61,12 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
     
     public void OnTakeDamage(string enemyname, int weaponNum, Vector3 _attackDir, EAttackType eAttackType = EAttackType.Knockback, int _addForce = 2, int _attackDamage = 1)
     {
-
         if (!HasStateAuthority)
         {
             return;
         }
         if (lastHitTime + damageDelay > Time.time && playerInfo.GetEnemyName() == enemyname)
         {
-            //Debug.Log("버그로 타격판정");
             lastHitTime = Time.time;
             return;
         }
@@ -80,10 +78,7 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
         {
             return;
         }
-
-        //playerInfo.enemyinfo =_enemyInfo;
         addForce += _addForce;
-        //playerInfo.SetEnemyName(_enemyInfo.GetName());
         playerInfo.enemyName = enemyname;
         if (eAttackType == EAttackType.Knockback)
         {
@@ -99,8 +94,6 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
             if (!playerStateHandler.isKnockBack)
                 playerStateHandler.isHit = true;
         }
-
-
     }
     public void KillSelf()
     {
@@ -119,7 +112,6 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
         {
             playerActionEvents.TriggerRespawn();
         }
-
     }
     public void CheckFallRespawn()
     {
@@ -129,7 +121,6 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
             {
                 KillSelf();
             }
-
         }
     }
     static void OnStateChanged(Changed<HPHandler> changed)
@@ -151,23 +142,23 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
                 GameManager.Instance.FadeIn(0.2f);
             }
             playerActionEvents.TriggerDeath();
-            //Debug.Log("HPHandler TriggerDeath()");
+            //이거 추후에 playerinfo로 
         }
         else
         {
             if (HasInputAuthority)
             {
                 Debug.Log("HPHandler Fade Out");
-                //SetTraceCamera(true);
                 GameManager.Instance.FadeOut(1f, 0.5f);
             }
-
         }
     }
 
     #region Event
     public void SubscribeToPlayerActionEvents(ref PlayerActionEvents _playerActionEvents)
     {
+        playerActionEvents = _playerActionEvents;
+
         //Update
         _playerActionEvents.OnPlayerUpdate += OnPlayerUpdate;
 
@@ -179,13 +170,8 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
 
         _playerActionEvents.OnPlyaerInit += OnPlyaerInit;
 
-        _playerActionEvents.OnGameStart += OnGameStart;
-
-        _playerActionEvents.OnGameEnd += OnGameEnd;
-
         _playerActionEvents.OnGameOver += OnGameOver;
 
-        playerActionEvents = _playerActionEvents;
 
     }
     void OnPlyaerInit()
@@ -203,24 +189,7 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
             }
         }
     }
-    void OnGameStart()
-    {
-        //if (HasInputAuthority)
-        //{
-        //    GameManager.Instance.FadeIn_Out(1f);
-        //    Debug.Log("FadeIn_Out");
-        //}
-    }
-
-    void OnGameEnd()
-    {
-        //if (HasInputAuthority)
-        //{
-        //    GameManager.Instance.FadeIn_Out(1f);
-        //    Debug.Log("FadeIn_Out");
-        //    //SetTraceCamera(true);
-        //}
-    }
+    
     void OnPlayerUpdate()
     {
         CheckFallRespawn();
