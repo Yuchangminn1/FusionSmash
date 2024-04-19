@@ -37,7 +37,11 @@ public class ChatSystem : NetworkBehaviour
 
 
     string lastChatName = "";
-    float lastChatTime = 0f;
+    //[Networked]
+    //NetworkString<_16> lastChatName { get; set; } = "";
+    //[Networked]
+
+    float lastChatTime { get; set; } = 0f;
 
     //Ŭ���̾�Ʈ���� ���� onoffonoff�ݺ��ϴ°� ����
     //float inputTime = 0f;
@@ -66,11 +70,11 @@ public class ChatSystem : NetworkBehaviour
     private void FixedUpdate()
     {
         
-        if (HasInputAuthority)
-        {
-            if (scrollV)
-                scrollV.value = 0;
-        }
+        //if (HasInputAuthority)
+        //{
+        //    if (scrollV)
+        //        scrollV.value = 0;
+        //}
     }
     static void OnChangeSumit(Changed<ChatSystem> changed)
     {
@@ -136,7 +140,7 @@ public class ChatSystem : NetworkBehaviour
     {
         if(lastChatName == sendName)
         {
-            if (lastChatTime + 0.1f < Time.time)
+            if (lastChatTime + 0.1f > Time.time)
             {
                 Debug.Log("두번 보냈음");
                 return;
