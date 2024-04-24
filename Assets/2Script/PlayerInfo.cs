@@ -45,6 +45,11 @@ public class PlayerInfo : NetworkBehaviour, IPlayerActionListener
 
     [Networked(OnChanged = nameof(FadeInChanged))]
     public NetworkBool FadeIN { get; set; } = false;
+
+    [Networked(OnChanged = nameof(IsDamageAbleChanged))]
+    [SerializeField]
+    public NetworkBool isDamageAble { get; private set; } = false;
+    WaitForSeconds respawnDelay = new WaitForSeconds(1.5f);
     void ResetLife()
     {
         life = defaultLife;
@@ -162,6 +167,21 @@ public class PlayerInfo : NetworkBehaviour, IPlayerActionListener
             changed.Behaviour.StateChanged(newS);
         }
     }
+    static void IsDamageAbleChanged(Changed<PlayerInfo> changed)
+    {
+        bool newS = changed.Behaviour.isDamageAble;
+        changed.LoadOld();
+        bool oldS = changed.Behaviour.isDamageAble;
+        if (newS != oldS)
+        {
+            changed.Behaviour.DEDAMAGEable(newS);
+        }
+    }
+    void DEDAMAGEable(bool _tf)
+    {
+        Debug.Log($"DamageAble = {_tf}");
+    }
+    
     static void FadeInChanged(Changed<PlayerInfo> changed)
     {
         bool newS = changed.Behaviour.FadeIN;
@@ -301,10 +321,16 @@ public class PlayerInfo : NetworkBehaviour, IPlayerActionListener
     public void OnRespawned()
     {
         SetEnemyName("");
-
+        StartCoroutine(CSetDamageAble(true));
         if (playingState == (int)EPlayingState.Stop || playingState == (int)EPlayingState.Waiting)
             return;
     }
+    IEnumerator CSetDamageAble(bool _tf)
+    {
+        yield return respawnDelay;
+        isDamageAble = _tf;
+    }
+
 
     public void SubscribeToPlayerActionEvents(ref PlayerActionEvents _playerActionEvents)
     {
@@ -342,9 +368,11 @@ public class PlayerInfo : NetworkBehaviour, IPlayerActionListener
     public void OnPlyaerDeath()
     {
         ReduceLife();
+        StartCoroutine(CSetDamageAble(false));
+
     }
-    
-    
+
+
     public void OnPlyaerRespawn()
     {
         ResetForce();

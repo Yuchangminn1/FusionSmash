@@ -61,6 +61,11 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
     
     public void OnTakeDamage(string enemyname, int weaponNum, Vector3 _attackDir, EAttackType eAttackType = EAttackType.Knockback, int _addForce = 2, int _attackDamage = 1)
     {
+        if (!playerInfo.isDamageAble)
+        {
+            return;
+        }
+
         if (!HasStateAuthority)
         {
             return;
@@ -80,6 +85,7 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
         }
         addForce += _addForce;
         playerInfo.enemyName = enemyname;
+        //이거 트리거로 characterMovementHandler playerStateHandler이것도  안쓰게 하기 1.
         if (eAttackType == EAttackType.Knockback)
         {
             playerActionEvents.TriggerPlayerOnTakeDamage(_addForce, true);

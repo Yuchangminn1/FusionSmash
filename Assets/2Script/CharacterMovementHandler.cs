@@ -17,17 +17,12 @@ public class CharacterMovementHandler : NetworkBehaviour
 
     float moveSpeed = 5f;
     float dampener = 4f;
-    //float jumpTime = 0f;
-    //float jumpCooldown = 0f;
     float jumpForce = 6f;
     float maxGravity = -20f;
 
 
     [Networked(OnChanged = nameof(ChangeDir))]
     float myDir { get; set; } = 0f;
-
-    [Header("State")]
-    PlayerStateHandler playerStateHandler;
 
     [Header("Component")]
     NetworkRigidbody networkRigidbody;
@@ -58,7 +53,6 @@ public class CharacterMovementHandler : NetworkBehaviour
         {
             networkRigidbody = GetComponent<NetworkRigidbody>();
             capsuleCollider = GetComponent<CapsuleCollider>();
-            playerStateHandler = GetComponent<PlayerStateHandler>();
 
             RotateTowards(1);
             myDir = 1;
@@ -124,11 +118,11 @@ public class CharacterMovementHandler : NetworkBehaviour
 
 
     //Rule
-    public void SetCharacterControllerEnabled(bool isEnabled)
-    {
-        //if (networkRigidbody != null)
-        //    networkRigidbody.enabled = isEnabled;
-    }
+    //public void SetCharacterControllerEnabled(bool isEnabled)
+    //{
+    //    //if (networkRigidbody != null)
+    //    //    networkRigidbody.enabled = isEnabled;
+    //}
 
     //Hit
     public void HitAddForce(Vector3 _attackVec, int _force)

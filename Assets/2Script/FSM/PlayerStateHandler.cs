@@ -85,7 +85,6 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
     public DeathState deathState { get; private set; }
     public HealState healState { get; private set; }
 
-    CharacterMovementHandler characterMovementHandler;
 
     public bool isJumpButtonPressed = false;
 
@@ -101,9 +100,10 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
     #endregion
     //Weapon
     [Header("Weapon ")]
-    WeaponHandler weaponHandler;
     private Dictionary<string, int> animationHashes = new Dictionary<string, int>();
     PlayerEffectHandler playerEffectHandler;
+
+    WeaponHandler weaponHandler;
 
     public override void Spawned()
     {
@@ -117,7 +117,6 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
         animationHashes.Add("AnimationTrigger", Animator.StringToHash("AnimationTrigger"));
         AnimationTrigger = false;
         anima = GetComponent<Animator>();
-        characterMovementHandler = GetComponent<CharacterMovementHandler>();
         weaponHandler = GetComponent<WeaponHandler>();
         State_Initialize();
         if (stateMachine == null)
