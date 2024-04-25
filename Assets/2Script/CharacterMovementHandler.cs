@@ -70,7 +70,7 @@ public class CharacterMovementHandler : NetworkBehaviour
             CameraCC.GetComponent<CMCameraTest>().plyaerTransform = transform;
         }
     }
-    
+
 
 
     void RotateTowards(float _dir)
@@ -185,8 +185,13 @@ public class CharacterMovementHandler : NetworkBehaviour
 
         _playerActionEvents.OnVictory += OnVictory;
 
-    }
+        _playerActionEvents.OnPlayerKnockBack += OnPlayerKnockBack;
 
+    }
+    void OnPlayerKnockBack(Vector3 _dir, int _force)
+    {
+        HitAddForce(_dir, _force);
+    }
     public void OnGameOver()
     {
         if (HasStateAuthority)

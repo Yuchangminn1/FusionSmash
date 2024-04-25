@@ -23,10 +23,10 @@ public class PlayerActionEvents : MonoBehaviour
 
 
 
-
+    public event Action<Vector3,int> OnPlayerKnockBack;
     public event Action<float> OnPlayerMove;
     public event Action<float> OnPlyaerTurn;
-    public event Action<int,bool> OnTakeDamage;
+    public event Action<int> OnTakeDamage;
     public event Action<string> OnPlayerNameChange;
 
 
@@ -85,6 +85,10 @@ public class PlayerActionEvents : MonoBehaviour
         Debug.Log("TriggerGameOver");
 
     }
+    public void TriggerPlayerKnockBack(Vector3 _dir, int _force)
+    {
+        OnPlayerKnockBack?.Invoke(_dir,_force);
+    }
     public void TriggerMove(float direction)
     {
         OnPlayerMove?.Invoke(direction);
@@ -100,9 +104,9 @@ public class PlayerActionEvents : MonoBehaviour
         OnPlayerNameChange?.Invoke(_name);
         Debug.Log("TriggerPlayerNameChange");
     }
-    public void TriggerPlayerOnTakeDamage(int _force,bool _isSmash)
+    public void TriggerPlayerOnTakeDamage(int _force)
     {
-        OnTakeDamage?.Invoke(_force, _isSmash);
+        OnTakeDamage?.Invoke(_force);
         //Debug.Log("TriggerPlayerOnTakeDamage");
     }
 

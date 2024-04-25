@@ -586,11 +586,20 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
         _playerActionEvents.OnPlyaerFixedUpdate += OnPlayerFixedUpdate;
         //TakeDamage
         _playerActionEvents.OnTakeDamage += OnTakeDamage;
+        //KnockBack
+        _playerActionEvents.OnPlayerKnockBack += OnPlayerKnockBack;
         //PlyaerInit
         _playerActionEvents.OnPlyaerInit += OnPlyaerInit;
         //OnVictory
         _playerActionEvents.OnVictory += OnVictory;
 
+    }
+    void OnPlayerKnockBack(Vector3 _dir,int _force)
+    {
+        SetCanMove(false);
+        AnimationTrigger = false;
+        isHit = false;
+        isKnockBack = true;
     }
     void OnPlyaerInit()
     {
@@ -598,9 +607,12 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
         AnimationTrigger = false;
         stateMachine.ChangeState(moveState);
     }
-    public void OnTakeDamage(int _force, bool _tf)
+    public void OnTakeDamage(int _force)
     {
         SetCanMove(false);
+        AnimationTrigger = false;
+        isHit = true;
+
     }
     public void OnPlyaerDeath()
     {
@@ -649,7 +661,7 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
         state2 = UnityEngine.Random.Range(0, 4);
     }
 
-    
+
 
 
 }

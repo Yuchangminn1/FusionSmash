@@ -14,13 +14,8 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
     public PlayerInfo playerInfo;
     public PlayerInfo enemyInfo;
 
-    [Networked]
-    public int addForce { get; private set; }
     [Networked(OnChanged = nameof(OnStateChanged))]
     public bool isDead { get; set; }
-
-    CharacterMovementHandler characterMovementHandler;
-    PlayerStateHandler playerStateHandler;
 
     public TMP_Text nickNameText;
     //[Networked]
@@ -31,15 +26,12 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
 
     const int defaultforce = 1;
 
-    Camera playerTraceCamera;
-    Camera observingCamera;
+    
 
     float MYTIME = 0f;
 
     public override void Spawned()
     {
-        characterMovementHandler = GetComponent<CharacterMovementHandler>();
-        playerStateHandler = GetComponent<PlayerStateHandler>();
         playerInfo = GetComponent<PlayerInfo>();
         nickNameText = GetComponentInChildren<TMP_Text>();
         isDead = false;
@@ -47,16 +39,9 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
         {
             nickNameText.color = new Color(0, 0, 0, 0);
         }
-        //Camera
-        playerTraceCamera = GameObject.Find("TraceCamera").GetComponent<Camera>();
-        observingCamera = GameObject.Find("ObservingCamera").GetComponent<Camera>();
+        
     }
-    public void SetTraceCamera(bool _tf)
-    {
-        playerTraceCamera.enabled = _tf;
-        observingCamera.enabled = !_tf;
-        Debug.Log("Trace Camera Set");
-    }
+    
 
     
     public void OnTakeDamage(string enemyname, int weaponNum, Vector3 _attackDir, EAttackType eAttackType = EAttackType.Knockback, int _addForce = 2, int _attackDamage = 1)
@@ -83,23 +68,14 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
         {
             return;
         }
-        addForce += _addForce;
         playerInfo.enemyName = enemyname;
-        //이거 트리거로 characterMovementHandler playerStateHandler이것도  안쓰게 하기 1.
+        playerActionEvents.TriggerPlayerOnTakeDamage(_addForce);
+
         if (eAttackType == EAttackType.Knockback)
         {
-            playerActionEvents.TriggerPlayerOnTakeDamage(_addForce, true);
-            characterMovementHandler.HitAddForce(_attackDir, addForce);
-            playerStateHandler.isKnockBack = true;
-            Debug.Log("KnockBack");
-            playerStateHandler.isHit = false;
+            playerActionEvents.TriggerPlayerKnockBack(_attackDir,playerInfo.force);
         }
-        else
-        {
-            playerActionEvents.TriggerPlayerOnTakeDamage(_addForce, false);
-            if (!playerStateHandler.isKnockBack)
-                playerStateHandler.isHit = true;
-        }
+        
     }
     public void KillSelf()
     {
@@ -148,7 +124,6 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
                 GameManager.Instance.FadeIn(0.2f);
             }
             playerActionEvents.TriggerDeath();
-            //이거 추후에 playerinfo로 
         }
         else
         {
@@ -176,13 +151,9 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
 
         _playerActionEvents.OnPlyaerInit += OnPlyaerInit;
 
-        _playerActionEvents.OnGameOver += OnGameOver;
-
-
     }
     void OnPlyaerInit()
     {
-        addForce = defaultforce;
         isDead = false;
     }
     void OnPlyaerDeath()
@@ -207,14 +178,9 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
             playerInfo.OnRespawned();
         }
         isDead = false;
-        addForce = defaultforce;
         Debug.Log("HPHnadler OnPlyaerRespawn");
     }
-    void OnGameOver()
-    {
-        if(HasInputAuthority)
-            SetTraceCamera(false);
-    }
+    
     #endregion
 
 

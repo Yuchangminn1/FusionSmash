@@ -79,21 +79,21 @@ public class GameManager : NetworkBehaviour
 
     void SetRoomState(int _num)
     {
+        roomState = _num;
         //FadeIn_Out(3f);
 
-        //if (_num == (int)ERoomState.Waiting)
-        //{
-        //    UIManager.Instance.OnGameWait();
-        //    //FadeIn_Out(1f);
-        //}
-        //else if (_num == (int)ERoomState.Playing)
-        //{
-        //    UIManager.Instance.OnGameStart();
-        //}
-        //else if (_num == (int)ERoomState.End)
-        //{
-        //    UIManager.Instance.OnGameEnd();
-        //}
+        if (_num == (int)ERoomState.Waiting)
+        {
+            UIManager.Instance.OnGameWait();
+        }
+        else if (_num == (int)ERoomState.Playing)
+        {
+            UIManager.Instance.OnGameStart();
+        }
+        else if (_num == (int)ERoomState.End)
+        {
+            UIManager.Instance.OnGameEnd();
+        }
 
     }
     private void Awake()

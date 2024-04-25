@@ -40,7 +40,7 @@ public class PlayerAnimationTrigger : NetworkBehaviour
             player.AnimationTrigger = false;
         }
     }
-
+    
     void AnimationTriggerOn()
     {
         if (HasStateAuthority || HasInputAuthority)

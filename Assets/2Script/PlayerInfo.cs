@@ -10,9 +10,10 @@ using static UnityEngine.CullingGroup;
 
 public class PlayerInfo : NetworkBehaviour, IPlayerActionListener
 {
+    PlayerCameraHandler playerCameraHandler;
     public bool isSpawned { get; private set; } = false;
 
-    HPHandler hPHandler;
+    HPHandler hpHandler;
 
     PlayerActionEvents playerActionEvents;
 
@@ -132,10 +133,10 @@ public class PlayerInfo : NetworkBehaviour, IPlayerActionListener
 
         PlayerInfo[] players = FindObjectsOfType<PlayerInfo>();
         playerNumber = players.Length;
-        hPHandler = GetComponent<HPHandler>();
+
+        hpHandler = GetComponent<HPHandler>();
         //GameManager.Instance.SetPlayer(this);
         isSpawned = true;
-
         if (GameManager.Instance.roomState == (int)ERoomState.Playing)
         {
             GameManager.Instance.playingPlayerNum += 1;
@@ -147,6 +148,9 @@ public class PlayerInfo : NetworkBehaviour, IPlayerActionListener
         }
 
         GameManager.Instance.SetPlayer(this);
+
+        isDamageAble = true;
+        playerCameraHandler = GameObject.Find("Cameras").GetComponent<PlayerCameraHandler>();
     }
 
     static void NickNameChanged(Changed<PlayerInfo> changed)
@@ -181,7 +185,7 @@ public class PlayerInfo : NetworkBehaviour, IPlayerActionListener
     {
         Debug.Log($"DamageAble = {_tf}");
     }
-    
+
     static void FadeInChanged(Changed<PlayerInfo> changed)
     {
         bool newS = changed.Behaviour.FadeIN;
@@ -189,10 +193,10 @@ public class PlayerInfo : NetworkBehaviour, IPlayerActionListener
         bool oldS = changed.Behaviour.FadeIN;
         if (newS)
         {
-            changed.Behaviour.FadeIn();
+            changed.Behaviour.FadeIn(newS);
         }
     }
-    void FadeIn()
+    void FadeIn(bool _tf)
     {
         FadeIN = false;
         if (HasInputAuthority)
@@ -232,23 +236,25 @@ public class PlayerInfo : NetworkBehaviour, IPlayerActionListener
         else if (_playingState == (int)EPlayingState.Waiting)
         {
             SoundManager.Instance.StopSound((int)EAudio.audioSourceBGM);
-            hPHandler.SetTraceCamera(true);
             Debug.Log("SetTraceCamera");
             UIManager.Instance.OnGameWait();
-
+            if (HasInputAuthority)
+            {
+                playerCameraHandler.SetTraceCamera(true);
+            }
         }
 
         else if (_playingState == (int)EPlayingState.Playing)
         {
             if (HasInputAuthority)
             {
-                GameManager.Instance.FadeOut(1f,0.5f);
+                GameManager.Instance.FadeOut(1f, 0.5f);
                 Debug.Log("FadeInOut");
                 SoundManager.Instance.StopSound((int)EAudio.audioSourceBGM);
                 SoundManager.Instance.PlaySound((int)EAudio.audioSourceBGM, (int)ESound.BGM2);
                 SoundManager.Instance.PlaySound((int)EAudio.audioSourceGameSet, (int)ESound.GameStart);
                 Debug.Log("Sound Start");
-                
+
             }
             TriggerGameStart();
             UIManager.Instance.SetUIObject(playerNumber, true);
@@ -272,7 +278,7 @@ public class PlayerInfo : NetworkBehaviour, IPlayerActionListener
             }
         }
     }
-    
+
     static void KillChanged(Changed<PlayerInfo> changed)
     {
         int newS = changed.Behaviour.kill;
@@ -350,15 +356,17 @@ public class PlayerInfo : NetworkBehaviour, IPlayerActionListener
 
 
     }
-    void OnTakeDamage(int _force, bool _isSmash)
+    void OnTakeDamage(int _force)
     {
         AddForce(_force);
-        Debug.Log("OnTakeDamage");
     }
     public void OnPlyaerInit()
     {
-        if(HasInputAuthority)
+        if (HasInputAuthority)
+        {
             Debug.Log("OnInit");
+            //hPHandler.SetTraceCamera(true);
+        }
         if (HasStateAuthority)
         {
             ResetForce();
@@ -382,16 +390,21 @@ public class PlayerInfo : NetworkBehaviour, IPlayerActionListener
     {
         GameManager.Instance.playingPlayerNum -= 1;
         Debug.Log($"playingPlayerNum = {GameManager.Instance.playingPlayerNum}");
+        if (HasInputAuthority)
+        {
+            playerCameraHandler.SetTraceCamera(false);
+        }
     }
     public void GameEndToWaiting(float duration)
     {
         Debug.Log("GameEndToWaiting");
-        if(playingState == (int)EPlayingState.Playing )
+        playerCameraHandler.SetEndingCamera();
+        if (playingState == (int)EPlayingState.Playing)
         {
             GameManager.Instance.winnerName = playerName.ToString();
             playerActionEvents.TriggerVictory();
         }
-        
+
         playingState = (int)EPlayingState.Stop;
         StartCoroutine(CGameEndToWaiting(duration));
 

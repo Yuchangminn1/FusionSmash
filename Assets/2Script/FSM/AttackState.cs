@@ -30,7 +30,6 @@ public class AttackState : PlayerState
         if (player.attackCount == player.maxAttackCount)
         {
             attackDelay = 0.6f;
-
         }
         else
         {
@@ -40,7 +39,11 @@ public class AttackState : PlayerState
         {
             return false;
         }
-        if (player.attackstack > 0)
+        if (player.AnimationTrigger)
+        {
+            return false;
+        }
+        if (player.attackstack > 0 && player.attackCount< player.maxAttackCount)
         {
             player.nextState = player.attackState;
             player.ChangeState();
