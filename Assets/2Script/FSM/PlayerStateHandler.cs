@@ -9,6 +9,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
 using static UnityEngine.Video.VideoPlayer;
 enum EStateType
 {
@@ -105,6 +106,9 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
 
     WeaponHandler weaponHandler;
 
+    [Networked]
+    public NetworkBool isEnding { get; set; } = false;
+
     public override void Spawned()
     {
         playerEffectHandler = GetComponent<PlayerEffectHandler>();
@@ -186,15 +190,20 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
     }
     public void SetState(int num)
     {
+        if (isEnding) return;
         state = num;
         //animationID
         anima.SetInteger(animationHashes["State"], num);
+        Debug.Log($"State = {num}");
         //SetInt(animationHashes["State"], num);
     }
     public void SetState2(int num)
     {
+        if (isEnding) return;
         state2 = num;
         anima.SetInteger(animationHashes["State2"], num);
+        Debug.Log($"State2 = {num}");
+
         //SetInt("State2", num);
     }
     public void SetAttackCount(int num)
@@ -622,6 +631,7 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
     public void OnPlyaerRespawn()
     {
         canMove = true;
+        isEnding = false;
         AnimationTrigger = false;
         stateMachine.ChangeState(nextState);
     }
@@ -657,11 +667,18 @@ public class PlayerStateHandler : NetworkBehaviour, IPlayerActionListener
 
     void OnVictory()
     {
-        state = (int)EStateType.Victory;
-        state2 = UnityEngine.Random.Range(0, 4);
+        GameManager.Instance.FadeOut(1f);
+        AnimationTrigger = false;
+        SetCanMove(false);
+        VIctoryAnimation();
+        isEnding = true;
+
     }
 
-
-
-
+    private void VIctoryAnimation()
+    {
+        state = (int)EStateType.Victory;
+        state2 = UnityEngine.Random.Range(0, 4);
+        Debug.Log("Victory Anima");
+    }
 }

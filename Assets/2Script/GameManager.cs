@@ -260,6 +260,7 @@ public class GameManager : NetworkBehaviour
     {
 
         fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, 0);
+        Debug.Log("Fade in");
 
         StartCoroutine(FadelToFullAlpha(duration));
     }
@@ -267,18 +268,16 @@ public class GameManager : NetworkBehaviour
     public void FadeOut(float duration, float _waitTime = 0f)
     {
         fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, 1);
-
+        Debug.Log("Fade out");
         StartCoroutine(FadeToZeroAlpha(duration, _waitTime));
     }
     public void FadeIn_Out(float duration, float _waitTime = 0f)
     {
+        Debug.Log("Fade in_out");
 
         StartCoroutine(CFadelIn_Out(duration, _waitTime));
     }
-    public void FadeIn_OutStop()
-    {
-        StopCoroutine("CFadelIn_Out");
-    }
+    
     private IEnumerator FadelToFullAlpha(float duration)
     {
         // Material의 Color의 Alpha 값을 0으로 설정합니다.

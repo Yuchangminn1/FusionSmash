@@ -353,6 +353,7 @@ public class PlayerInfo : NetworkBehaviour, IPlayerActionListener
         _playerActionEvents.OnPlyaerDeath += OnPlyaerDeath;
         _playerActionEvents.OnPlyaerRespawn += OnPlyaerRespawn;
         _playerActionEvents.OnGameOver += OnGameOver;
+       
 
 
     }

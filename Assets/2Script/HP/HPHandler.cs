@@ -17,6 +17,8 @@ public class HPHandler : NetworkBehaviour, IPlayerActionListener
     [Networked(OnChanged = nameof(OnStateChanged))]
     public bool isDead { get; set; }
 
+    
+
     public TMP_Text nickNameText;
     //[Networked]
     //public NetworkBool isRespawnRequsted { get; set; } = false;
